@@ -159,6 +159,7 @@ L.Set(config.Language);
 config.ApplyTimeSettings();
 Themes.Set(config.Theme);
 config.ApplyGoals();
+Performance.Apply(config);
 var appName = L.T("Compteur de coffres Fortnite", "Fortnite Chest Counter", "Contador de cofres de Fortnite", "Contador de baús do Fortnite");
 
 if (demosArg != null) config.DemosFolder = demosArg;
@@ -212,6 +213,11 @@ store.SaveConfig(config);
 // folder, until the one on GitHub is read below. Pictures of the treasure collection: local copies (downloaded once).
 TreasureCatalog.LoadCached(store.Folder);
 TreasureImages.Folder = Path.Combine(store.Folder, "images");
+MapData.Folder = TreasureImages.Folder;
+if (config.MapMinX is double mapMinX && config.MapMinY is double mapMinY && config.MapSpan is double mapSpan && mapSpan > 0)
+{
+    (MapData.MinX, MapData.MinY, MapData.Span) = (mapMinX, mapMinY, mapSpan);
+}
 
 // ---- Command line: analyze once and quit ---------------------------------------------------
 if (once)
@@ -221,6 +227,10 @@ if (once)
     if (TreasureImages.Missing())
     {
         TreasureImages.DownloadMissingAsync().Wait(TimeSpan.FromSeconds(30));
+    }
+    if (!Performance.On && MapData.Stale(L.Code))
+    {
+        MapData.RefreshAsync(L.Code).Wait(TimeSpan.FromSeconds(60));
     }
     tracker.Scan(ignoreQuietPeriod: true);
     ReportWriter.WriteAll(store, config, data);
@@ -336,6 +346,11 @@ _ = Task.Run(async () =>
     {
         var changed = await TreasureCatalog.RefreshAsync(store.Folder);
         if (TreasureImages.Missing() && await TreasureImages.DownloadMissingAsync() > 0)
+        {
+            changed = true;
+        }
+        // The island's map and its named places (weekly; not in performance mode, where the report has no map).
+        if (!Performance.On && MapData.Stale(L.Code) && await MapData.RefreshAsync(L.Code))
         {
             changed = true;
         }
@@ -977,7 +992,8 @@ object BuildGuiState()
         matches = L.N(matches.Count),
         average = matches.Count > 0 ? ((double)view.CountedChests / matches.Count).ToString("F1", L.Culture) : "0",
         goals = Goals.Of(matches, tracker.LiveMatch?.ChestsOpened ?? 0).Select(g => new { label = g.Label, text = g.Text, pct = g.Percent, done = g.Done }).ToList(),
-        achievements = $"{Achievements.Unlocked(ProgressStats.From(matches, view.ManualAdjust)).Count} / {Achievements.All.Length}",
+        achievements = Performance.On ? null : $"{Achievements.Unlocked(ProgressStats.From(matches, view.ManualAdjust)).Count} / {Achievements.All.Length}",
+        perf = Performance.On,
         progress = progress == null ? null : new { done = progress.Done, total = progress.Total },
         update = u == null ? null : new { version = u.Version.ToString(3), notes = u.WhatsNew, url = u.PageUrl },
         // First launch after an update: what this version brings (the notes are built into the exe).
@@ -1005,6 +1021,8 @@ object BuildGuiState()
             languages = L.Codes.Select(c => new[] { c, L.NativeName(c) }).ToList(),
             theme = Themes.Current.Id,
             themes = Themes.All.Select(t => new[] { t.Id, t.Name }).ToList(),
+            performanceMode = config.PerformanceMode,
+            performanceRecommended = Performance.Recommended,
             dailyGoal = config.DailyGoal,
             weeklyGoal = config.WeeklyGoal,
             discordWebhook = config.DiscordWebhook ?? "",
@@ -1103,6 +1121,7 @@ object? RunGuiAction(string name, System.Text.Json.JsonElement value)
                 Themes.Set(theme.Id);
             }
             break;
+        case "performanceMode": config.PerformanceMode = Bool(); Performance.Apply(config); break;
         case "dailyGoal": config.DailyGoal = Int(); config.ApplyGoals(); break;
         case "weeklyGoal": config.WeeklyGoal = Int(); config.ApplyGoals(); break;
         case "discordWebhook":
@@ -1266,7 +1285,7 @@ static void LowerPriority()
     {
         return;
     }
-    try { Process.GetCurrentProcess().PriorityClass = ProcessPriorityClass.BelowNormal; } catch { }
+    Performance.SetPriority(); // idle in performance mode
     try { EcoQos.Enable(); } catch { }
 }
 

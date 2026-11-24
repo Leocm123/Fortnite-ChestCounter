@@ -518,7 +518,8 @@ public sealed class Tracker
 
         // Fortnite writes the encryption key only at the end of the match: until then the data cannot be read,
         // so we only know that a match is in progress (no useless re-reading).
-        if (!_config.LiveUpdate || ReplayHeaderProbe.KeyMissing(file.FullName))
+        // Performance mode: no re-reading during the match either (the heaviest work while the game runs).
+        if (!_config.LiveUpdate || Performance.On || ReplayHeaderProbe.KeyMissing(file.FullName))
         {
             return started;
         }

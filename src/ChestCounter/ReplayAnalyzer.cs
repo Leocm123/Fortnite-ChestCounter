@@ -106,6 +106,8 @@ public sealed class ReplayAnalyzer : FortniteReplayReader.ReplayReader
     }
 
     private readonly Dictionary<uint, string> _channelKey = new();
+    /// <summary>Where each container stands (key = its identity), when the replay sends it: for the map of the report.</summary>
+    private readonly Dictionary<string, Pt> _containerLoc = new();
     private readonly Dictionary<uint, string> _channelLabel = new();
     private readonly Dictionary<uint, uint> _lastSearcher = new();
     private readonly HashSet<string> _searched = new();
@@ -211,7 +213,7 @@ public sealed class ReplayAnalyzer : FortniteReplayReader.ReplayReader
     private readonly List<GrantEvent> _grants = new();
 
     /// <summary>Bump when the analysis changes so that existing replays are re-analyzed.</summary>
-    public const int CurrentVersion = 17; // 17 (1.5.1): closed chests broken without an instigator counted again
+    public const int CurrentVersion = 18; // 18 (1.8.0): where each chest stands (map); 17 (1.5.1): closed chests broken without an instigator counted again
 
     private static readonly bool ProbeDebug = Environment.GetEnvironmentVariable("CHESTCOUNTER_DEBUG") == "4";
 
@@ -474,6 +476,10 @@ public sealed class ReplayAnalyzer : FortniteReplayReader.ReplayReader
         else
         {
             _channelKey[channelIndex] = $"guid:{channel?.ActorId}";
+        }
+        if (channel?.Actor?.Location is { } standsAt && (standsAt.X != 0 || standsAt.Y != 0))
+        {
+            _containerLoc[_channelKey[channelIndex]] = new Pt(Now, (float)standsAt.X, (float)standsAt.Y, (float)standsAt.Z);
         }
         _channelLabel[channelIndex] = label;
         _channelOpenAt[channelIndex] = Now;
@@ -740,7 +746,7 @@ public sealed class ReplayAnalyzer : FortniteReplayReader.ReplayReader
         var interactions = _searches
             .Where(s => s.SearcherPawn is uint p && targetPawns.Contains(p) && (!s.Stale || StableKey(s.ActorKey)))
             .OrderBy(s => s.Time)
-            .Select(s => (s.Time, Kind: ChestKinds.Classify(s.Label), s.Label, s.ActorKey, s.Destroyed))
+            .Select(s => (s.Time, Kind: ChestKinds.Classify(s.Label), s.Label, s.ActorKey, s.Destroyed, s.SearcherPawn))
             .ToList();
 
         var chests = new List<ChestRecord>();
@@ -758,8 +764,15 @@ public sealed class ReplayAnalyzer : FortniteReplayReader.ReplayReader
                 .Select(t => t.Item)
                 .ToList();
 
+            // Where it stands: the container's own location when the replay sends it, else where the player who opened
+            // it stood at that moment (within a couple of meters of it).
+            var at = _containerLoc.TryGetValue(search.ActorKey, out var stands) ? stands
+                : search.SearcherPawn is uint opener ? PositionOf(opener, search.Time) : null;
+
             chests.Add(new ChestRecord
             {
+                X = at is { } p ? (int)MathF.Round(p.X) : null,
+                Y = at is { } q ? (int)MathF.Round(q.Y) : null,
                 TimeSeconds = MathF.Round(search.Time, 1),
                 Kind = search.Kind,
                 Blueprint = search.Label,

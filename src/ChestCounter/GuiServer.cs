@@ -168,7 +168,8 @@ public sealed class GuiServer
                     var file = Path.Combine(_dataFolder, "images", name);
                     if (name.Length > 0 && File.Exists(file))
                     {
-                        Write(stream, 200, name.EndsWith(".png", StringComparison.OrdinalIgnoreCase) ? "image/png" : "image/webp", File.ReadAllBytes(file));
+                        var type = Path.GetExtension(name).ToLowerInvariant() switch { ".png" => "image/png", ".jpg" or ".jpeg" => "image/jpeg", _ => "image/webp" };
+                        Write(stream, 200, type, File.ReadAllBytes(file));
                     }
                     else
                     {

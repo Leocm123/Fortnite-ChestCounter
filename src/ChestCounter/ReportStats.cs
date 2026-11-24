@@ -35,6 +35,15 @@ public static class ReportStats
         .phases i{display:flex;align-items:center;justify-content:center;font:700 12px "Segoe UI",system-ui,sans-serif;color:#fff;font-style:normal;min-width:2px}
         .plegend{display:flex;justify-content:space-between;font-size:13px;color:var(--cmuted)}
         .shead{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}.shead .muted{font-size:14px}
+        .mapgrid{display:grid;grid-template-columns:minmax(0,3fr) minmax(0,2fr);gap:16px;align-items:start}
+        @media (max-width:820px){.mapgrid{grid-template-columns:1fr}}
+        .mapcard{padding:10px}
+        .chestmap{display:block;width:100%;height:auto;aspect-ratio:1;border-radius:6px;background:#0d3a5c}
+        .chestmap .pt{stroke:#0b0f18;stroke-width:1;opacity:.9}
+        .chestmap text{fill:#fff;stroke:#0b0f18;stroke-width:3;paint-order:stroke;font-family:"Segoe UI",system-ui,sans-serif;font-weight:700;text-anchor:middle;pointer-events:none}
+        #mapbox[data-f="week"] .pt:not(.w),#mapbox[data-f="last"] .pt:not(.l){display:none}
+        .mapf{display:flex;gap:14px;flex-wrap:wrap;margin:2px 4px 8px;font-size:14px}.mapf label{display:flex;gap:5px;align-items:center;cursor:pointer}
+        .maplegend{display:flex;gap:14px;flex-wrap:wrap;margin:8px 4px 2px;font-size:13px;color:var(--cmuted)}
         """;
 
     private static string H(string? s) => WebUtility.HtmlEncode(s ?? "");
@@ -73,6 +82,7 @@ public static class ReportStats
         }
         var sb = new StringBuilder();
         sb.Append(YourStats(matches));
+        sb.Append(MapSection(matches));
         sb.Append(AchievementsSection(matches, manual));
         sb.Append("<div class=\"two\">").Append(ByMode(matches)).Append(ByPlacement(matches)).Append("</div>");
         sb.Append(Rhythm(matches));
@@ -122,6 +132,81 @@ public static class ReportStats
             $"<div class=\"goal{(g.Done ? " done" : "")}\"><div class=\"gh\"><span>🎯 {H(g.Label)}</span><span class=\"num\">{H(g.Text)}</span></div><span class=\"gbar\"><i style=\"width:{g.Percent}%\"></i></span></div>")) + "</div>";
 
         return $"<section>{Title(L.T("Tes statistiques", "Your stats", "Tus estadísticas", "Suas estatísticas"))}<section class=\"tiles stats\">{pace}{streak}{week}{form}</section>{goalsHtml}</section>";
+    }
+
+    // ---- Map of the chests -------------------------------------------------------------------------------------
+
+    private static string MapSection(IReadOnlyList<MatchRecord> matches)
+    {
+        var title = L.T("Où tu ouvres tes coffres", "Where you open your chests", "Dónde abres tus cofres", "Onde você abre seus baús");
+        var points = matches.SelectMany(m => m.Chests.Where(c => c.X != null && c.Y != null).Select(c => (m, c))).ToList();
+        if (points.Count == 0)
+        {
+            return $"<section>{Title(title)}<div class=\"card\"><p class=\"items\">{L.T(
+                "La carte se remplit avec les parties analysées à partir de la version 1.8 (les replays encore sur ton PC sont réanalysés).",
+                "The map fills up with the matches analyzed from version 1.8 on (the replays still on your PC are analyzed again).",
+                "El mapa se llena con las partidas analizadas desde la versión 1.8 (las repeticiones que siguen en tu PC se analizan de nuevo).",
+                "O mapa é preenchido com as partidas analisadas a partir da versão 1.8 (os replays que ainda estão no seu PC são analisados de novo).")}</p></div></section>";
+        }
+
+        var pois = MapData.Pois(L.Code);
+        var weekStart = Goals.WeekStart(Goals.Today);
+        var last = matches.OrderByDescending(Goals.When).First();
+
+        // Crop on the island: the named places and the chests, with a margin, as a square (picture units 0..1000).
+        var us = points.Select(p => MapData.Project(p.c.X!.Value, p.c.Y!.Value)).Concat(pois.Select(p => MapData.Project(p.X, p.Y))).ToList();
+        double u0 = us.Min(p => p.U), u1 = us.Max(p => p.U), v0 = us.Min(p => p.V), v1 = us.Max(p => p.V);
+        var size = Math.Clamp(Math.Max(u1 - u0, v1 - v0) + 0.08, 0.15, 1.0);
+        var cu = Math.Clamp((u0 + u1) / 2, size / 2, 1 - size / 2);
+        var cv = Math.Clamp((v0 + v1) / 2, size / 2, 1 - size / 2);
+        string N1(double v) => v.ToString("0.#", System.Globalization.CultureInfo.InvariantCulture);
+        var box = $"{N1((cu - size / 2) * 1000)} {N1((cv - size / 2) * 1000)} {N1(size * 1000)} {N1(size * 1000)}";
+        var r = size * 1000 * 0.0065;
+        var font = size * 1000 * 0.021;
+
+        var svg = new StringBuilder($"<svg viewBox=\"{box}\" class=\"chestmap\" role=\"img\" aria-label=\"{H(title)}\">");
+        svg.Append(MapData.HasImage
+            ? $"<image href=\"images/{MapData.ImageName}\" x=\"0\" y=\"0\" width=\"1000\" height=\"1000\"/>"
+            : "<defs><pattern id=\"mgrid\" width=\"50\" height=\"50\" patternUnits=\"userSpaceOnUse\"><path d=\"M50 0H0V50\" fill=\"none\" stroke=\"#2c4a5e\" stroke-width=\"1\"/></pattern></defs><rect x=\"0\" y=\"0\" width=\"1000\" height=\"1000\" fill=\"#123247\"/><rect x=\"0\" y=\"0\" width=\"1000\" height=\"1000\" fill=\"url(#mgrid)\"/>");
+        foreach (var (m, c) in points)
+        {
+            var (u, v) = MapData.Project(c.X!.Value, c.Y!.Value);
+            var cls = "pt" + (Goals.When(m).Date >= weekStart ? " w" : "") + (m.SessionId == last.SessionId ? " l" : "");
+            var color = ReportWriter.KindColor.GetValueOrDefault(ChestKinds.Canonical(c.Kind), "#9a8f7a");
+            svg.Append($"<circle class=\"{cls}\" cx=\"{N1(u * 1000)}\" cy=\"{N1(v * 1000)}\" r=\"{N1(r)}\" fill=\"{color}\"/>");
+        }
+        foreach (var p in pois)
+        {
+            var (u, v) = MapData.Project(p.X, p.Y);
+            svg.Append($"<text x=\"{N1(u * 1000)}\" y=\"{N1(v * 1000)}\" font-size=\"{N1(font)}\">{H(p.Name)}</text>");
+        }
+        svg.Append("</svg>");
+
+        // Legend: the kinds of chest seen on the map.
+        var legend = string.Concat(points.GroupBy(p => ChestKinds.Canonical(p.c.Kind)).OrderByDescending(g => g.Count()).Select(g =>
+            $"<span><span class=\"sw\" style=\"background:{ReportWriter.KindColor.GetValueOrDefault(g.Key, "#9a8f7a")}\"></span>{H(L.Name(g.Key))} · {L.N(g.Count())}</span>"));
+
+        // Where: the named place closest to each chest (within 300 m).
+        var places = points.GroupBy(p => MapData.Nearest(pois, p.c.X!.Value, p.c.Y!.Value)?.Name ?? L.T("Entre deux lieux", "Between places", "Entre lugares", "Entre locais"))
+            .Select(g => (Name: g.Key, Count: g.Count(), Matches: g.Select(x => x.m.SessionId).Distinct().Count()))
+            .OrderByDescending(x => x.Count).Take(10).ToList();
+        var top = Math.Max(1, places.Count > 0 ? places.Max(x => x.Count) : 1);
+        var placesHtml = new StringBuilder($"<div class=\"card\"><b>{L.T("Là où tu en ouvres le plus", "Where you open the most", "Donde más abres", "Onde você mais abre")}</b><table>");
+        foreach (var p in places)
+        {
+            placesHtml.Append($"<tr><td>{H(p.Name)}</td><td style=\"width:110px\">{Bar((int)Math.Round(100.0 * p.Count / top))}</td><td class=\"n num\">{L.N(p.Count)}</td><td class=\"sub num\">{L.Count(p.Matches, "partie", "parties", "match", "matches", "partida", "partidas", "partida", "partidas")}</td></tr>");
+        }
+        placesHtml.Append("</table></div>");
+
+        var filters = string.Join("", new[] { ("all", L.T("Tout", "All", "Todo", "Tudo")), ("week", L.T("Cette semaine", "This week", "Esta semana", "Esta semana")), ("last", L.T("Dernière partie", "Last match", "Última partida", "Última partida")) }
+            .Select(f => $"<label><input type=\"radio\" name=\"mapf\" value=\"{f.Item1}\"{(f.Item1 == "all" ? " checked" : "")} onchange=\"document.getElementById('mapbox').dataset.f=this.value;try{{localStorage.setItem('cc-mapf',this.value)}}catch(e){{}}\">{f.Item2}</label>"));
+        // The page reloads itself: the filter chosen is kept.
+        const string keepFilter = "<script>try{var f=localStorage.getItem('cc-mapf'),b=document.getElementById('mapbox'),i=f&&b.querySelector('input[value=\"'+f+'\"]');if(i){i.checked=true;b.dataset.f=f}}catch(e){}</script>";
+
+        return $"<section>{Title(title, L.T($"{L.N(points.Count)} coffres placés", $"{L.N(points.Count)} chests placed", $"{L.N(points.Count)} cofres situados", $"{L.N(points.Count)} baús no mapa"))}"
+            + $"<div class=\"mapgrid\"><div><div class=\"card mapcard\" id=\"mapbox\" data-f=\"all\"><div class=\"mapf\">{filters}</div>{svg}<div class=\"maplegend\">{legend}</div></div>"
+            + (MapData.HasImage ? $"<div class=\"items\" style=\"margin-top:6px\">{L.T("Carte : fortnite-api.com", "Map: fortnite-api.com", "Mapa: fortnite-api.com", "Mapa: fortnite-api.com")}</div>" : "")
+            + $"</div>{placesHtml}</div>{keepFilter}</section>";
     }
 
     // ---- Achievements ------------------------------------------------------------------------------------------

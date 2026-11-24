@@ -19,6 +19,8 @@
 > - **temas de cores** (Pirata, Brasil, Neon, Gelo, Lava) para a janela, o relatório e o overlay;
 > - uma seção **Suas estatísticas** no relatório (baús por hora, sequência de dias, semana atual × anterior, fase recente, por modo e por colocação);
 > - **metas** diárias e semanais no overlay, **21 conquistas**, **ranking do esquadrão**, **ritmo na partida**, **baús × resultado** e o **loot** dos seus baús;
+> - **mapa dos seus baús** no relatório (mapa e locais baixados de fortnite-api.com, atualizados toda semana);
+> - **modo desempenho** para PCs mais fracos (sem leitura durante a partida, prioridade mínima, relatório enxuto);
 > - resumo opcional das partidas num canal do **Discord** (via webhook; desligado por padrão, e nada além do resumo é enviado).
 >
 > As atualizações do exe vêm deste repositório; os dados da caça ao tesouro continuam vindo do projeto original. Para todo o resto (funcionamento, segurança, FAQ), veja o [README em inglês](README.md).

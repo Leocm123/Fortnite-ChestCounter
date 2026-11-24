@@ -79,6 +79,13 @@ public static class GuiPage
         ["timesHelp"] = L.T("Dans le rapport et ici : semaines, heures du trésor, parties.", "In the report and here: weeks, Treasure Hours, matches.", "En el informe y aquí: semanas, horas del tesoro, partidas.", "No relatório e aqui: semanas, Horas do Tesouro, partidas."),
         ["timesLocal"] = L.T("Heure locale ({0})", "Local time ({0})", "Hora local ({0})", "Horário local ({0})"),
         ["timesUtc"] = L.T("UTC (heure du jeu)", "UTC (game time)", "UTC (hora del juego)", "UTC (horário do jogo)"),
+        ["perf"] = L.T("Mode performance", "Performance mode", "Modo rendimiento", "Modo desempenho"),
+        ["perfRecommended"] = L.T("conseillé pour ce PC", "recommended for this PC", "recomendado para este PC", "recomendado para este PC"),
+        ["perfHelp"] = L.T("Pour les PC modestes : pas de lecture du replay pendant la partie (les coffres sont comptés à la fin), priorité minimale, fenêtre fermée en mémoire quand elle est réduite, rapport allégé et pas de page OBS.",
+            "For low-end PCs: no reading of the replay during the match (the chests are counted at the end), lowest priority, window released from memory when minimized, lean report and no OBS page.",
+            "Para PC modestos: sin lectura de la repetición durante la partida (los cofres se cuentan al final), prioridad mínima, ventana liberada de la memoria al minimizarla, informe reducido y sin página de OBS.",
+            "Para PCs mais fracos: não lê o replay durante a partida (os baús são contados no final), prioridade mínima, janela liberada da memória ao minimizar, relatório enxuto e sem página do OBS."),
+        ["obsPerf"] = L.T("Désactivé en mode performance (Réglages).", "Off in performance mode (Settings).", "Desactivado en modo rendimiento (Ajustes).", "Desligado no modo desempenho (Configurações)."),
         ["goals"] = L.T("Objectifs", "Goals", "Metas", "Metas"),
         ["goalsHelp"] = L.T("Un nombre de coffres à ouvrir : affiché sur l'overlay, l'accueil et le rapport. 0 = pas d'objectif.",
             "A number of chests to open: shown on the overlay, the home tab and the report. 0 = no goal.",
@@ -226,6 +233,8 @@ public static class GuiPage
         .path{font:13px Consolas,monospace;word-break:break-all;background:var(--track);padding:6px 8px;border-radius:6px;display:block;margin:6px 0}
         .note{font-size:13px;color:var(--muted)}
         .hidden{display:none!important}
+        body.perf *,body.perf *:before,body.perf *:after{transition:none!important;animation:none!important}
+        .perfbadge{display:inline-block;margin-left:6px;padding:1px 8px;border-radius:999px;background:var(--team);color:#fff;font-size:12px;font-weight:700;vertical-align:1px}
         footer{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;border-top:1px dashed var(--gold);padding-top:12px;color:var(--muted);font-size:13px}
         .estimate{margin-top:8px;font-weight:600}
         .mtotal{font-weight:600;margin-bottom:6px}
@@ -295,7 +304,7 @@ public static class GuiPage
         function sel(act,value,opts){return `<select onchange="api('${act}',this.value)">${opts.map(o=>`<option value="${esc(o[0])}" ${String(o[0])===String(value)?'selected':''}>${esc(o[1])}</option>`).join('')}</select>`}
         function setTab(t){tab=t;try{localStorage.setItem('cc-gui-tab',t)}catch(e){}render(true)}
         function render(force){
-          const T=S.txt;document.documentElement.lang=S.lang;document.documentElement.dataset.accent=S.settings.theme||'pirate';
+          const T=S.txt;document.documentElement.lang=S.lang;document.documentElement.dataset.accent=S.settings.theme||'pirate';document.body.classList.toggle('perf',!!S.perf);
           const head=`<header><div class="brand"><svg width="44" height="44" viewBox="0 0 56 56" aria-hidden="true"><rect x="6" y="20" width="44" height="28" rx="4" style="fill:var(--hero,#7a4a1e);stroke:var(--heroline,#e7b440)" stroke-width="3"/><path d="M6 26 Q28 4 50 26" fill="#965d27" style="stroke:var(--heroline,#e7b440)" stroke-width="3"/><rect x="24" y="24" width="8" height="10" rx="2" style="fill:var(--heroline,#e7b440)"/></svg><div><h1 class="pirate">${esc(S.appName)}</h1><div class="who">${S.profiles.length>1?`<select aria-label="${esc(T.profile)}" title="${esc(T.profile)}" onchange="api('profile',this.value)">${S.profiles.map(p=>`<option value="${esc(p.key)}" ${p.key===S.profileKey?'selected':''}>${esc(p.name)} (${esc(p.matches)})</option>`).join('')}</select>`:`<span>${esc(S.player||'')}</span>`}<span>v${esc(S.version)}</span></div></div></div><span class="pill ${S.status.kind}"><i></i>${esc(S.status.text)}</span></header>
           <nav>${['home','report','overlay','settings','help'].map(t=>`<button class="${t===tab?'on':''}" onclick="setTab('${t}')">${esc(T[t])}</button>`).join('')}</nav>`;
           if(!force&&busyHeader())return;
@@ -352,6 +361,7 @@ public static class GuiPage
           if(S.firstRun){const s=S.settings;h+=`<div class="card welcome"><h2 class="pirate" style="color:var(--hero,#7a4a1e)">${esc(T.welcome)}</h2><p style="margin-top:0">${esc(T.welcomeText)}</p>
             <div class="t" style="font-weight:600;margin-top:14px">${esc(T.welcomeQuick)}</div>
             ${row(esc(T.language),'',sel('language',s.language,s.languages))}
+            ${s.performanceRecommended?perfRow(T,s,'wpm'):''}
             ${row(esc(T.inGame),esc(T.inGameHelp),sw('wov',S.overlay.show,'showOverlay'))}
             ${s.windowed?row(esc(T.tray),esc(T.trayHelp),sw('wtr',s.minimizeToTray,'minimizeToTray')):''}
             <div class="actions" style="margin-top:12px"><button class="b main" onclick="api('dismissWelcome')">${esc(T.welcomeDone)}</button></div></div>`}
@@ -363,7 +373,7 @@ public static class GuiPage
             <div class="tile"><div class="v num">${esc(S.last?S.last.chests:'—')}</div><div class="l">${esc(T.last)}${S.last?'<br>'+esc(S.last.when)+' · '+esc(S.last.mode):''}</div></div>
             ${S.squad?`<div class="tile"><div class="v num">${esc(S.squad.total)}</div><div class="l">${esc(T.squad)}<span class="badge" title="${esc(T.inaccurateWhy)}">${esc(T.inaccurate)}</span><br>${esc(fmt(T.squadSub,S.squad.team))}</div></div>`:''}
             <div class="tile"><div class="v num">★ ${esc(S.treasures)}</div><div class="l">${esc(T.treasures)} · ${esc(S.matches)} ${esc(T.matches)} · ${esc(fmt(T.perMatch,S.average))}</div></div></section>`;
-          if(S.goals&&S.goals.length)h+=`<section class="tiles">${S.goals.map(g=>`<div class="tile"><div class="v num">${esc(g.text)}</div><div class="l">🎯 ${esc(g.label)}</div><div class="bar"><i style="width:${g.pct}%;${g.done?'background:var(--team)':''}"></i></div></div>`).join('')}<div class="tile"><div class="v num">🏆 ${esc(S.achievements)}</div><div class="l">${esc(T.achievements)}</div></div></section>`;
+          if(S.goals&&S.goals.length)h+=`<section class="tiles">${S.goals.map(g=>`<div class="tile"><div class="v num">${esc(g.text)}</div><div class="l">🎯 ${esc(g.label)}</div><div class="bar"><i style="width:${g.pct}%;${g.done?'background:var(--team)':''}"></i></div></div>`).join('')}${S.achievements?`<div class="tile"><div class="v num">🏆 ${esc(S.achievements)}</div><div class="l">${esc(T.achievements)}</div></div>`:''}</section>`;
           h+=`<div class="actions"><button class="b main" onclick="setTab('report')">${esc(T.openReport)}</button>`;
           if(S.overlay.running)h+=`<button class="b" onclick="api('toggleOverlayVisible')">${esc(S.overlay.visible?T.hideOverlay:T.showOverlay)}</button><button class="b" onclick="api('toggleOverlayLock')">${esc(S.overlay.locked?T.unlock:T.lock)}</button>`;
           if(!S.update&&S.updatesOn)h+=`<button class="b" onclick="api('checkUpdate')">${esc(T.checkUpdate)}</button>`;
@@ -376,13 +386,13 @@ public static class GuiPage
             ${row(esc(T.style),'',sel('overlayStyle',o.style,[['hud',T.hud],['classic',T.classic]]))}
             ${o.show?row(esc(T.size),'',sel('overlaySize',o.size,o.sizes.map(x=>[x,x+' %'])))+row(esc(T.opacity),'',sel('overlayOpacity',o.opacity,o.opacities.map(x=>[x,x+' %']))):''}
             ${row(esc(T.squadToggle)+`<span class="badge" title="${esc(T.inaccurateWhy)}">${esc(T.inaccurate)}</span>`,esc(T.squadHelp)+'<br>'+esc(T.inaccurateWhy),sw('sq',o.squad,'showSquadTotal'))}</div>
-            <section><h2 class="pirate">${esc(T.obs)}</h2><div class="card"><span class="path">${esc(S.paths.overlay)}</span><p class="note" style="color:var(--cmuted)">${esc(T.obsSteps)}</p>
-            <div class="actions"><button class="b main" onclick="copyObs()">${esc(copied?T.copied:T.copy)}</button><button class="b" onclick="window.open('/overlay?t='+TOKEN,'_blank')">${esc(T.preview)}</button></div></div></section>`;
+            <section><h2 class="pirate">${esc(T.obs)}</h2><div class="card">${S.perf?`<p class="note" style="color:var(--cmuted);margin:0">${esc(T.obsPerf)}</p>`:`<span class="path">${esc(S.paths.overlay)}</span><p class="note" style="color:var(--cmuted)">${esc(T.obsSteps)}</p>
+            <div class="actions"><button class="b main" onclick="copyObs()">${esc(copied?T.copied:T.copy)}</button><button class="b" onclick="window.open('/overlay?t='+TOKEN,'_blank')">${esc(T.preview)}</button></div>`}</div></section>`;
           return h;
         }
         function settings(T){
           const s=S.settings;
-          let h=`<div class="card">${row(esc(T.language),'',sel('language',s.language,s.languages))}
+          let h=`<div class="card">${perfRow(T,s,'pm')}${row(esc(T.language),'',sel('language',s.language,s.languages))}
             ${row(esc(T.theme),esc(T.themeHelp),sel('theme',s.theme,s.themes))}
             ${row(esc(T.times),esc(T.timesHelp),sel('timeZone',s.timeZone,[['local',fmt(T.timesLocal,s.localZone)],['utc',T.timesUtc]]))}
             ${row(esc(T.clock),'',sel('clockFormat',s.clockFormat,[['auto',fmt(T.clockAuto,s.windowsClock==='24'?T.h24:T.h12)],['12',T.clock12],['24',T.clock24]]))}
@@ -399,6 +409,7 @@ public static class GuiPage
             ${row(esc(T.discordMode),'',sel('discordMode',s.discordMode,[['match',T.discordAll],['treasure',T.discordNotable]]))}</div></section>`;
           return h;
         }
+        function perfRow(T,s,id){return row(esc(T.perf)+(s.performanceRecommended&&!s.performanceMode?`<span class="perfbadge">${esc(T.perfRecommended)}</span>`:''),esc(T.perfHelp),sw(id,s.performanceMode,'performanceMode'))}
         let discordMsg='';
         async function saveDiscord(){const r=await api('discordWebhook',$('#dhook').value);discordMsg=r&&r.error?r.error:S.txt.saved;render(true)}
         async function testDiscord(){discordMsg='…';render(true);const r=await api('discordTest',$('#dhook').value);discordMsg=r&&r.error?r.error:S.txt.discordSent;render(true)}
@@ -443,7 +454,8 @@ public static class GuiPage
         function closedView(){stopped=true;$('#app').innerHTML='<div class="card">'+esc(S.txt.closed)+'</div>';$('#foot').innerHTML='';appHtml=footHtml=null;$('#activityPane').classList.add('hidden');$('#reportPane').classList.add('hidden')}
         async function uninstall(all){if(!confirm(S.txt.uninstallConfirm))return;await api('uninstall',all);closedView()}
         async function quit(){if(!confirm(S.txt.quitConfirm))return;try{await api('quit')}catch(e){}closedView()}
-        refresh(true);setInterval(()=>refresh(false),2000);
+        // Every 2 s (5 s in performance mode), never two at once.
+        refresh(true);(function loop(){setTimeout(()=>refresh(false).finally(loop),S&&S.perf?5000:2000)})();
         </script></body></html>
         """;
 }

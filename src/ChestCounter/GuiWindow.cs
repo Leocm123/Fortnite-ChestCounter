@@ -104,6 +104,10 @@ public static class GuiWindow
                     {
                         ToTray(title, trayNotice);
                     }
+                    else if (Performance.On)
+                    {
+                        ReleaseView(); // performance mode: the web engine's processes end, rebuilt when restored
+                    }
                     else
                     {
                         Sleep();

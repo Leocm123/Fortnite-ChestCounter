@@ -98,7 +98,10 @@ public static class ReportWriter
             WriteAtomic(store.ReportPath, Report(config, view, Profiles.List(data)));
             // The OBS page keeps what the overlay shows (a match in progress stays "live"), in the chosen style.
             OverlayStyle = config.OverlayStyle;
-            WriteAtomic(store.OverlayPath, Overlay(LastOverlay ?? OverlayModel.Build(view, null, false, config.ShowSquadTotal)));
+            if (!Performance.On) // performance mode: no OBS page
+            {
+                WriteAtomic(store.OverlayPath, Overlay(LastOverlay ?? OverlayModel.Build(view, null, false, config.ShowSquadTotal)));
+            }
             WriteAtomic(store.CsvPath, Csv(data));
         }
         catch (Exception ex)
@@ -385,7 +388,7 @@ public static class ReportWriter
     private const string TeamIcon = """<svg width="16" height="16" viewBox="0 0 24 24" aria-hidden="true"><circle cx="9" cy="8" r="3.2" fill="none" stroke="#1f7f7a" stroke-width="2"/><path d="M3 20c0-3.5 2.7-6 6-6s6 2.5 6 6" fill="none" stroke="#1f7f7a" stroke-width="2"/><circle cx="17" cy="9" r="2.6" fill="none" stroke="#1f7f7a" stroke-width="2"/><path d="M16 14c3 0 5 2.2 5 5" fill="none" stroke="#1f7f7a" stroke-width="2"/></svg>""";
     private const string FlagIcon = """<svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true" style="flex:none;margin-top:2px"><path d="M5 21V4M5 4h11l-2 4 2 4H5" fill="none" stroke="#ff8a6a" stroke-width="2" stroke-linejoin="round"/></svg>""";
 
-    private static readonly Dictionary<string, string> KindColor = new()
+    internal static readonly Dictionary<string, string> KindColor = new()
     {
         [ChestKinds.Normal] = "#c9a24f",
         [ChestKinds.Rare] = "#2c7fb8",
@@ -426,7 +429,7 @@ public static class ReportWriter
         sb.Append($"""
             <!doctype html><html lang="{L.Code}" data-accent="{Themes.Current.Id}"><head><meta charset="utf-8">
             <meta name="viewport" content="width=device-width,initial-scale=1">
-            <meta http-equiv="refresh" content="{(progress != null ? 2 : 15)}">
+            <meta http-equiv="refresh" content="{(progress != null ? 2 : Performance.On ? 60 : 15)}">
             <title>{title}</title><style>{FontFace}{Style}{ReportStats.Css}{Themes.Css}</style></head><body data-showsquad="{(config.ShowSquadInReport ? 1 : 0)}" data-showteam="{(config.ShowTeamTreasuresInReport ? 1 : 0)}"><main>
             <header><div class="brand">{ChestIcon}<div><h1 class="pirate">{title}</h1>{(player.Length > 0 ? $"<div class=\"who\"><b>{H(player)}</b></div>" : "")}</div></div>
             <span class="muted" style="font-size:13px">{updated}</span></header>
@@ -444,92 +447,100 @@ public static class ReportWriter
             {(teamChests > 0 ? $"<div class=\"statsbar\">{Switch("showsquad", L.T("Afficher le total d'équipe", "Show the squad total", "Mostrar el total del equipo", "Mostrar o total do esquadrão") + $" <span class=\"badge\">{L.T("imprécis", "inaccurate", "impreciso", "impreciso")}</span>")}</div>" : "")}
             """);
 
-        // Last 30 days, one bar per day (the best day stands out).
-        var today = L.Shown(DateTime.UtcNow).Date;
-        var days = Enumerable.Range(0, 30).Select(i => today.AddDays(i - 29)).ToList();
-        var perDay = days.Select(d => matches.Where(m => When(m).Date == d).Sum(m => m.ChestsOpened)).ToList();
-        var max = Math.Max(1, perDay.Max());
-        sb.Append($"<section><h2 class=\"pirate\">{L.T("Coffres par jour", "Chests per day", "Cofres por día", "Baús por dia")}</h2><div class=\"card chart\"><div class=\"bars\">");
-        for (var i = 0; i < days.Count; i++)
-        {
-            var v = perDay[i];
-            var h = (int)Math.Round(100.0 * v / max);
-            var tip = $"{days[i].ToString(L.T("ddd dd/MM", "ddd d MMM", "ddd dd/MM", "ddd dd/MM"), Fr)}{L.T(" : ", ": ", ": ", ": ")}{L.Count(v, "coffre", "chest", "cofre", "baú")}";
-            var cls = v == 0 ? " zero" : v == max ? " top" : "";
-            sb.Append($"<div class=\"col\" aria-label=\"{H(tip)}\"><span class=\"tip\" style=\"bottom:calc({Math.Max(h, 3)}% + 6px)\">{H(tip)}</span><div class=\"bar{cls}\" style=\"height:{h}%\"></div></div>");
-        }
-        var bestDay = perDay[perDay.IndexOf(perDay.Max())];
-        var bestDate = days[perDay.IndexOf(perDay.Max())];
-        sb.Append($"</div><div class=\"axis\"><span>{days[0].ToString(L.T("dd/MM", "d MMM", "dd/MM", "dd/MM"), Fr)}</span>"
-            + (bestDay > 0 ? $"<span>{L.T("meilleur jour", "best day", "mejor día", "melhor dia")}{L.T(" : ", ": ", ": ", ": ")}{bestDate.ToString(L.T("dd/MM", "d MMM", "dd/MM", "dd/MM"), Fr)} · {L.Count(bestDay, "coffre", "chest", "cofre", "baú")}</span>" : "")
-            + $"<span>{L.T("aujourd'hui", "today", "hoy", "hoje")}</span></div></div></section>");
-        sb.Append(ReportStats.Section(matches, data.ManualAdjust));
-
-        // By chest type (with the other interactions, not in the total) | where the player's treasures come from.
-        var byKind = matches.SelectMany(m => m.Chests).GroupBy(c => ChestKinds.Canonical(c.Kind)).OrderByDescending(g => g.Count()).ToList();
-        var kindMax = Math.Max(1, byKind.Count > 0 ? byKind.Max(g => g.Count()) : 1);
-        var otherKinds = matches
-            .SelectMany(m => m.OtherInteractions.Count > 0
-                ? m.OtherInteractions
-                : new Dictionary<string, int> { [ChestKinds.AmmoBox] = m.AmmoBoxesOpened, [ChestKinds.OtherContainer] = m.OtherContainersOpened })
-            .GroupBy(kv => kv.Key)
-            .Select(g => (Kind: g.Key, Count: g.Sum(kv => kv.Value)))
-            .Where(x => x.Count > 0)
-            .OrderByDescending(x => x.Count)
-            .ToList();
-        sb.Append($"<div class=\"two\"><section><h2 class=\"pirate\">{L.T("Par type de coffre", "By chest type", "Por tipo de cofre", "Por tipo de baú")}</h2><div class=\"card\"><table>");
-        foreach (var g in byKind)
-        {
-            var color = KindColor.GetValueOrDefault(g.Key, "#9a8f7a");
-            var w = Math.Max(2, (int)Math.Round(100.0 * g.Count() / kindMax));
-            sb.Append($"<tr><td><span class=\"sw\" style=\"background:{color}\"></span>{H(L.Name(g.Key))}</td><td style=\"width:150px\"><span class=\"meter\"><i style=\"width:{w}%;background:{color}\"></i></span></td><td class=\"n num big\">{g.Count().ToString("N0", Fr)}</td></tr>");
-        }
-        var destroyedTotal = matches.Sum(m => m.Chests.Count(c => c.Destroyed));
-        var notes = new List<string>();
-        if (destroyedTotal > 0)
-        {
-            notes.Add(L.T($"dont {destroyedTotal.ToString("N0", Fr)} détruits (cassés au lieu d'être ouverts)", $"of which {destroyedTotal.ToString("N0", Fr)} destroyed (broken instead of opened)", $"de ellos, {destroyedTotal.ToString("N0", Fr)} destruidos (rotos en lugar de abiertos)", $"dos quais {destroyedTotal.ToString("N0", Fr)} destruídos (quebrados em vez de abertos)"));
-        }
-        foreach (var (kind, count) in otherKinds)
-        {
-            sb.Append($"<tr class=\"items\"><td>{H(L.Name(kind))} {L.T("(hors total)", "(not in the total)", "(fuera del total)", "(fora do total)")}</td><td></td><td class=\"n num\">{count.ToString("N0", Fr)}</td></tr>");
-        }
-        sb.Append("</table>");
-        if (notes.Count > 0)
-        {
-            sb.Append($"<div class=\"items\" style=\"padding:10px 0 8px\">{string.Join(" · ", notes)}</div>");
-        }
-        sb.Append("</div></section>");
-
         var treasureRows = matches.SelectMany(m => m.TreasureFinds.Select(f => (m, f, Team: false))).ToList();
         var teamRows = matches.SelectMany(m => m.TeamTreasureFinds.Select(f => (m, f, Team: true))).ToList();
-        sb.Append($"<section><h2 class=\"pirate\">{L.T("D'où viennent tes trésors", "Where your treasures come from", "De dónde vienen tus tesoros", "De onde vêm seus tesouros")}</h2><div class=\"card\"><table>");
-        if (treasureRows.Count == 0)
+
+        // Performance mode: a lean report (totals, chances, treasures, matches), without these extras.
+        if (!Performance.On)
         {
-            sb.Append($"<tr><td class=\"items\">{L.T("Pas encore de trésor.", "No treasure yet.", "Todavía ningún tesoro.", "Nenhum tesouro ainda.")}</td></tr>");
+            // Last 30 days, one bar per day (the best day stands out).
+            var today = L.Shown(DateTime.UtcNow).Date;
+            var days = Enumerable.Range(0, 30).Select(i => today.AddDays(i - 29)).ToList();
+            var perDay = days.Select(d => matches.Where(m => When(m).Date == d).Sum(m => m.ChestsOpened)).ToList();
+            var max = Math.Max(1, perDay.Max());
+            sb.Append($"<section><h2 class=\"pirate\">{L.T("Coffres par jour", "Chests per day", "Cofres por día", "Baús por dia")}</h2><div class=\"card chart\"><div class=\"bars\">");
+            for (var i = 0; i < days.Count; i++)
+            {
+                var v = perDay[i];
+                var h = (int)Math.Round(100.0 * v / max);
+                var tip = $"{days[i].ToString(L.T("ddd dd/MM", "ddd d MMM", "ddd dd/MM", "ddd dd/MM"), Fr)}{L.T(" : ", ": ", ": ", ": ")}{L.Count(v, "coffre", "chest", "cofre", "baú")}";
+                var cls = v == 0 ? " zero" : v == max ? " top" : "";
+                sb.Append($"<div class=\"col\" aria-label=\"{H(tip)}\"><span class=\"tip\" style=\"bottom:calc({Math.Max(h, 3)}% + 6px)\">{H(tip)}</span><div class=\"bar{cls}\" style=\"height:{h}%\"></div></div>");
+            }
+            var bestDay = perDay[perDay.IndexOf(perDay.Max())];
+            var bestDate = days[perDay.IndexOf(perDay.Max())];
+            sb.Append($"</div><div class=\"axis\"><span>{days[0].ToString(L.T("dd/MM", "d MMM", "dd/MM", "dd/MM"), Fr)}</span>"
+                + (bestDay > 0 ? $"<span>{L.T("meilleur jour", "best day", "mejor día", "melhor dia")}{L.T(" : ", ": ", ": ", ": ")}{bestDate.ToString(L.T("dd/MM", "d MMM", "dd/MM", "dd/MM"), Fr)} · {L.Count(bestDay, "coffre", "chest", "cofre", "baú")}</span>" : "")
+                + $"<span>{L.T("aujourd'hui", "today", "hoy", "hoje")}</span></div></div></section>");
+            sb.Append(ReportStats.Section(matches, data.ManualAdjust));
+
+            // By chest type (with the other interactions, not in the total) | where the player's treasures come from.
+            var byKind = matches.SelectMany(m => m.Chests).GroupBy(c => ChestKinds.Canonical(c.Kind)).OrderByDescending(g => g.Count()).ToList();
+            var kindMax = Math.Max(1, byKind.Count > 0 ? byKind.Max(g => g.Count()) : 1);
+            var otherKinds = matches
+                .SelectMany(m => m.OtherInteractions.Count > 0
+                    ? m.OtherInteractions
+                    : new Dictionary<string, int> { [ChestKinds.AmmoBox] = m.AmmoBoxesOpened, [ChestKinds.OtherContainer] = m.OtherContainersOpened })
+                .GroupBy(kv => kv.Key)
+                .Select(g => (Kind: g.Key, Count: g.Sum(kv => kv.Value)))
+                .Where(x => x.Count > 0)
+                .OrderByDescending(x => x.Count)
+                .ToList();
+            sb.Append($"<div class=\"two\"><section><h2 class=\"pirate\">{L.T("Par type de coffre", "By chest type", "Por tipo de cofre", "Por tipo de baú")}</h2><div class=\"card\"><table>");
+            foreach (var g in byKind)
+            {
+                var color = KindColor.GetValueOrDefault(g.Key, "#9a8f7a");
+                var w = Math.Max(2, (int)Math.Round(100.0 * g.Count() / kindMax));
+                sb.Append($"<tr><td><span class=\"sw\" style=\"background:{color}\"></span>{H(L.Name(g.Key))}</td><td style=\"width:150px\"><span class=\"meter\"><i style=\"width:{w}%;background:{color}\"></i></span></td><td class=\"n num big\">{g.Count().ToString("N0", Fr)}</td></tr>");
+            }
+            var destroyedTotal = matches.Sum(m => m.Chests.Count(c => c.Destroyed));
+            var notes = new List<string>();
+            if (destroyedTotal > 0)
+            {
+                notes.Add(L.T($"dont {destroyedTotal.ToString("N0", Fr)} détruits (cassés au lieu d'être ouverts)", $"of which {destroyedTotal.ToString("N0", Fr)} destroyed (broken instead of opened)", $"de ellos, {destroyedTotal.ToString("N0", Fr)} destruidos (rotos en lugar de abiertos)", $"dos quais {destroyedTotal.ToString("N0", Fr)} destruídos (quebrados em vez de abertos)"));
+            }
+            foreach (var (kind, count) in otherKinds)
+            {
+                sb.Append($"<tr class=\"items\"><td>{H(L.Name(kind))} {L.T("(hors total)", "(not in the total)", "(fuera del total)", "(fora do total)")}</td><td></td><td class=\"n num\">{count.ToString("N0", Fr)}</td></tr>");
+            }
+            sb.Append("</table>");
+            if (notes.Count > 0)
+            {
+                sb.Append($"<div class=\"items\" style=\"padding:10px 0 8px\">{string.Join(" · ", notes)}</div>");
+            }
+            sb.Append("</div></section>");
+
+            sb.Append($"<section><h2 class=\"pirate\">{L.T("D'où viennent tes trésors", "Where your treasures come from", "De dónde vienen tus tesoros", "De onde vêm seus tesouros")}</h2><div class=\"card\"><table>");
+            if (treasureRows.Count == 0)
+            {
+                sb.Append($"<tr><td class=\"items\">{L.T("Pas encore de trésor.", "No treasure yet.", "Todavía ningún tesoro.", "Nenhum tesouro ainda.")}</td></tr>");
+            }
+            foreach (var g in treasureRows.GroupBy(r => r.f.SourceLabel).OrderByDescending(g => g.Count()))
+            {
+                var isChest = g.First().f.SourceIsChest;
+                sb.Append(isChest
+                    ? $"<tr><td>{H(g.Key)}</td><td class=\"n num big\">{g.Count()}</td></tr>"
+                    : $"<tr class=\"unusual\"><td class=\"warn\">{H(g.Key)} <span style=\"font-size:12px\">· {L.T("fiabilité faible", "low reliability", "fiabilidad baja", "confiabilidade baixa")}</span></td><td class=\"n num big warn\">{g.Count()}</td></tr>");
+            }
+            sb.Append("</table></div>");
+            var unusual = treasureRows.Where(r => !r.f.SourceIsChest).ToList();
+            if (unusual.Count > 0)
+            {
+                var count = L.Count(unusual.Count, "trésor obtenu", "trésors obtenus", "treasure", "treasures", "tesoro obtenido", "tesoros obtenidos", "tesouro obtido", "tesouros obtidos");
+                sb.Append($"<div class=\"flag\">{FlagIcon}<span>" + L.T(
+                    $"<b>{count} autrement qu'avec un coffre.</b> Fiabilité faible : il s'agit très probablement d'une erreur dans la façon dont les replays sont analysés.",
+                    $"<b>{count} obtained other than from a chest.</b> Low reliability: most likely a mistake in the way the replays are analyzed.",
+                    $"<b>{count} de otra forma que con un cofre.</b> Fiabilidad baja: muy probablemente un error en la forma de analizar las repeticiones.", $"<b>{count} de outra forma que não um baú.</b> Confiabilidade baixa: muito provavelmente um erro na forma como os replays são analisados.") + "</span></div>");
+            }
+            sb.Append("</section></div>");
         }
-        foreach (var g in treasureRows.GroupBy(r => r.f.SourceLabel).OrderByDescending(g => g.Count()))
-        {
-            var isChest = g.First().f.SourceIsChest;
-            sb.Append(isChest
-                ? $"<tr><td>{H(g.Key)}</td><td class=\"n num big\">{g.Count()}</td></tr>"
-                : $"<tr class=\"unusual\"><td class=\"warn\">{H(g.Key)} <span style=\"font-size:12px\">· {L.T("fiabilité faible", "low reliability", "fiabilidad baja", "confiabilidade baixa")}</span></td><td class=\"n num big warn\">{g.Count()}</td></tr>");
-        }
-        sb.Append("</table></div>");
-        var unusual = treasureRows.Where(r => !r.f.SourceIsChest).ToList();
-        if (unusual.Count > 0)
-        {
-            var count = L.Count(unusual.Count, "trésor obtenu", "trésors obtenus", "treasure", "treasures", "tesoro obtenido", "tesoros obtenidos", "tesouro obtido", "tesouros obtidos");
-            sb.Append($"<div class=\"flag\">{FlagIcon}<span>" + L.T(
-                $"<b>{count} autrement qu'avec un coffre.</b> Fiabilité faible : il s'agit très probablement d'une erreur dans la façon dont les replays sont analysés.",
-                $"<b>{count} obtained other than from a chest.</b> Low reliability: most likely a mistake in the way the replays are analyzed.",
-                $"<b>{count} de otra forma que con un cofre.</b> Fiabilidad baja: muy probablemente un error en la forma de analizar las repeticiones.", $"<b>{count} de outra forma que não um baú.</b> Confiabilidade baixa: muito provavelmente um erro na forma como os replays são analisados.") + "</span></div>");
-        }
-        sb.Append("</section></div>");
 
         sb.Append(ChancesSection(grandTotal, matches, data.ManualEntries));
-        sb.Append(SeenSection(matches));
-        sb.Append(CollectionSection(matches, data.ObtainedIds));
+        if (!Performance.On)
+        {
+            sb.Append(SeenSection(matches));
+            sb.Append(CollectionSection(matches, data.ObtainedIds));
+        }
 
         // Treasures: the player's own, then (hidden unless asked) those found by teammates, shared with the whole team.
         if (treasureRows.Count > 0 || teamRows.Count > 0)
@@ -1226,6 +1237,10 @@ public static class ReportWriter
     public static void WriteOverlay(Store store, OverlayView view)
     {
         LastOverlay = view;
+        if (Performance.On)
+        {
+            return;
+        }
         try
         {
             WriteAtomic(store.OverlayPath, Overlay(view));

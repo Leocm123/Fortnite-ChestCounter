@@ -5,6 +5,9 @@ namespace ChestCounter;
 
 public sealed class ChestRecord
 {
+    /// <summary>Where the chest stands, in world units (centimeters); null for matches analyzed before version 1.8.</summary>
+    public int? X { get; set; }
+    public int? Y { get; set; }
     public float TimeSeconds { get; set; }
     public string Kind { get; set; } = "";
     public string Blueprint { get; set; } = "";
@@ -159,6 +162,14 @@ public sealed class Config
 
     /// <summary>Color theme of the window, the report and the overlay (<see cref="Themes"/>).</summary>
     public string Theme { get; set; } = "pirate";
+
+    /// <summary>World area of the map picture, to adjust it if a new season moves the island (null = built-in, see <see cref="MapData"/>).</summary>
+    public double? MapMinX { get; set; }
+    public double? MapMinY { get; set; }
+    public double? MapSpan { get; set; }
+
+    /// <summary>Lighter counter for low-end PCs (see <see cref="Performance"/>).</summary>
+    public bool PerformanceMode { get; set; }
 
     /// <summary>Chests to open per day / per week (0 = no goal), see <see cref="Goals"/>.</summary>
     public int DailyGoal { get; set; }
