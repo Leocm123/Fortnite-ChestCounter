@@ -47,10 +47,14 @@ Instale o [.NET 10 SDK](https://dotnet.microsoft.com/download/dotnet/10.0) e dê
 
 ### Puxar novidades do projeto original
 
+O histórico deste fork foi reescrito, então ele não compartilha commits com o original e um `git merge` não funciona de forma limpa. Traga as novidades com `cherry-pick`, a partir do último commit do original já incluído aqui (`a2c309b`, "Merge pull request #59"):
+
 ```
 git fetch upstream
-git merge upstream/main
+git cherry-pick --no-merges a2c309b..upstream/main
 ```
+
+Depois de sincronizar, anote o novo último commit do original para usar na próxima vez.
 
 Textos novos do original sem tradução aparecem em inglês até receberem o 4º argumento (`L.T("fr", "en", "es", "pt")`).
 
