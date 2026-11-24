@@ -108,6 +108,38 @@ public sealed class ReplayAnalyzer : FortniteReplayReader.ReplayReader
     private readonly Dictionary<uint, string> _channelKey = new();
     /// <summary>Where each container stands (key = its identity), when the replay sends it: for the map of the report.</summary>
     private readonly Dictionary<string, Pt> _containerLoc = new();
+
+    // ---- The storm ------------------------------------------------------------------------------------------------
+    /// <summary>A phase of the safe zone: the circle before (Last) and after (Next) it shrinks, between Start and Finish (server times).</summary>
+    private sealed record ZonePhase(float At, float LastX, float LastY, float LastR, float NextX, float NextY, float NextR, float Start, float Finish);
+    private sealed class ZoneState { public float LastRadius, NextRadius, Start, Finish; public FVector? LastCenter, NextCenter; }
+    private readonly ZoneState _zone = new();
+    private readonly List<ZonePhase> _zones = new();
+    /// <summary>Server world time minus replay time (null until the game state sends its clock).</summary>
+    private double? _worldOffset;
+
+    /// <summary>
+    /// Whether a point was outside the safe zone at replay time t: the current circle before the phase shrinks, the one
+    /// it shrinks to afterwards, and in between the two. Null when the replay has no storm data to tell.
+    /// </summary>
+    private bool? InStorm(double x, double y, float t)
+    {
+        if (_worldOffset is not double offset || _zones.Count == 0)
+        {
+            return null;
+        }
+        var phase = _zones.LastOrDefault(z => z.At <= t + 0.5f);
+        if (phase == null)
+        {
+            return false; // before the first circle: no storm yet
+        }
+        var w = t + offset;
+        var f = w <= phase.Start ? 0 : w >= phase.Finish ? 1 : (w - phase.Start) / (phase.Finish - phase.Start);
+        var cx = phase.LastX + (phase.NextX - phase.LastX) * f;
+        var cy = phase.LastY + (phase.NextY - phase.LastY) * f;
+        var r = phase.LastR + (phase.NextR - phase.LastR) * f;
+        return (x - cx) * (x - cx) + (y - cy) * (y - cy) > r * r;
+    }
     private readonly Dictionary<uint, string> _channelLabel = new();
     private readonly Dictionary<uint, uint> _lastSearcher = new();
     private readonly HashSet<string> _searched = new();
@@ -213,7 +245,7 @@ public sealed class ReplayAnalyzer : FortniteReplayReader.ReplayReader
     private readonly List<GrantEvent> _grants = new();
 
     /// <summary>Bump when the analysis changes so that existing replays are re-analyzed.</summary>
-    public const int CurrentVersion = 18; // 18 (1.8.0): where each chest stands (map); 17 (1.5.1): closed chests broken without an instigator counted again
+    public const int CurrentVersion = 20; // 20 (1.11.0): a treasure comes from a chest only (never an ammo box opened at that moment); 19: chests opened in the storm; 18 (1.8.0): where each chest stands (map); 17 (1.5.1): closed chests broken without an instigator counted again
 
     private static readonly bool ProbeDebug = Environment.GetEnvironmentVariable("CHESTCOUNTER_DEBUG") == "4";
 
@@ -649,6 +681,26 @@ public sealed class ReplayAnalyzer : FortniteReplayReader.ReplayReader
                 }
                 break;
 
+            // The server's clock against the replay's: the storm's shrink times are server times.
+            case GameState gameState when (gameState.ReplicatedWorldTimeSecondsDouble ?? gameState.ReplicatedWorldTimeSeconds) is double world && world > 0:
+                _worldOffset = world - Now;
+                break;
+
+            // The storm: each phase of the safe zone (fields arrive a few at a time, so they are kept and merged).
+            case SafeZoneIndicator zone:
+                if (zone.LastRadius > 0) _zone.LastRadius = zone.LastRadius;
+                if (zone.NextRadius > 0) _zone.NextRadius = zone.NextRadius;
+                if (zone.LastCenter != null) _zone.LastCenter = zone.LastCenter;
+                if (zone.NextCenter != null) _zone.NextCenter = zone.NextCenter;
+                if (zone.SafeZoneStartShrinkTime > 0) _zone.Start = zone.SafeZoneStartShrinkTime;
+                if (zone.SafeZoneFinishShrinkTime > 0) _zone.Finish = zone.SafeZoneFinishShrinkTime;
+                if (_zone is { LastCenter: { } from, NextCenter: { } to, LastRadius: > 0, NextRadius: > 0, Start: > 0 } z && z.Finish > z.Start
+                    && (_zones.Count == 0 || _zones[^1].Start != z.Start || _zones[^1].NextR != z.NextRadius || _zones[^1].LastR != z.LastRadius))
+                {
+                    _zones.Add(new ZonePhase(Now, (float)from.X, (float)from.Y, z.LastRadius, (float)to.X, (float)to.Y, z.NextRadius, z.Start, z.Finish));
+                }
+                break;
+
             case PlayerPawn pawn:
                 var pawnId = Channels[channelIndex]?.ActorId;
                 if (pawnId != null)
@@ -773,6 +825,7 @@ public sealed class ReplayAnalyzer : FortniteReplayReader.ReplayReader
             {
                 X = at is { } p ? (int)MathF.Round(p.X) : null,
                 Y = at is { } q ? (int)MathF.Round(q.Y) : null,
+                InStorm = at is { } s ? InStorm(s.X, s.Y, search.Time) : null,
                 TimeSeconds = MathF.Round(search.Time, 1),
                 Kind = search.Kind,
                 Blueprint = search.Label,
@@ -943,7 +996,11 @@ public sealed class ReplayAnalyzer : FortniteReplayReader.ReplayReader
             var nextHandler = hi + 1 < handlerTimes.Count ? handlerTimes[hi + 1] : float.MaxValue;
             // Buried chests grant the prize when the dig completes, ~2.5s before the chest reports "searched": allow
             // up to +4s for them only.
+            // Only chests can give a treasure (chests, rare, buried and sprite chests, opened or broken; ammo boxes,
+            // produce boxes, supply drops, wanted posters and loot cannons cannot). Anything else opened at that moment
+            // (an ammo box picked up while a teammate's chest gave the squad a treasure) is not the source.
             var closest = _searches
+                .Where(x => ChestKinds.IsChest(ChestKinds.Classify(x.Label)))
                 .Where(x => x.Time >= h - 3 && (x.Time <= h + 2 || (x.Time <= h + 4 && ChestKinds.Classify(x.Label) == ChestKinds.Buried)))
                 .OrderBy(x => Math.Abs(x.Time - h))
                 .FirstOrDefault();
@@ -1329,7 +1386,9 @@ public static class ChestKinds
         var b = blueprint.ToLowerInvariant();
         if (b.Contains("lootcannon") || b.Contains("cannon")) return Cannon;
         if (b.Contains("ammo")) return AmmoBox;
-        if (b.Contains("foodbox") || b.Contains("food_box")) return FoodBox;
+        if (b.Contains("foodbox") || b.Contains("food_box") || b.Contains("produce")) return FoodBox;
+        // Never a chest, even when "chest" is somewhere in the name.
+        if (b.Contains("supplydrop") || b.Contains("supply_drop") || b.Contains("airdrop") || b.Contains("barrel") || b.Contains("cooler")) return OtherContainer;
         if (b.Contains("rarechest") || b.Contains("legendary") || b.Contains("rare_chest")) return Rare;
         if (b.Contains("buried")) return Buried;
         if (b.Contains("spriteposter") || b.Contains("booty")) return PosterChest;

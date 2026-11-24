@@ -2,6 +2,11 @@
 
 > **Ative os replays no Fortnite primeiro**: *Configurações → Jogo → Replays → Gravar Replays: Ativado*. A ferramenta só lê esses arquivos de replay: nenhuma modificação no jogo, nenhum acesso à memória do jogo.
 
+**Novidades da 1.11.0**
+- **Baús abertos na tempestade**: o contador agora sabe se cada baú foi aberto fora da zona segura. Aparece em "Ritmo na partida" (quantos, que parte dos seus baús e o recorde numa partida), num filtro novo da aba Mapa e na conquista "Caçador na tempestade". Os replays que ainda estão no seu PC são analisados de novo
+- **Ritmo na partida** reorganizado em 4 cartões: até o 1º baú, tempo entre um baú e outro, recorde em 1 minuto e baús na tempestade
+- **Origem dos tesouros corrigida**: só baús (comuns, raros, enterrados e de espírito) dão tesouro. Antes, uma caixa de munição aberta no mesmo segundo em que um colega achava um tesouro aparecia como "Outro contêiner" e "obtido de outra forma que não um baú"
+
 **Novidades da 1.10.0**
 - **Aba Mapa nova e leve**: o mapa dos baús agora é desenhado direto na janela, sem travar mesmo com milhares de baús. Tem zoom com a roda do mouse, arrastar para mover, modo calor (onde você mais abre baús), filtros e a lista dos locais ao lado
 - **Telas grandes**: o conteúdo fica centralizado, com uma largura confortável, em vez de esticar
@@ -37,6 +42,11 @@ O Windows pode mostrar *"O Windows protegeu o computador"* (exe sem assinatura):
 ---
 
 **English** · Download **`ChestCounter.exe`** below and run it. Already using it? The counter offers the update on its home tab. Your history and settings are kept.
+
+**What's new in 1.11.0**
+- **Chests opened in the storm**: the counter now knows whether each chest was opened outside the safe zone. Shown in "Rhythm within a match" (how many, their share and the most in one match), as a new filter of the Map tab and with the "Storm hunter" achievement. The replays still on your PC are analyzed again
+- **Rhythm within a match** in 4 cards: to the first chest, time between two chests, most chests within a minute and chests in the storm
+- **Treasure sources fixed**: only chests (regular, rare, buried and sprite) give treasures. An ammo box opened in the same second a teammate found a treasure used to show as "Other container" and "obtained other than from a chest"
 
 **What's new in 1.10.0**
 - **New, light Map tab**: the map of your chests is drawn right in the window, smooth even with thousands of chests. Wheel to zoom, drag to move, heat mode (where you open the most), filters and the list of places next to it

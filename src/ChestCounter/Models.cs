@@ -8,6 +8,8 @@ public sealed class ChestRecord
     /// <summary>Where the chest stands, in world units (centimeters); null for matches analyzed before version 1.8.</summary>
     public int? X { get; set; }
     public int? Y { get; set; }
+    /// <summary>Opened outside the safe zone (in the storm); null when the replay has no storm data (or before version 1.11).</summary>
+    public bool? InStorm { get; set; }
     public float TimeSeconds { get; set; }
     public string Kind { get; set; } = "";
     public string Blueprint { get; set; } = "";

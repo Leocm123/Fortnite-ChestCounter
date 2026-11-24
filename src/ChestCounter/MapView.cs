@@ -40,7 +40,7 @@ public static class MapView
 
     /// <summary>
     /// Everything the window's map draws, in a compact form: each chest as [u, v, kind, flags] (u and v in thousandths
-    /// of the picture; flags: 1 = this week, 2 = last match).
+    /// of the picture; flags: 1 = this week, 2 = last match, 4 = opened in the storm).
     /// </summary>
     public static object Data(TrackerData view)
     {
@@ -62,7 +62,7 @@ public static class MapView
             points = points.Select(p => new[]
             {
                 (int)Math.Round(p.U * 1000), (int)Math.Round(p.V * 1000), kinds.IndexOf(ChestKinds.Canonical(p.Chest.Kind)),
-                (Goals.When(p.Match).Date >= weekStart ? 1 : 0) | (p.Match.SessionId == last?.SessionId ? 2 : 0),
+                (Goals.When(p.Match).Date >= weekStart ? 1 : 0) | (p.Match.SessionId == last?.SessionId ? 2 : 0) | (p.Chest.InStorm == true ? 4 : 0),
             }).ToList(),
             pois = pois.Select(p => { var (u, v) = MapData.Project(p.X, p.Y); return new { name = p.Name, u = Math.Round(u * 1000, 1), v = Math.Round(v * 1000, 1) }; }).ToList(),
             places = Places(points, pois).Select(p => new { name = p.Name, count = L.N(p.Count), matches = L.Count(p.Matches, "partie", "parties", "match", "matches", "partida", "partidas", "partida", "partidas"), n = p.Count }).ToList(),

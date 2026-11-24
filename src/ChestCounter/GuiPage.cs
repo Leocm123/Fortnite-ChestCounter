@@ -129,8 +129,9 @@ public static class GuiPage
         ["mapLegend"] = L.T("Types de coffre", "Chest types", "Tipos de cofre", "Tipos de baú"),
         ["mapWhere"] = L.T("Là où tu en ouvres le plus", "Where you open the most", "Donde más abres", "Onde você mais abre"),
         ["mapEmpty"] = L.T("La carte se remplit avec les parties analysées à partir de la version 1.8.", "The map fills up with the matches analyzed from version 1.8 on.", "El mapa se llena con las partidas analizadas desde la versión 1.8.", "O mapa é preenchido com as partidas analisadas a partir da versão 1.8."),
+        ["mapStorm"] = L.T("Dans la tempête", "In the storm", "En la tormenta", "Na tempestade"),
         ["mapSource"] = L.T("Carte", "Map", "Mapa", "Mapa"),
-        ["brand"] =L.T("Compteur de coffres", "Chest Counter", "Contador de cofres", "Contador de Baús"),
+        ["brand"] = L.T("Compteur de coffres", "Chest Counter", "Contador de cofres", "Contador de Baús"),
         ["map"] = L.T("Carte", "Map", "Mapa", "Mapa"),
         ["account"] = L.T("Compte", "Account", "Cuenta", "Conta"),
         ["recent"] = L.T("le plus récent en haut", "newest first", "lo más reciente arriba", "mais recentes no topo"),
@@ -140,7 +141,7 @@ public static class GuiPage
         ["avgShort"] = L.T("Moyenne", "Average", "Media", "Média"),
         ["every"] = L.T("1 tous les {0} coffres", "1 every {0} chests", "1 cada {0} cofres", "1 a cada {0} baús"),
         ["openInBrowser"] = L.T("Ouvrir dans le navigateur", "Open in the browser", "Abrir en el navegador", "Abrir no navegador"),
-        ["achievementsSub"] =L.T("détails dans le rapport", "details in the report", "detalles en el informe", "detalhes no relatório"),
+        ["achievementsSub"] = L.T("détails dans le rapport", "details in the report", "detalles en el informe", "detalhes no relatório"),
         ["avgTile"] = L.T("Moyenne par partie", "Average per match", "Media por partida", "Média por partida"),
         ["inMatches"] = L.T("sur {0} parties", "over {0} matches", "en {0} partidas", "em {0} partidas"),
         ["goalDone"] = L.T("objectif atteint", "goal reached", "meta cumplida", "meta batida"),
@@ -606,7 +607,7 @@ public static class GuiPage
           if(S.reportStamp!==mapStamp&&!mapLoading)loadMap();else drawMap();
         }
         function buildMap(T){
-          $('#mapPane').innerHTML=`<div class="card mapbox"><div class="mapbar"><div class="seg" id="mapF">${[['all',T.mapAll],['week',T.mapWeek],['last',T.mapLast]].map(([k,t])=>`<button type="button" data-f="${k}" class="${k===mapF?'on':''}">${esc(t)}</button>`).join('')}</div>
+          $('#mapPane').innerHTML=`<div class="card mapbox"><div class="mapbar"><div class="seg" id="mapF">${[['all',T.mapAll],['week',T.mapWeek],['last',T.mapLast],['storm',T.mapStorm]].map(([k,t])=>`<button type="button" data-f="${k}" class="${k===mapF?'on':''}">${esc(t)}</button>`).join('')}</div>
             <div class="seg" id="mapM">${[['pts',IC.dots,T.mapPoints],['heat',IC.flame,T.mapHeat]].map(([k,i,t])=>`<button type="button" data-m="${k}" class="${k===mapMode?'on':''}">${i}${esc(t)}</button>`).join('')}</div></div>
             <div class="mapcv" id="mapCv"><canvas aria-label="${esc(T.map)}" role="img"></canvas><div class="mapzoom"><button type="button" data-z="1" title="${esc(T.mapZoomIn)}">${IC.plus}</button><button type="button" data-z="-1" title="${esc(T.mapZoomOut)}">${IC.minus}</button><button type="button" data-z="0" title="${esc(T.mapReset)}">${IC.crosshair}</button></div><div class="fempty" id="mapEmpty" style="position:absolute;inset:0;justify-content:center;color:#fff;padding:24px;text-align:center" hidden>${IC.map}<span>${esc(T.mapEmpty)}</span></div></div>
             <div class="maphint"><span>${esc(T.mapHint)}</span><span id="mapSrc"></span></div></div>
@@ -662,7 +663,7 @@ public static class GuiPage
           const g=c.getContext('2d'),s=mapView.s,k=W/s,x0=mapView.cx-s/2,y0=mapView.cy-s*mapView.a/2;
           g.setTransform(1,0,0,1,0,0);g.fillStyle='#0d3a5c';g.fillRect(0,0,W,H);
           if(mapImg&&mapImg.complete&&mapImg.naturalWidth){g.setTransform(k,0,0,k,-x0*k,-y0*k);g.imageSmoothingQuality='high';g.drawImage(mapImg,0,0,1000,1000);g.setTransform(1,0,0,1,0,0)}
-          const pts=MD.points.filter(p=>mapF==='all'||(mapF==='week'?p[3]&1:p[3]&2)),X=p=>(p[0]-x0)*k,Y=p=>(p[1]-y0)*k;
+          const pts=MD.points.filter(p=>mapF==='all'||p[3]&({week:1,last:2,storm:4}[mapF])),X=p=>(p[0]-x0)*k,Y=p=>(p[1]-y0)*k;
           if(mapMode==='heat'){
             const R=Math.min(70*dpr,Math.max(12*dpr,20*k)),off=document.createElement('canvas');off.width=W;off.height=H;const o=off.getContext('2d');
             for(const p of pts){const x=X(p),y=Y(p);if(x<-R||y<-R||x>W+R||y>H+R)continue;const gr=o.createRadialGradient(x,y,0,x,y,R);gr.addColorStop(0,'rgba(0,0,0,.28)');gr.addColorStop(1,'rgba(0,0,0,0)');o.fillStyle=gr;o.fillRect(x-R,y-R,2*R,2*R)}

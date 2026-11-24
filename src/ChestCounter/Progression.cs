@@ -50,7 +50,7 @@ public static class Goals
 /// <summary>Figures the achievements are checked against.</summary>
 public sealed class ProgressStats
 {
-    public int Total, Matches, BestMatch, BestDay, MostMatchesDay, BestStreak, Wins, LootedWins, Treasures, Golden, Rare, Destroyed, Fastest;
+    public int Total, Matches, BestMatch, BestDay, MostMatchesDay, BestStreak, Wins, LootedWins, Treasures, Golden, Rare, Destroyed, Fastest, Storm;
 
     public static ProgressStats From(IReadOnlyList<MatchRecord> matches, int manual)
     {
@@ -66,6 +66,7 @@ public sealed class ProgressStats
             Rare = matches.Sum(m => m.Chests.Count(c => ChestKinds.Canonical(c.Kind) == ChestKinds.Rare)),
             Destroyed = matches.Sum(m => m.Chests.Count(c => c.Destroyed)),
             Fastest = matches.Count > 0 ? matches.Max(m => MostInWindow(m, 60)) : 0,
+            Storm = matches.Sum(m => m.Chests.Count(c => c.InStorm == true)),
         };
         var byDay = matches.GroupBy(m => Goals.When(m).Date).ToList();
         s.BestDay = byDay.Count > 0 ? byDay.Max(g => g.Sum(m => m.ChestsOpened)) : 0;
@@ -169,6 +170,8 @@ public static class Achievements
             "50 coffres rares.", "50 rare chests.", "50 cofres raros.", "50 baús raros.", s => s.Rare, 50),
         new("destroy25", "hammer", "Démolisseur", "Wrecker", "Demoledor", "Destruidor",
             "Casse 25 coffres au lieu de les ouvrir.", "Break 25 chests instead of opening them.", "Rompe 25 cofres en lugar de abrirlos.", "Quebre 25 baús em vez de abrir.", s => s.Destroyed, 25),
+        new("storm10", "storm", "Chasseur dans la tempête", "Storm hunter", "Cazador en la tormenta", "Caçador na tempestade",
+            "Ouvre 10 coffres dans la tempête.", "Open 10 chests in the storm.", "Abre 10 cofres en la tormenta.", "Abra 10 baús dentro da tempestade.", s => s.Storm, 10),
         new("veteran", "controller", "Vétéran", "Veteran", "Veterano", "Veterano",
             "100 parties comptées.", "100 counted matches.", "100 partidas contadas.", "100 partidas contadas.", s => s.Matches, 100),
     };

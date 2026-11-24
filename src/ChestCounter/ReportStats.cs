@@ -18,6 +18,7 @@ public static class ReportStats
         td.sub{color:var(--cmuted);font-size:13px;white-space:nowrap;text-align:right}
         th.r{text-align:right}
         .ic{display:inline-block;flex:none}.ici{width:1.05em;height:1.05em;vertical-align:-.18em}
+        .tile .storm{color:#7b4fc9}.tile .storm .ici{width:.8em;height:.8em;vertical-align:-.05em}
         :root[data-accent="noite"] .pirate{font-family:"Segoe UI",system-ui,sans-serif;font-weight:700;font-size:.85em}
         :root[data-accent="arena"] .pirate{font-family:Bahnschrift,"Segoe UI",sans-serif;font-weight:700;font-style:italic;text-transform:uppercase;font-size:.85em}
         #mapa{scroll-margin-top:16px}
@@ -299,16 +300,43 @@ public static class ReportStats
             $"<i style=\"width:{Pct(i)}%;background:{colors[i]}\">{(Pct(i) >= 8 ? $"{Pct(i)}%" : "")}</i>")) + "</div>"
             + $"<div class=\"plegend\">{string.Concat(Enumerable.Range(0, 3).Select(i => $"<span>{names[i]} · {Pct(i)}%</span>"))}</div>";
 
+        // Time between two chests of the same match (median).
+        var gaps = withChests.SelectMany(m => m.Chests.Select(c => c.TimeSeconds).OrderBy(t => t).Zip(m.Chests.Select(c => c.TimeSeconds).OrderBy(t => t).Skip(1), (a, b) => (double)(b - a)))
+            .OrderBy(x => x).ToList();
+        var gapTile = gaps.Count > 0
+            ? Tile(MinSec(gaps[gaps.Count / 2]), L.T("entre deux coffres (médiane)", "between two chests (median)", "entre dos cofres (mediana)", "entre um baú e outro (mediana)"),
+                L.T("dans la même partie", "in the same match", "en la misma partida", "na mesma partida"))
+            : Tile("—", L.T("entre deux coffres (médiane)", "between two chests (median)", "entre dos cofres (mediana)", "entre um baú e outro (mediana)"), null);
+
         return $"<section>{Title(L.T("Rythme dans la partie", "Rhythm within a match", "Ritmo en la partida", "Ritmo na partida"))}<section class=\"tiles stats\">"
             + Tile(MinSec(median), L.T("jusqu'au 1er coffre (médiane)", "to the first chest (median)", "hasta el 1.er cofre (mediana)", "até o 1º baú (mediana)"),
                 L.T("depuis le début du replay, bus compris", "from the start of the replay, bus included", "desde el inicio de la repetición, autobús incluido", "desde o início do replay, ônibus incluído"))
-            + Tile(L.N(bestMinute), L.T("coffres en 1 minute (record)", "chests within 1 minute (best)", "cofres en 1 minuto (récord)", "baús em 1 minuto (recorde)"), null)
-            + Tile(F1(withChests.Average(m => m.Chests.Count)), L.T("coffres par partie avec coffres", "chests per match with chests", "cofres por partida con cofres", "baús por partida com baús"),
-                L.T($"{L.N(matches.Count - withChests.Count)} partie(s) sans coffre", $"{L.N(matches.Count - withChests.Count)} match(es) without a chest", $"{L.N(matches.Count - withChests.Count)} partida(s) sin cofre", $"{L.N(matches.Count - withChests.Count)} partida(s) sem baú"))
+            + gapTile
+            + Tile(L.N(bestMinute), L.T("coffres en 1 minute (record)", "chests within 1 minute (best)", "cofres en 1 minuto (récord)", "baús em 1 minuto (recorde)"),
+                L.T("dans une même partie", "in a single match", "en una misma partida", "numa única partida"))
+            + StormTile(matches)
             + "</section>"
-            + (bar.Length > 0 ? $"<div class=\"card chart\"><b>{L.T("Quand tu ouvres tes coffres", "When you open your chests", "Cuándo abres tus cofres", "Quando você abre seus baús")}</b> <span class=\"items\">{L.T("(par tiers de ta partie)", "(by thirds of your match)", "(por tercios de tu partida)", "(por terços da sua partida)")}</span>{bar}</div>" : "")
+            + (bar.Length > 0 ? $"<div class=\"card chart\" style=\"margin-top:12px\"><b>{L.T("Quand tu ouvres tes coffres", "When you open your chests", "Cuándo abres tus cofres", "Quando você abre seus baús")}</b> <span class=\"items\">{L.T("(par tiers de ta partie)", "(by thirds of your match)", "(por tercios de tu partida)", "(por terços da sua partida)")}</span>{bar}</div>" : "")
             + "</section>";
     }
+
+    /// <summary>Chests opened outside the safe zone: how many, their share, and the most in one match.</summary>
+    private static string StormTile(IReadOnlyList<MatchRecord> matches)
+    {
+        var label = L.T("coffres ouverts dans la tempête", "chests opened in the storm", "cofres abiertos en la tormenta", "baús abertos na tempestade");
+        var known = matches.SelectMany(m => m.Chests).Where(c => c.InStorm != null).ToList();
+        if (known.Count == 0)
+        {
+            return Tile("—", label, L.T("parties analysées à partir de la 1.11", "matches analyzed from 1.11 on", "partidas analizadas desde la 1.11", "partidas analisadas a partir da 1.11"));
+        }
+        var storm = known.Count(c => c.InStorm == true);
+        var best = matches.Max(m => m.Chests.Count(c => c.InStorm == true));
+        return Tile($"<span class=\"storm\">{Icons.Svg("storm", "ic ici")}</span> {L.N(storm)}", label,
+            L.T($"{Percent(storm, known.Count)} des coffres · record : {L.N(best)}", $"{Percent(storm, known.Count)} of the chests · best: {L.N(best)}",
+                $"{Percent(storm, known.Count)} de los cofres · récord: {L.N(best)}", $"{Percent(storm, known.Count)} dos baús · recorde: {L.N(best)} numa partida"));
+    }
+
+    private static string Percent(int part, int whole) => whole == 0 ? "0%" : $"{(int)Math.Round(100.0 * part / whole)}%";
 
     // ---- Chests against the result -----------------------------------------------------------------------------
 
