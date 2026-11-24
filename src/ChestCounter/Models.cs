@@ -160,6 +160,23 @@ public sealed class Config
     /// <summary>Color theme of the window, the report and the overlay (<see cref="Themes"/>).</summary>
     public string Theme { get; set; } = "pirate";
 
+    /// <summary>Chests to open per day / per week (0 = no goal), see <see cref="Goals"/>.</summary>
+    public int DailyGoal { get; set; }
+    public int WeeklyGoal { get; set; }
+
+    /// <summary>Discord webhook the summaries are posted to (null = off), and "match" or "treasure" (see <see cref="DiscordNotify"/>).</summary>
+    public string? DiscordWebhook { get; set; }
+    public string DiscordMode { get; set; } = "match";
+
+    /// <summary>Applies the goals to <see cref="Goals"/> (overlay, home tab, report).</summary>
+    public void ApplyGoals()
+    {
+        DailyGoal = Math.Clamp(DailyGoal, 0, 100_000);
+        WeeklyGoal = Math.Clamp(WeeklyGoal, 0, 1_000_000);
+        Goals.Daily = DailyGoal;
+        Goals.Weekly = WeeklyGoal;
+    }
+
     /// <summary>Selected profile (Epic id or name of the account the player plays on); null = most recent one.</summary>
     public string? Profile { get; set; }
     public string DemosFolder { get; set; } = "";

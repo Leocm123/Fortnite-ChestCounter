@@ -15,7 +15,7 @@ public sealed record OverlayRow(string Label, string Value, bool Treasure = fals
 /// <param name="Current">Right counter (match in progress, or last match); null = "—".</param>
 /// <param name="CurrentLive">Right counter is the match in progress (green).</param>
 /// <param name="Badge">Header badge ("● EN DIRECT" / "● LIVE", "● PARTIE EN COURS" / "● MATCH IN PROGRESS") or null.</param>
-public sealed record OverlayView(string Total, string? Current, string CurrentCaption, bool CurrentLive, string? Badge, IReadOnlyList<OverlayRow> Rows, string Treasures = "0", string Session = "0", string? Last = null, string? Squad = null);
+public sealed record OverlayView(string Total, string? Current, string CurrentCaption, bool CurrentLive, string? Badge, IReadOnlyList<OverlayRow> Rows, string Treasures = "0", string Session = "0", string? Last = null, string? Squad = null, IReadOnlyList<Goals.Progress>? Goals = null);
 
 [SupportedOSPlatform("windows")]
 public static class NativeOverlay
@@ -632,10 +632,10 @@ public static class NativeOverlay
                 TextWidth(hdc, _fontHudSmall, sessionLabel + Sep + v.Session, out _),
                 v.Squad != null ? TextWidth(hdc, _fontHudSmall, OverlayModel.SquadLabel + Sep + v.Squad, out _) : 0,
                 Sc(22) + TextWidth(hdc, _fontHudSmall, v.Treasures, out _),
-            }.Max();
+            }.Concat((v.Goals ?? []).Select(g => TextWidth(hdc, _fontHudSmall, g.Label + Sep + g.Text, out _))).Max();
             // Room for the in-match dot is always kept: the overlay does not widen when a match starts.
             w = lockW + pad + Math.Max(Sc(18) + Sc(26) + Sc(8) + bigW, rowsW) + pad + Sc(14);
-            h = pad + _hudBigH + (v.Squad != null ? 4 : 3) * (_hudSmallH + Sc(2)) + pad;
+            h = pad + _hudBigH + ((v.Squad != null ? 4 : 3) + (v.Goals?.Count ?? 0)) * (_hudSmallH + Sc(2)) + pad;
             w = Math.Max(_stableW, w);
             _stableW = w;
             _lockRect = new RECT { Left = Sc(2), Top = 0, Right = lockW, Bottom = h };
@@ -821,6 +821,11 @@ public static class NativeOverlay
         if (v.Squad != null)
         {
             LabelValue(hdc, OverlayModel.SquadLabel, v.Squad, left, right, y, rowH, white);
+            y += rowH + Sc(2);
+        }
+        foreach (var g in v.Goals ?? [])
+        {
+            LabelValue(hdc, g.Label, g.Text, left, right, y, rowH, g.Done ? gold : white);
             y += rowH + Sc(2);
         }
         var tw = TextWidth(hdc, _fontHudSmall, v.Treasures, out _);

@@ -79,6 +79,25 @@ public static class GuiPage
         ["timesHelp"] = L.T("Dans le rapport et ici : semaines, heures du trésor, parties.", "In the report and here: weeks, Treasure Hours, matches.", "En el informe y aquí: semanas, horas del tesoro, partidas.", "No relatório e aqui: semanas, Horas do Tesouro, partidas."),
         ["timesLocal"] = L.T("Heure locale ({0})", "Local time ({0})", "Hora local ({0})", "Horário local ({0})"),
         ["timesUtc"] = L.T("UTC (heure du jeu)", "UTC (game time)", "UTC (hora del juego)", "UTC (horário do jogo)"),
+        ["goals"] = L.T("Objectifs", "Goals", "Metas", "Metas"),
+        ["goalsHelp"] = L.T("Un nombre de coffres à ouvrir : affiché sur l'overlay, l'accueil et le rapport. 0 = pas d'objectif.",
+            "A number of chests to open: shown on the overlay, the home tab and the report. 0 = no goal.",
+            "Un número de cofres que abrir: se muestra en el overlay, el inicio y el informe. 0 = sin meta.",
+            "Um número de baús para abrir: aparece no overlay, no Início e no relatório. 0 = sem meta."),
+        ["goalDaily"] = L.T("Objectif du jour", "Daily goal", "Meta del día", "Meta do dia"),
+        ["goalWeekly"] = L.T("Objectif de la semaine (depuis lundi)", "Weekly goal (from Monday)", "Meta de la semana (desde el lunes)", "Meta da semana (a partir de segunda)"),
+        ["achievements"] = L.T("succès débloqués (détails dans le rapport)", "achievements unlocked (details in the report)", "logros desbloqueados (detalles en el informe)", "conquistas desbloqueadas (detalhes no relatório)"),
+        ["discordHelp"] = L.T("Optionnel : colle le webhook d'un salon (Paramètres du salon → Intégrations → Webhooks) pour y publier un résumé après chaque partie. Rien d'autre n'est envoyé ; vide = désactivé.",
+            "Optional: paste a channel's webhook (Channel settings → Integrations → Webhooks) to post a summary there after each match. Nothing else is sent; empty = off.",
+            "Opcional: pega el webhook de un canal (Ajustes del canal → Integraciones → Webhooks) para publicar un resumen tras cada partida. No se envía nada más; vacío = desactivado.",
+            "Opcional: cole o webhook de um canal (Configurações do canal → Integrações → Webhooks) para postar um resumo depois de cada partida. Nada mais é enviado; vazio = desligado."),
+        ["discordUrl"] = L.T("Webhook du salon", "Channel webhook", "Webhook del canal", "Webhook do canal"),
+        ["discordTest"] = L.T("Tester", "Test", "Probar", "Testar"),
+        ["discordSent"] = L.T("Message de test envoyé : regarde le salon.", "Test message sent: check the channel.", "Mensaje de prueba enviado: mira el canal.", "Mensagem de teste enviada: confira o canal."),
+        ["discordMode"] = L.T("Publier", "Post", "Publicar", "Postar"),
+        ["discordAll"] = L.T("Chaque partie", "Every match", "Cada partida", "Toda partida"),
+        ["discordNotable"] = L.T("Seulement trésors, succès et objectifs", "Only treasures, achievements and goals", "Solo tesoros, logros y metas", "Só tesouros, conquistas e metas"),
+        ["saved"] = L.T("Enregistré.", "Saved.", "Guardado.", "Salvo."),
         ["theme"] = L.T("Thème", "Theme", "Tema", "Tema"),
         ["themeHelp"] = L.T("Couleurs de la fenêtre, du rapport et de l'overlay.", "Colors of the window, the report and the overlay.",
             "Colores de la ventana, del informe y del overlay.", "Cores da janela, do relatório e do overlay."),
@@ -344,6 +363,7 @@ public static class GuiPage
             <div class="tile"><div class="v num">${esc(S.last?S.last.chests:'—')}</div><div class="l">${esc(T.last)}${S.last?'<br>'+esc(S.last.when)+' · '+esc(S.last.mode):''}</div></div>
             ${S.squad?`<div class="tile"><div class="v num">${esc(S.squad.total)}</div><div class="l">${esc(T.squad)}<span class="badge" title="${esc(T.inaccurateWhy)}">${esc(T.inaccurate)}</span><br>${esc(fmt(T.squadSub,S.squad.team))}</div></div>`:''}
             <div class="tile"><div class="v num">★ ${esc(S.treasures)}</div><div class="l">${esc(T.treasures)} · ${esc(S.matches)} ${esc(T.matches)} · ${esc(fmt(T.perMatch,S.average))}</div></div></section>`;
+          if(S.goals&&S.goals.length)h+=`<section class="tiles">${S.goals.map(g=>`<div class="tile"><div class="v num">${esc(g.text)}</div><div class="l">🎯 ${esc(g.label)}</div><div class="bar"><i style="width:${g.pct}%;${g.done?'background:var(--team)':''}"></i></div></div>`).join('')}<div class="tile"><div class="v num">🏆 ${esc(S.achievements)}</div><div class="l">${esc(T.achievements)}</div></div></section>`;
           h+=`<div class="actions"><button class="b main" onclick="setTab('report')">${esc(T.openReport)}</button>`;
           if(S.overlay.running)h+=`<button class="b" onclick="api('toggleOverlayVisible')">${esc(S.overlay.visible?T.hideOverlay:T.showOverlay)}</button><button class="b" onclick="api('toggleOverlayLock')">${esc(S.overlay.locked?T.unlock:T.lock)}</button>`;
           if(!S.update&&S.updatesOn)h+=`<button class="b" onclick="api('checkUpdate')">${esc(T.checkUpdate)}</button>`;
@@ -371,8 +391,17 @@ public static class GuiPage
             ${s.canStartWithFortnite?row(esc(T.withFortnite),esc(T.withFortniteHelp),sw('wf',s.startWithFortnite,'startWithFortnite')):''}
             ${row(esc(T.updates),'',sel('updateMode',s.updateMode,[['prompt',T.upPrompt],['auto',T.upAuto],['off',T.upOff]]))}
             <div class="row"><div style="flex:1"><div class="t">${esc(T.demos)}</div>${s.demosExists?'':`<div class="h">${esc(T.demosMissing)}</div>`}<div class="actions" style="margin-top:6px"><input type="text" id="demos" value="${esc(s.demos)}"><button class="b" onclick="api('demosFolder',$('#demos').value)">${esc(T.save)}</button></div></div></div></div>`;
+          h+=`<section><h2 class="pirate">${esc(T.goals)}</h2><div class="card"><p class="note" style="color:var(--cmuted);margin-top:0">${esc(T.goalsHelp)}</p>
+            ${row(esc(T.goalDaily),'',`<div class="actions"><input type="number" id="gday" min="0" step="1" value="${s.dailyGoal||''}" placeholder="0" style="width:110px"><button class="b" onclick="api('dailyGoal',$('#gday').value||'0')">${esc(T.save)}</button></div>`)}
+            ${row(esc(T.goalWeekly),'',`<div class="actions"><input type="number" id="gweek" min="0" step="1" value="${s.weeklyGoal||''}" placeholder="0" style="width:110px"><button class="b" onclick="api('weeklyGoal',$('#gweek').value||'0')">${esc(T.save)}</button></div>`)}</div></section>
+            <section><h2 class="pirate">Discord</h2><div class="card"><p class="note" style="color:var(--cmuted);margin-top:0">${esc(T.discordHelp)}</p>
+            <div class="row"><div style="flex:1"><div class="t">${esc(T.discordUrl)}</div><div class="actions" style="margin-top:6px"><input type="text" id="dhook" value="${esc(s.discordWebhook)}" placeholder="https://discord.com/api/webhooks/…"><button class="b" onclick="saveDiscord()">${esc(T.save)}</button><button class="b" onclick="testDiscord()">${esc(T.discordTest)}</button></div>${discordMsg?`<div class="h" style="margin-top:6px">${esc(discordMsg)}</div>`:''}</div></div>
+            ${row(esc(T.discordMode),'',sel('discordMode',s.discordMode,[['match',T.discordAll],['treasure',T.discordNotable]]))}</div></section>`;
           return h;
         }
+        let discordMsg='';
+        async function saveDiscord(){const r=await api('discordWebhook',$('#dhook').value);discordMsg=r&&r.error?r.error:S.txt.saved;render(true)}
+        async function testDiscord(){discordMsg='…';render(true);const r=await api('discordTest',$('#dhook').value);discordMsg=r&&r.error?r.error:S.txt.discordSent;render(true)}
         // Chests added by hand (and the estimate from the Career matches): p = 's' in the settings, 'd' in the edit box.
         // The box starts empty each time: the number typed is added to what was already added, and each addition can be
         // undone with its cross (issue #27).

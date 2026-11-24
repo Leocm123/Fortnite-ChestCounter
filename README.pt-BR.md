@@ -17,7 +17,9 @@
 > Esta é uma versão personalizada do [Fortnite Chest Counter](https://github.com/LED-N/Fortnite-ChestCounter) de LED-N, com:
 > - **interface em português (Brasil)**;
 > - **temas de cores** (Pirata, Brasil, Neon, Gelo, Lava) para a janela, o relatório e o overlay;
-> - uma seção **Suas estatísticas** no relatório (baús por hora, sequência de dias, semana atual × anterior, fase recente, por modo e por colocação).
+> - uma seção **Suas estatísticas** no relatório (baús por hora, sequência de dias, semana atual × anterior, fase recente, por modo e por colocação);
+> - **metas** diárias e semanais no overlay, **21 conquistas**, **ranking do esquadrão**, **ritmo na partida**, **baús × resultado** e o **loot** dos seus baús;
+> - resumo opcional das partidas num canal do **Discord** (via webhook; desligado por padrão, e nada além do resumo é enviado).
 >
 > As atualizações do exe vêm deste repositório; os dados da caça ao tesouro continuam vindo do projeto original. Para todo o resto (funcionamento, segurança, FAQ), veja o [README em inglês](README.md).
 

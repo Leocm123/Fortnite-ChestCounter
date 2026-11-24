@@ -158,6 +158,7 @@ if (L.Normalize(config.Language) == null)
 L.Set(config.Language);
 config.ApplyTimeSettings();
 Themes.Set(config.Theme);
+config.ApplyGoals();
 var appName = L.T("Compteur de coffres Fortnite", "Fortnite Chest Counter", "Contador de cofres de Fortnite", "Contador de baús do Fortnite");
 
 if (demosArg != null) config.DemosFolder = demosArg;
@@ -446,7 +447,11 @@ while (!quit)
     {
         try
         {
-            tracker.Scan();
+            var known = data.Matches.Select(m => m.SessionId).ToHashSet();
+            if (tracker.Scan() > 0)
+            {
+                AfterNewMatches(known);
+            }
             if (ReportWriter.Progress != null)
             {
                 // The replays left at startup are read (a batch clears it itself, a single replay does not).
@@ -835,6 +840,43 @@ void ApplyOverlayAppearance()
 
 // ---- Graphical interface: state for the page, actions from the page --------------------------------
 
+// Matches just counted: the achievements they unlock and the goals they reach (activity log), and the Discord summary.
+void AfterNewMatches(HashSet<string> known)
+{
+    var view = Profiles.View(data, config);
+    var fresh = view.Matches.Where(m => !known.Contains(m.SessionId)).OrderBy(Goals.When).ToList();
+    if (fresh.Count == 0)
+    {
+        return;
+    }
+    var before = view.Matches.Where(m => known.Contains(m.SessionId)).ToList();
+    var statsBefore = ProgressStats.From(before, view.ManualAdjust);
+    var statsAfter = ProgressStats.From(view.Matches, view.ManualAdjust);
+    var unlocked = Achievements.All.Where(a => a.Unlocked(statsAfter) && !a.Unlocked(statsBefore)).ToList();
+    var goalsBefore = Goals.Of(before);
+    var reached = Goals.Of(view.Matches).Where(g => g.Done && !goalsBefore.Any(b => b.Label == g.Label && b.Done)).ToList();
+
+    Console.ForegroundColor = ConsoleColor.DarkGreen;
+    foreach (var a in unlocked)
+    {
+        Console.WriteLine($"   {a.Icon} {L.T("Succès débloqué", "Achievement unlocked", "Logro desbloqueado", "Conquista desbloqueada")}: {a.Name} — {a.Description}");
+    }
+    foreach (var g in reached)
+    {
+        Console.WriteLine($"   🎯 {L.T("Objectif atteint", "Goal reached", "Meta cumplida", "Meta batida")}: {g.Label} ({g.Text})");
+    }
+    Console.ResetColor();
+
+    // Discord: only matches played in the last 3 hours (not replays left from earlier days), 3 at most. The
+    // achievements and goals go with the last one.
+    var recent = fresh.Where(m => DateTime.UtcNow - (m.MatchStartUtc ?? m.AnalyzedAtUtc) < TimeSpan.FromHours(3)).TakeLast(3).ToList();
+    for (var i = 0; i < recent.Count; i++)
+    {
+        var lastOne = i == recent.Count - 1;
+        DiscordNotify.MatchCounted(config, recent[i], view.Matches, view.TotalChests, lastOne ? unlocked : [], lastOne ? reached : []);
+    }
+}
+
 object GuiState()
 {
     try
@@ -934,6 +976,8 @@ object BuildGuiState()
         treasures = L.N(matches.Sum(m => m.TreasureFinds.Count)),
         matches = L.N(matches.Count),
         average = matches.Count > 0 ? ((double)view.CountedChests / matches.Count).ToString("F1", L.Culture) : "0",
+        goals = Goals.Of(matches, tracker.LiveMatch?.ChestsOpened ?? 0).Select(g => new { label = g.Label, text = g.Text, pct = g.Percent, done = g.Done }).ToList(),
+        achievements = $"{Achievements.Unlocked(ProgressStats.From(matches, view.ManualAdjust)).Count} / {Achievements.All.Length}",
         progress = progress == null ? null : new { done = progress.Done, total = progress.Total },
         update = u == null ? null : new { version = u.Version.ToString(3), notes = u.WhatsNew, url = u.PageUrl },
         // First launch after an update: what this version brings (the notes are built into the exe).
@@ -961,6 +1005,10 @@ object BuildGuiState()
             languages = L.Codes.Select(c => new[] { c, L.NativeName(c) }).ToList(),
             theme = Themes.Current.Id,
             themes = Themes.All.Select(t => new[] { t.Id, t.Name }).ToList(),
+            dailyGoal = config.DailyGoal,
+            weeklyGoal = config.WeeklyGoal,
+            discordWebhook = config.DiscordWebhook ?? "",
+            discordMode = config.DiscordMode,
             windowed = guiWindowed,
             minimizeToTray = config.MinimizeToTray,
             startWithFortnite = config.StartWithFortnite,
@@ -1054,6 +1102,24 @@ object? RunGuiAction(string name, System.Text.Json.JsonElement value)
                 config.Theme = theme.Id;
                 Themes.Set(theme.Id);
             }
+            break;
+        case "dailyGoal": config.DailyGoal = Int(); config.ApplyGoals(); break;
+        case "weeklyGoal": config.WeeklyGoal = Int(); config.ApplyGoals(); break;
+        case "discordWebhook":
+            if (Str().Trim() is var url && (url.Length == 0 || DiscordNotify.IsValid(url)))
+            {
+                config.DiscordWebhook = url.Length == 0 ? null : url;
+            }
+            else
+            {
+                result = new { error = L.T("Adresse de webhook Discord invalide.", "Not a valid Discord webhook address.", "Dirección de webhook de Discord no válida.", "Endereço de webhook do Discord inválido.") };
+                settingsChanged = false;
+            }
+            break;
+        case "discordMode": config.DiscordMode = Array.IndexOf(DiscordNotify.Modes, Str()) >= 0 ? Str() : "match"; break;
+        case "discordTest":
+            settingsChanged = false;
+            result = DiscordNotify.TestAsync(Str()).GetAwaiter().GetResult() is { } failed ? new { error = failed } : new { ok = true };
             break;
         case "profile": if (Profiles.List(data).Any(p => p.Key == Str())) config.Profile = Str(); break;
         case "minimizeToTray":

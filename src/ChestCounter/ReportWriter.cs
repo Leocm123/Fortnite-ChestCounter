@@ -463,7 +463,7 @@ public static class ReportWriter
         sb.Append($"</div><div class=\"axis\"><span>{days[0].ToString(L.T("dd/MM", "d MMM", "dd/MM", "dd/MM"), Fr)}</span>"
             + (bestDay > 0 ? $"<span>{L.T("meilleur jour", "best day", "mejor día", "melhor dia")}{L.T(" : ", ": ", ": ", ": ")}{bestDate.ToString(L.T("dd/MM", "d MMM", "dd/MM", "dd/MM"), Fr)} · {L.Count(bestDay, "coffre", "chest", "cofre", "baú")}</span>" : "")
             + $"<span>{L.T("aujourd'hui", "today", "hoy", "hoje")}</span></div></div></section>");
-        sb.Append(ReportStats.Section(matches));
+        sb.Append(ReportStats.Section(matches, data.ManualAdjust));
 
         // By chest type (with the other interactions, not in the total) | where the player's treasures come from.
         var byKind = matches.SelectMany(m => m.Chests).GroupBy(c => ChestKinds.Canonical(c.Kind)).OrderByDescending(g => g.Count()).ToList();
@@ -1247,6 +1247,7 @@ public static class ReportWriter
         // The last finished match stays during the next one; the red dot next to the total says a match is in progress.
         var state = Row(L.T("Dernière", "Last", "Última", "Última"), v.Last ?? "—", "");
         var squad = v.Squad != null ? Row(OverlayModel.SquadLabel, v.Squad, "") : "";
+        var goals = string.Concat((v.Goals ?? []).Select(g => Row(g.Label, g.Text, g.Done ? "gold" : "")));
         static string Row(string label, string value, string cls) =>
             $"<div class=\"r {cls}\"><span>{H(label)}</span>{(value.Length > 0 ? $"<span class=\"sep\">•</span><b>{H(value)}</b>" : "")}</div>";
         return $$"""
@@ -1269,6 +1270,7 @@ public static class ReportWriter
             {{state}}
             {{Row(L.T("Session", "Session", "Sesión", "Sessão"), v.Session, "")}}
             {{squad}}
+            {{goals}}
             <div class="r t"><span class="star">★</span><b>{{H(v.Treasures)}}</b></div>
             </body></html>
             """;
