@@ -94,7 +94,43 @@ public static class GuiPage
         ["goalDaily"] = L.T("Objectif du jour", "Daily goal", "Meta del día", "Meta do dia"),
         ["goalWeekly"] = L.T("Objectif de la semaine (depuis lundi)", "Weekly goal (from Monday)", "Meta de la semana (desde el lunes)", "Meta da semana (a partir de segunda)"),
         ["achievements"] = L.T("Succès", "Achievements", "Logros", "Conquistas"),
-        ["brand"] = L.T("Compteur de coffres", "Chest Counter", "Contador de cofres", "Contador de Baús"),
+        ["perfOn"] = L.T("Activer le mode performance", "Turn on performance mode", "Activar el modo rendimiento", "Ativar o modo desempenho"),
+        ["showInGame"] = L.T("Afficher en jeu", "Show in game", "Mostrar en el juego", "Mostrar no jogo"),
+        ["overlayCardHelp"] = L.T("Petite fenêtre toujours au premier plan avec tes coffres (Fortnite en « Plein écran fenêtré »).", "Small always-on-top window with your chests (Fortnite in \"Windowed Fullscreen\").", "Pequeña ventana siempre visible con tus cofres (Fortnite en «Pantalla completa en ventana»).", "Janelinha sempre por cima com seus baús (Fortnite em \"Tela Cheia em Janela\")."),
+        ["uninstallKeep"] = L.T("Désinstaller et garder mon historique", "Uninstall, keep my history", "Desinstalar y conservar mi historial", "Desinstalar e manter meu histórico"),
+        ["uninstallAll"] = L.T("Désinstaller et tout supprimer", "Uninstall and delete everything", "Desinstalar y borrarlo todo", "Desinstalar e apagar tudo"),
+        ["grpLook"] = L.T("Apparence", "Look", "Apariencia", "Aparência"),
+        ["grpPerfHelp"] = L.T("Pour que le jeu garde toute la puissance du PC.", "So that the game keeps all the power of the PC.", "Para que el juego conserve toda la potencia del PC.", "Para o jogo ficar com toda a força do PC."),
+        ["grpTime"] = L.T("Heures", "Times", "Horas", "Horários"),
+        ["grpWindow"] = L.T("Fenêtre et démarrage", "Window and startup", "Ventana e inicio", "Janela e inicialização"),
+        ["grpWindowHelp"] = L.T("Comment le compteur s'ouvre, se réduit et se met à jour.", "How the counter opens, minimizes and updates.", "Cómo se abre, se minimiza y se actualiza el contador.", "Como o contador abre, minimiza e se atualiza."),
+        ["grpReplays"] = L.T("Replays et compte", "Replays and account", "Repeticiones y cuenta", "Replays e conta"),
+        ["grpReplaysHelp"] = L.T("Où Fortnite enregistre tes parties.", "Where Fortnite saves your matches.", "Dónde guarda Fortnite tus partidas.", "Onde o Fortnite salva suas partidas."),
+        ["shortcuts"] = L.T("Raccourcis", "Shortcuts", "Atajos", "Atalhos"),
+        ["shortcutsHelp"] = L.T("Fonctionnent partout, même en jeu.", "Work anywhere, even in game.", "Funcionan en cualquier lugar, incluso en el juego.", "Funcionam em qualquer lugar, até dentro do jogo."),
+        ["scShow"] = L.T("Afficher / masquer l'overlay", "Show / hide the overlay", "Mostrar / ocultar el overlay", "Mostrar / esconder o overlay"),
+        ["scLock"] = L.T("Verrouiller / déverrouiller (déverrouillé : glisse pour le déplacer)", "Lock / unlock (unlocked: drag to move it)", "Bloquear / desbloquear (desbloqueado: arrástralo para moverlo)", "Travar / destravar (destravado: arraste para mover)"),
+        ["previewHelp"] = L.T("Le même affichage que la page pour OBS, mise à jour en direct.", "The same look as the page for OBS, updated live.", "El mismo aspecto que la página para OBS, actualizado en directo.", "O mesmo visual da página do OBS, atualizado ao vivo."),
+        ["howTitle"] = L.T("Comment ça marche", "How it works", "Cómo funciona", "Como funciona"),
+        ["dataTitle"] = L.T("Tes données", "Your data", "Tus datos", "Seus dados"),
+        ["dataHelp"] = L.T("Historique, réglages, rapport et journal d'erreurs, sur ce PC.", "History, settings, report and error log, on this PC.", "Historial, ajustes, informe y registro de errores, en este PC.", "Histórico, configurações, relatório e log de erros, neste PC."),
+        ["supportTitle"] = L.T("Besoin d'aide ?", "Need help?", "¿Necesitas ayuda?", "Precisa de ajuda?"),
+        ["supportHelp"] = L.T("Un replay illisible ou un compte faux : signale-le avec le journal d'erreurs.", "An unreadable replay or a wrong count: report it with the error log.", "Una repetición ilegible o una cuenta errónea: infórmalo con el registro de errores.", "Um replay ilegível ou uma contagem errada: informe com o log de erros."),
+        ["uninstallHelp"] = L.T("Ferme le compteur et supprime ChestCounter.exe.", "Closes the counter and deletes ChestCounter.exe.", "Cierra el contador y borra ChestCounter.exe.", "Fecha o contador e apaga o ChestCounter.exe."),
+        ["mapAll"] = L.T("Tout", "All", "Todo", "Tudo"),
+        ["mapWeek"] = L.T("Cette semaine", "This week", "Esta semana", "Esta semana"),
+        ["mapLast"] = L.T("Dernière partie", "Last match", "Última partida", "Última partida"),
+        ["mapPoints"] = L.T("Points", "Points", "Puntos", "Pontos"),
+        ["mapHeat"] = L.T("Chaleur", "Heat", "Calor", "Calor"),
+        ["mapZoomIn"] = L.T("Zoomer", "Zoom in", "Acercar", "Aproximar"),
+        ["mapZoomOut"] = L.T("Dézoomer", "Zoom out", "Alejar", "Afastar"),
+        ["mapReset"] = L.T("Recentrer", "Reset the view", "Recentrar", "Recentralizar"),
+        ["mapHint"] = L.T("Molette : zoom · glisser : déplacer · double clic : zoomer", "Wheel: zoom · drag: move · double click: zoom in", "Rueda: zoom · arrastrar: mover · doble clic: acercar", "Roda do mouse: zoom · arrastar: mover · clique duplo: aproximar"),
+        ["mapLegend"] = L.T("Types de coffre", "Chest types", "Tipos de cofre", "Tipos de baú"),
+        ["mapWhere"] = L.T("Là où tu en ouvres le plus", "Where you open the most", "Donde más abres", "Onde você mais abre"),
+        ["mapEmpty"] = L.T("La carte se remplit avec les parties analysées à partir de la version 1.8.", "The map fills up with the matches analyzed from version 1.8 on.", "El mapa se llena con las partidas analizadas desde la versión 1.8.", "O mapa é preenchido com as partidas analisadas a partir da versão 1.8."),
+        ["mapSource"] = L.T("Carte", "Map", "Mapa", "Mapa"),
+        ["brand"] =L.T("Compteur de coffres", "Chest Counter", "Contador de cofres", "Contador de Baús"),
         ["map"] = L.T("Carte", "Map", "Mapa", "Mapa"),
         ["account"] = L.T("Compte", "Account", "Cuenta", "Conta"),
         ["recent"] = L.T("le plus récent en haut", "newest first", "lo más reciente arriba", "mais recentes no topo"),
@@ -250,7 +286,10 @@ public static class GuiPage
         .sbtn{display:flex;align-items:center;gap:8px;padding:8px 10px;border:1px solid var(--sideline);border-radius:9px;background:transparent;color:var(--sidemuted);font:600 13px "Segoe UI",system-ui,sans-serif;cursor:pointer}
         .sbtn:hover{color:var(--err);border-color:var(--err)}.sbtn .ic{width:16px;height:16px}
         #scroll{flex:1;min-width:0}
-        main{display:grid;grid-template-columns:minmax(0,1fr);gap:18px;padding:24px 24px 32px;max-width:1360px}
+        /* Large screens: the content keeps a comfortable width and sits in the middle of the space next to the side bar. */
+        main{display:grid;grid-template-columns:minmax(0,1fr);gap:18px;padding:24px 24px 32px;max-width:1320px;margin:0 auto}
+        @media (min-width:1600px){main{max-width:1400px;padding-top:36px}main.home{grid-template-columns:minmax(0,1fr) 340px}.hero .v{font-size:88px}}
+        @media (min-width:2200px){main{max-width:1560px;padding-top:48px}body{font-size:16px}}
         main.home{grid-template-columns:minmax(0,1fr) 292px}
         #app{display:flex;flex-direction:column;gap:18px;min-width:0}
         #reportPane{grid-column:1/-1}
@@ -373,6 +412,55 @@ public static class GuiPage
         .mhist .mx{border:0;background:none;color:var(--smuted);font-size:18px;line-height:1;cursor:pointer;padding:2px 7px;border-radius:4px}
         .mhist .mx:hover{color:var(--err)}
         @media (max-width:640px){.row{flex-direction:column;align-items:flex-start}.hero{grid-template-columns:1fr}}
+        /* ---- Grouped cards (settings, overlay, help) ---- */
+        .cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(440px,1fr));gap:16px;align-items:start}
+        @media (max-width:980px){.cards{grid-template-columns:1fr}}
+        .cards .wide{grid-column:1/-1}
+        .scard{padding:18px 20px}
+        .scard .ch{display:flex;gap:12px;align-items:flex-start;margin-bottom:6px}
+        .scard .ch>.ic{width:38px;height:38px;padding:9px;border-radius:11px;background:color-mix(in srgb,var(--kicon) 16%,transparent);color:var(--kicon)}
+        .scard h3{margin:0;font-size:16px;line-height:1.25;color:var(--sink)}
+        .scard .ch p{margin:2px 0 0;font-size:13px;color:var(--smuted)}
+        .scard .row:first-of-type{border-top:1px solid var(--sline)}
+        .scard>p{font-size:14px;margin:10px 0 12px}
+        .themes{display:grid;grid-template-columns:repeat(auto-fill,minmax(118px,1fr));gap:10px;padding:12px 0 6px}
+        .theme{display:flex;flex-direction:column;gap:8px;padding:8px;border-radius:12px;border:2px solid var(--sline);background:transparent;color:var(--sink);font:600 13px "Segoe UI",system-ui,sans-serif;cursor:pointer;text-align:left}
+        .theme:hover{border-color:var(--kicon)}.theme.on{border-color:var(--kicon);box-shadow:0 0 0 3px color-mix(in srgb,var(--kicon) 25%,transparent)}
+        .theme i{display:block;height:44px;border-radius:8px;position:relative;overflow:hidden}
+        .theme i:after{content:"";position:absolute;right:8px;bottom:8px;width:34%;height:30%;border-radius:4px;background:var(--b)}
+        .keys{display:flex;flex-direction:column;gap:10px;margin-top:10px}
+        .key{display:grid;grid-template-columns:150px 1fr;align-items:center;gap:12px;font-size:14px}.key>span:first-child{white-space:nowrap}
+        kbd{display:inline-block;min-width:26px;padding:3px 8px;border-radius:6px;border:1px solid var(--sline);border-bottom-width:3px;background:color-mix(in srgb,var(--sink) 5%,transparent);font:700 12px "Segoe UI",system-ui,sans-serif;text-align:center;white-space:nowrap}
+        .stage{margin-top:12px;border-radius:12px;min-height:250px;display:grid;place-items:center;padding:16px;background:linear-gradient(160deg,#3b6fb6 0%,#6fa0d8 38%,#9cc26a 62%,#5d8a3c 100%);position:relative;overflow:hidden}
+        .stage:before{content:"";position:absolute;inset:0;background:radial-gradient(60% 40% at 80% 10%,rgba(255,255,255,.35),transparent 70%)}
+        .stage iframe{position:relative;border:0;width:380px;height:240px;max-width:100%;background:transparent}
+        /* ---- Map tab ---- */
+        #mapPane{grid-column:1/-1;display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:18px;align-items:start}
+        @media (max-width:1100px){#mapPane{grid-template-columns:1fr}}
+        .mapbox{padding:12px;position:relative}
+        .mapbar{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;margin:0 2px 10px}
+        .seg{display:inline-flex;padding:3px;border-radius:10px;background:color-mix(in srgb,var(--sink) 7%,transparent);gap:2px}
+        .seg button{border:0;background:transparent;color:var(--smuted);font:600 13px "Segoe UI",system-ui,sans-serif;padding:6px 12px;border-radius:8px;cursor:pointer;display:inline-flex;gap:6px;align-items:center}
+        .seg button .ic{width:15px;height:15px}
+        .seg button.on{background:var(--surface);color:var(--sink);box-shadow:0 1px 3px rgba(0,0,0,.18)}
+        :root[data-accent="arena"] .seg button.on{background:rgba(255,255,255,.14)}
+        .mapcv{position:relative;border-radius:10px;overflow:hidden;background:#0d3a5c;aspect-ratio:1;max-height:calc(100vh - 190px);margin:0 auto;cursor:grab;touch-action:none}
+        .mapcv.drag{cursor:grabbing}
+        .mapcv canvas{display:block;width:100%;height:100%}
+        .mapzoom{position:absolute;right:10px;top:10px;display:flex;flex-direction:column;gap:6px}
+        .mapzoom button{width:34px;height:34px;border-radius:9px;border:0;background:rgba(10,15,24,.72);color:#fff;display:grid;place-items:center;cursor:pointer}
+        .mapzoom button .ic{width:17px;height:17px}
+        .maphint{font-size:12px;color:var(--smuted);margin:8px 4px 0;display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap}
+        .mapside{display:flex;flex-direction:column;gap:14px}
+        .mapside .card h3{margin:0 0 8px;font-size:15px;color:var(--sink)}
+        .mstats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+        .mstats div{text-align:center}.mstats b{display:block;font-size:26px;line-height:1.1}.mstats span{font-size:12px;color:var(--smuted)}
+        .mlist,.card .mlist{list-style:none;margin:0;padding:0}
+        .mlist li{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:4px 10px;padding:8px 0;border-top:1px solid var(--sline);font-size:13.5px}
+        .mlist li:first-child{border-top:0}
+        .mlist .mb{grid-column:1/-1;height:5px;border-radius:3px;background:var(--strack);overflow:hidden}.mlist .mb i{display:block;height:100%;background:var(--accent)}
+        .mlist small{color:var(--smuted)}
+        .mleg{display:flex;flex-direction:column;gap:6px;font-size:13.5px}.mleg span{display:flex;align-items:center;gap:8px}.mleg i{width:11px;height:11px;border-radius:50%;box-shadow:0 0 0 1.5px rgba(0,0,0,.35)}
         body.perf *,body.perf *:before,body.perf *:after{transition:none!important;animation:none!important;backdrop-filter:none!important}
         /* ---- The counter's own window: its title bar is drawn here (drag to move, double click to maximize) ---- */
         .tbar{display:none}
@@ -398,7 +486,7 @@ public static class GuiPage
           <button type="button" id="wmax"><svg width="10" height="10" viewBox="0 0 10 10" aria-hidden="true"><rect id="wmaxicon" x=".55" y=".55" width="8.9" height="8.9" fill="none" stroke="currentColor" stroke-width="1.1"/><path id="wresicon" d="M2.5 2.5V.55h6.95v6.95H7.5M.55 2.5h6.95v6.95H.55z" fill="none" stroke="currentColor" stroke-width="1.1" style="display:none"/></svg></button>
           <button type="button" id="wclose" class="x"><svg width="10" height="10" viewBox="0 0 10 10" aria-hidden="true"><path d="M.5.5l9 9M9.5.5l-9 9" stroke="currentColor" stroke-width="1.2"/></svg></button>
         </div></div>
-        <div id="shell"><aside id="side"></aside><div id="scroll"><main id="main"><div id="app"><p class="note">…</p></div><aside id="activityPane" class="panel hidden"><h3 class="ttl"></h3><div class="log"></div></aside><section id="reportPane" class="hidden"><iframe id="rep" title="Report" scrolling="no"></iframe></section></main></div></div>
+        <div id="shell"><aside id="side"></aside><div id="scroll"><main id="main"><div id="app"><p class="note">…</p></div><aside id="activityPane" class="panel hidden"><h3 class="ttl"></h3><div class="log"></div></aside><section id="reportPane" class="hidden"><iframe id="rep" title="Report" scrolling="no"></iframe></section><section id="mapPane" class="hidden"></section></main></div></div>
         <dialog id="dlg" aria-labelledby="dlgT"><div class="dhead"><h2 class="ttl" id="dlgT"></h2><button type="button" class="dclose" id="dlgX">×</button></div><div id="dlgB"></div></dialog>
         <script>
         const TOKEN='__TOKEN__',IC=__ICONS__,TABS=['home','report','map','overlay','settings','help'];
@@ -420,7 +508,7 @@ public static class GuiPage
         function sw(id,on,act){return `<label class="switch"><input type="checkbox" id="${id}" ${on?'checked':''} onchange="api('${act}',this.checked)"><span></span></label>`}
         function row(title,help,control){return `<div class="row"><div><div class="t">${title}</div>${help?`<div class="h">${help}</div>`:''}</div><div>${control}</div></div>`}
         function sel(act,value,opts){return `<select onchange="api('${act}',this.value)">${opts.map(o=>`<option value="${esc(o[0])}" ${String(o[0])===String(value)?'selected':''}>${esc(o[1])}</option>`).join('')}</select>`}
-        function setTab(t){const was=tab;tab=t;try{localStorage.setItem('cc-gui-tab',t)}catch(e){}render(true);if(t==='map')scrollToMap();else if(t!==was)scroller().scrollTop=0}
+        function setTab(t){const was=tab;tab=t;try{localStorage.setItem('cc-gui-tab',t)}catch(e){}render(true);if(t!==was)scroller().scrollTop=0}
         const NAV={home:'home',report:'report',map:'map',overlay:'overlay',settings:'gear',help:'help'};
         // The side bar: the app, its tabs, and what the counter is doing (with the account and, in a browser, quit).
         function side(T){
@@ -445,11 +533,11 @@ public static class GuiPage
           if(!force&&pressedAt&&Date.now()-pressedAt<3000)return;
           $('#main').classList.toggle('home',tab==='home');
           let v='';
-          if(tab==='home')v=home(T);else if(tab==='report'||tab==='map')v=header(T,`<button class="b main" onclick="api('openReportFile')">${IC.report}${esc(T.openInBrowser)}</button>`);else if(tab==='overlay')v=overlay(T);else if(tab==='settings')v=settings(T);else if(tab==='help')v=help(T);
+          if(tab==='home')v=home(T);else if(tab==='report')v=header(T,`<button class="b main" onclick="api('openReportFile')">${IC.report}${esc(T.openInBrowser)}</button>`);else if(tab==='map')v=header(T,'');else if(tab==='overlay')v=overlay(T);else if(tab==='settings')v=settings(T);else if(tab==='help')v=help(T);
           // Rebuilt only when something changed: the buttons stay the same elements between two refreshes.
           const app=notices(T)+v;
           if(force||app!==appHtml){$('#app').innerHTML=app;appHtml=app}
-          showActivity(T);showReport();winTitles();
+          showActivity(T);showReport();showMap(T);winTitles();
         }
         // pressedAt: when the mouse button went down (0 once released). Forgotten after 3 s in case the release was
         // missed (outside the window), so the page never stops refreshing.
@@ -501,13 +589,92 @@ public static class GuiPage
         // The "Map" tab is the same page, scrolled to its map.
         let repStamp=null,repObs=null;
         function fitReport(){const f=$('#rep');try{const m=f.contentDocument.querySelector('main');f.style.height=Math.ceil(m.getBoundingClientRect().height)+'px'}catch(e){}}
-        function scrollToMap(){try{const f=$('#rep'),el=f.contentDocument&&f.contentDocument.getElementById('mapa');if(el)el.scrollIntoView({block:'start'})}catch(e){}}
         function showReport(){
-          const pane=$('#reportPane'),f=$('#rep'),on=tab==='report'||tab==='map';pane.classList.toggle('hidden',!on);
+          const pane=$('#reportPane'),f=$('#rep'),on=tab==='report';pane.classList.toggle('hidden',!on);
           if(!on||S.reportStamp===repStamp)return;
           const y=scroller().scrollTop;repStamp=S.reportStamp;
-          f.onload=()=>{fitReport();if(tab==='map')scrollToMap();else scroller().scrollTop=y;try{if(repObs)repObs.disconnect();repObs=new ResizeObserver(fitReport);repObs.observe(f.contentDocument.querySelector('main'))}catch(e){}};
+          f.onload=()=>{fitReport();scroller().scrollTop=y;try{if(repObs)repObs.disconnect();repObs=new ResizeObserver(fitReport);repObs.observe(f.contentDocument.querySelector('main'))}catch(e){}};
           f.src='/report?t='+TOKEN+'&v='+encodeURIComponent(repStamp);
+        }
+        // ---- The Map tab: drawn on a canvas (light even with thousands of chests), its data asked for when the tab opens
+        // and again only when the counter rewrote its figures. Wheel: zoom around the pointer; drag: move; points or heat.
+        let MD=null,mapStamp=null,mapLang=null,mapImg=null,mapF='all',mapMode='pts',mapView=null,mapLoading=false,mapRaf=0;
+        function showMap(T){
+          const pane=$('#mapPane'),on=tab==='map';pane.classList.toggle('hidden',!on);
+          if(!on)return;
+          if(mapLang!==S.lang||!pane.firstChild){mapLang=S.lang;buildMap(T)}
+          if(S.reportStamp!==mapStamp&&!mapLoading)loadMap();else drawMap();
+        }
+        function buildMap(T){
+          $('#mapPane').innerHTML=`<div class="card mapbox"><div class="mapbar"><div class="seg" id="mapF">${[['all',T.mapAll],['week',T.mapWeek],['last',T.mapLast]].map(([k,t])=>`<button type="button" data-f="${k}" class="${k===mapF?'on':''}">${esc(t)}</button>`).join('')}</div>
+            <div class="seg" id="mapM">${[['pts',IC.dots,T.mapPoints],['heat',IC.flame,T.mapHeat]].map(([k,i,t])=>`<button type="button" data-m="${k}" class="${k===mapMode?'on':''}">${i}${esc(t)}</button>`).join('')}</div></div>
+            <div class="mapcv" id="mapCv"><canvas aria-label="${esc(T.map)}" role="img"></canvas><div class="mapzoom"><button type="button" data-z="1" title="${esc(T.mapZoomIn)}">${IC.plus}</button><button type="button" data-z="-1" title="${esc(T.mapZoomOut)}">${IC.minus}</button><button type="button" data-z="0" title="${esc(T.mapReset)}">${IC.crosshair}</button></div><div class="fempty" id="mapEmpty" style="position:absolute;inset:0;justify-content:center;color:#fff;padding:24px;text-align:center" hidden>${IC.map}<span>${esc(T.mapEmpty)}</span></div></div>
+            <div class="maphint"><span>${esc(T.mapHint)}</span><span id="mapSrc"></span></div></div>
+            <div class="mapside"><div class="card"><div class="mstats" id="mapStats"></div></div><div class="card"><h3>${esc(T.mapLegend)}</h3><div class="mleg" id="mapLeg"></div></div><div class="card"><h3>${esc(T.mapWhere)}</h3><ul class="mlist" id="mapPlaces"></ul></div></div>`;
+          const seg=(id,attr,set)=>{$(id).onclick=e=>{const b=e.target.closest('button');if(!b)return;set(b.dataset[attr]);$(id).querySelectorAll('button').forEach(x=>x.classList.toggle('on',x===b));drawMap()}};
+          seg('#mapF','f',v=>mapF=v);seg('#mapM','m',v=>mapMode=v);
+          const cv=$('#mapCv');
+          cv.querySelector('.mapzoom').onclick=e=>{const b=e.target.closest('button');if(!b||!mapView)return;const z=+b.dataset.z;if(z===0)resetView();else zoomAt(z>0?1.5:1/1.5,.5,.5);drawMap()};
+          const at=e=>{const r=cv.getBoundingClientRect();return [(e.clientX-r.left)/r.width,(e.clientY-r.top)/r.height]};
+          cv.addEventListener('wheel',e=>{if(!mapView)return;e.preventDefault();zoomAt(e.deltaY<0?1.25:.8,...at(e));drawMap()},{passive:false});
+          cv.addEventListener('dblclick',e=>{if(!mapView||e.target.closest('.mapzoom'))return;zoomAt(1.8,...at(e));drawMap()});
+          let drag=null;
+          cv.addEventListener('pointerdown',e=>{if(!mapView||e.target.closest('.mapzoom'))return;drag={x:e.clientX,y:e.clientY,cx:mapView.cx,cy:mapView.cy};cv.setPointerCapture(e.pointerId);cv.classList.add('drag')});
+          cv.addEventListener('pointermove',e=>{if(!drag)return;const k=mapView.s/cv.getBoundingClientRect().width;mapView.cx=drag.cx-(e.clientX-drag.x)*k;mapView.cy=drag.cy-(e.clientY-drag.y)*k;clampView();drawMap()});
+          const end=()=>{drag=null;cv.classList.remove('drag')};cv.addEventListener('pointerup',end);cv.addEventListener('pointercancel',end);
+          new ResizeObserver(()=>drawMap()).observe(cv);
+          if(MD)fillMapSide();
+        }
+        async function loadMap(){
+          mapLoading=true;
+          try{
+            const r=await fetch('/api/action',{method:'POST',headers:{'X-Token':TOKEN,'Content-Type':'application/json'},body:JSON.stringify({action:'mapData'})});
+            MD=(await r.json()).result;mapStamp=S.reportStamp;
+            if(MD.image&&(!mapImg||mapImg.dataset.src!==MD.image)){mapImg=new Image();mapImg.dataset.src=MD.image;mapImg.onload=()=>drawMap();mapImg.src=MD.image}
+            if(!mapView)resetView();
+            fillMapSide();drawMap();
+          }catch(e){}
+          mapLoading=false;
+        }
+        function resetView(){if(MD)mapView={cx:MD.crop[0]+MD.crop[2]/2,cy:MD.crop[1]+MD.crop[2]/2,s:MD.crop[2]}}
+        function clampView(){mapView.cx=Math.min(1000,Math.max(0,mapView.cx));mapView.cy=Math.min(1000,Math.max(0,mapView.cy))}
+        // Zoom by f, keeping the point under (px, py) (0..1 of the canvas) where it is.
+        function zoomAt(f,px,py){const v=mapView,a=v.a||1,s2=Math.min(1000,Math.max(35,v.s/f)),wx=v.cx-v.s/2+px*v.s,wy=v.cy-v.s*a/2+py*v.s*a;v.cx=wx+s2/2-px*s2;v.cy=wy+s2*a/2-py*s2*a;v.s=s2;clampView()}
+        function fillMapSide(){
+          const T=S.txt;if(!MD||!$('#mapStats'))return;
+          $('#mapStats').innerHTML=[[MD.total,T.mapAll],[MD.week,T.mapWeek],[MD.lastCount,T.mapLast]].map(([n,t])=>`<div><b class="num">${esc(n)}</b><span>${esc(t)}</span></div>`).join('');
+          $('#mapLeg').innerHTML=MD.kinds.length?MD.kinds.map(k=>`<span><i style="background:${esc(k.color)}"></i>${esc(k.name)} · ${k.count}</span>`).join(''):`<span>—</span>`;
+          const top=Math.max(1,...MD.places.map(p=>p.n));
+          $('#mapPlaces').innerHTML=MD.places.length?MD.places.map(p=>`<li><span>${esc(p.name)}</span><b class="num">${esc(p.count)}</b><span class="mb"><i style="width:${Math.max(3,Math.round(100*p.n/top))}%"></i></span><small>${esc(p.matches)}</small></li>`).join(''):`<li><small>—</small></li>`;
+          $('#mapSrc').textContent=MD.source?T.mapSource+': '+MD.source:'';
+          $('#mapEmpty').style.display=MD.points.length?'none':'flex';
+        }
+        // The heat colors: from transparent blue to red.
+        const HEAT=(()=>{const c=document.createElement('canvas');c.width=256;c.height=1;const g=c.getContext('2d'),gr=g.createLinearGradient(0,0,256,0);[[0,'rgba(43,107,255,0)'],[.2,'#2b6bff'],[.45,'#3ff0a0'],[.7,'#ffe14d'],[1,'#ff3b30']].forEach(([o,col])=>gr.addColorStop(o,col));g.fillStyle=gr;g.fillRect(0,0,256,1);return g.getImageData(0,0,256,1).data})();
+        function drawMap(){if(!mapRaf)mapRaf=requestAnimationFrame(()=>{mapRaf=0;paintMap()})}
+        function paintMap(){
+          const cv=$('#mapCv');if(!cv||!MD||!mapView||tab!=='map')return;
+          const c=cv.querySelector('canvas'),dpr=window.devicePixelRatio||1,W=Math.round(cv.clientWidth*dpr),H=Math.round(cv.clientHeight*dpr);
+          if(!W||!H)return;
+          if(c.width!==W||c.height!==H){c.width=W;c.height=H}
+          // s: width shown (picture units); the height shown follows the canvas' proportions.
+          mapView.a=H/W;
+          const g=c.getContext('2d'),s=mapView.s,k=W/s,x0=mapView.cx-s/2,y0=mapView.cy-s*mapView.a/2;
+          g.setTransform(1,0,0,1,0,0);g.fillStyle='#0d3a5c';g.fillRect(0,0,W,H);
+          if(mapImg&&mapImg.complete&&mapImg.naturalWidth){g.setTransform(k,0,0,k,-x0*k,-y0*k);g.imageSmoothingQuality='high';g.drawImage(mapImg,0,0,1000,1000);g.setTransform(1,0,0,1,0,0)}
+          const pts=MD.points.filter(p=>mapF==='all'||(mapF==='week'?p[3]&1:p[3]&2)),X=p=>(p[0]-x0)*k,Y=p=>(p[1]-y0)*k;
+          if(mapMode==='heat'){
+            const R=Math.min(70*dpr,Math.max(12*dpr,20*k)),off=document.createElement('canvas');off.width=W;off.height=H;const o=off.getContext('2d');
+            for(const p of pts){const x=X(p),y=Y(p);if(x<-R||y<-R||x>W+R||y>H+R)continue;const gr=o.createRadialGradient(x,y,0,x,y,R);gr.addColorStop(0,'rgba(0,0,0,.28)');gr.addColorStop(1,'rgba(0,0,0,0)');o.fillStyle=gr;o.fillRect(x-R,y-R,2*R,2*R)}
+            const img=o.getImageData(0,0,W,H),d=img.data;
+            for(let i=3;i<d.length;i+=4){const a=d[i];if(!a)continue;const j=a*4;d[i-3]=HEAT[j];d[i-2]=HEAT[j+1];d[i-1]=HEAT[j+2];d[i]=Math.min(235,40+a*1.7)}
+            o.putImageData(img,0,0);g.drawImage(off,0,0);
+          }else{
+            const r=Math.min(7*dpr,Math.max(3*dpr,1.7*k));g.lineWidth=1.3*dpr;g.strokeStyle='rgba(8,12,20,.85)';
+            MD.kinds.forEach((kd,i)=>{g.beginPath();for(const p of pts){if(p[2]!==i)continue;const x=X(p),y=Y(p);if(x<-r||y<-r||x>W+r||y>H+r)continue;g.moveTo(x+r,y);g.arc(x,y,r,0,6.2832)}g.fillStyle=kd.color;g.fill();g.stroke()});
+          }
+          g.font=`700 ${Math.round(12.5*dpr)}px "Segoe UI",system-ui,sans-serif`;g.textAlign='center';g.textBaseline='middle';g.lineJoin='round';
+          for(const p of MD.pois){const x=(p.u-x0)*k,y=(p.v-y0)*k;if(x<-80||y<-20||x>W+80||y>H+20)continue;g.lineWidth=4*dpr;g.strokeStyle='rgba(8,12,20,.85)';g.strokeText(p.name,x,y);g.fillStyle='#fff';g.fillText(p.name,x,y)}
         }
         // Messages of content.json (a known problem, a fix to install...): above every tab.
         function notices(T){return (S.notices||[]).map(n=>`<div class="card notice ${n.level==='warning'?'warning':''}" role="${n.level==='warning'?'alert':'status'}"><span class="ni" aria-hidden="true">${n.level==='warning'?IC.warning:IC.info}</span><div class="nb">${n.title?`<div class="nt">${esc(n.title)}</div>`:''}<div class="nx">${esc(n.text)}</div>${n.link?`<div class="actions"><button class="b ${n.level==='warning'?'main':''}" onclick="window.open('${esc(n.link)}','_blank')">${esc(T.moreInfo)}</button></div>`:''}</div>${n.level==='info'?`<button class="nclose" title="${esc(T.close)}" aria-label="${esc(T.close)}" onclick="api('dismissNotice','${esc(n.id)}')">×</button>`:''}</div>`).join('')}
@@ -546,34 +713,40 @@ public static class GuiPage
           if(!S.update&&S.updatesOn)h+=`<div><button class="b" onclick="api('checkUpdate')">${IC.refresh}${esc(T.checkUpdate)}</button></div>`;
           return h;
         }
+        // A card of grouped settings: its icon, title and one line about it, then its rows.
+        function scard(icon,title,desc,body,cls){return `<section class="card scard ${cls||''}"><div class="ch">${IC[icon]}<div><h3>${title}</h3>${desc?`<p>${desc}</p>`:''}</div></div>${body}</section>`}
+        // The themes as small previews (background, panel, accent) instead of a list.
+        const SWATCH={pirate:['#101a22','#7a4a1e','#ffd36a'],noite:['#0b1016','#121a24','#f2b84b'],arena:['#0d0b2b','#7a3cff','#ffe14d'],brasil:['#062b1b','#002776','#ffdf00'],neon:['#0e0a1c','#2b0f52','#ff5fd8'],gelo:['#0b1a2b','#0f3c66','#7fd3ff'],lava:['#1c0b07','#6e1a0a','#ff8a3d']};
+        function themePicker(s){return `<div class="themes">${s.themes.map(([id,name])=>{const c=SWATCH[id]||['#222','#444','#999'];return `<button type="button" class="theme ${id===s.theme?'on':''}" onclick="api('theme','${esc(id)}')"><i style="background:linear-gradient(135deg,${c[0]} 0 55%,${c[1]} 55%);--b:${c[2]}"></i>${esc(name)}</button>`}).join('')}</div>`}
         function overlay(T){
           const o=S.overlay;
-          let h=header(T,'')+`<div class="card">${row(esc(T.inGame),esc(T.inGameHelp),sw('ov',o.show,'showOverlay'))}
-            ${row(esc(T.style),'',sel('overlayStyle',o.style,[['hud',T.hud],['classic',T.classic]]))}
-            ${o.show?row(esc(T.size),'',sel('overlaySize',o.size,o.sizes.map(x=>[x,x+' %'])))+row(esc(T.opacity),'',sel('overlayOpacity',o.opacity,o.opacities.map(x=>[x,x+' %']))):''}
-            ${row(esc(T.squadToggle)+`<span class="badge" title="${esc(T.inaccurateWhy)}">${esc(T.inaccurate)}</span>`,esc(T.squadHelp)+'<br>'+esc(T.inaccurateWhy),sw('sq',o.squad,'showSquadTotal'))}</div>
-            <h2 class="sec ttl">${esc(T.obs)}</h2><div class="card">${S.perf?`<p class="note" style="margin:0">${esc(T.obsPerf)}</p>`:`<span class="path">${esc(S.paths.overlay)}</span><p class="note">${esc(T.obsSteps)}</p>
-            <div class="actions"><button class="b main" onclick="copyObs()">${esc(copied?T.copied:T.copy)}</button><button class="b" onclick="window.open('/overlay?t='+TOKEN,'_blank')">${esc(T.preview)}</button></div>`}</div>`;
-          return h;
+          const look=scard('overlay',esc(T.inGame),esc(T.overlayCardHelp),row(esc(T.showInGame),'',sw('ov',o.show,'showOverlay'))
+            +row(esc(T.style),'',sel('overlayStyle',o.style,[['hud',T.hud],['classic',T.classic]]))
+            +(o.show?row(esc(T.size),'',sel('overlaySize',o.size,o.sizes.map(x=>[x,x+' %'])))+row(esc(T.opacity),'',sel('overlayOpacity',o.opacity,o.opacities.map(x=>[x,x+' %']))):'')
+            +row(esc(T.squadToggle)+`<span class="badge" title="${esc(T.inaccurateWhy)}">${esc(T.inaccurate)}</span>`,esc(T.squadHelp),sw('sq',o.squad,'showSquadTotal'))
+            +(o.running?`<div class="actions" style="margin-top:12px"><button class="b" onclick="api('toggleOverlayVisible')">${IC.eye}${esc(o.visible?T.hideOverlay:T.showOverlay)}</button><button class="b" onclick="api('toggleOverlayLock')">${IC.lock}${esc(o.locked?T.unlock:T.lock)}</button></div>`:''));
+          const keys=scard('keyboard',esc(T.shortcuts),esc(T.shortcutsHelp),`<div class="keys"><div class="key"><span><kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>O</kbd></span><span>${esc(T.scShow)}</span></div><div class="key"><span><kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>L</kbd></span><span>${esc(T.scLock)}</span></div></div>`);
+          const preview=scard('eye',esc(T.preview),esc(T.previewHelp),S.perf?`<p class="note">${esc(T.obsPerf)}</p>`:`<div class="stage"><iframe src="/overlay?t=${TOKEN}" title="${esc(T.preview)}" scrolling="no"></iframe></div>`);
+          const obs=scard('layers',esc(T.obs),'',S.perf?`<p class="note">${esc(T.obsPerf)}</p>`:`<span class="path">${esc(S.paths.overlay)}</span><p class="note">${esc(T.obsSteps)}</p>
+            <div class="actions"><button class="b main" onclick="copyObs()">${esc(copied?T.copied:T.copy)}</button><button class="b" onclick="window.open('/overlay?t='+TOKEN,'_blank')">${esc(T.preview)}</button></div>`);
+          return header(T,'')+`<div class="cards"><div style="display:flex;flex-direction:column;gap:16px">${look}${keys}</div><div style="display:flex;flex-direction:column;gap:16px">${preview}${obs}</div></div>`;
         }
         function settings(T){
           const s=S.settings;
-          let h=header(T,'')+`<div class="card">${row(esc(T.theme),esc(T.themeHelp),sel('theme',s.theme,s.themes))}
-            ${perfRow(T,s,'pm')}${row(esc(T.language),'',sel('language',s.language,s.languages))}
-            ${row(esc(T.times),esc(T.timesHelp),sel('timeZone',s.timeZone,[['local',fmt(T.timesLocal,s.localZone)],['utc',T.timesUtc]]))}
-            ${row(esc(T.clock),'',sel('clockFormat',s.clockFormat,[['auto',fmt(T.clockAuto,s.windowsClock==='24'?T.h24:T.h12)],['12',T.clock12],['24',T.clock24]]))}
-            ${S.profiles.length>1?row(esc(T.profile),'',sel('profile',S.profileKey,S.profiles.map(p=>[p.key,p.name+' ('+p.matches+' · '+p.chests+')']))):''}
-            ${s.windowed?row(esc(T.tray),esc(T.trayHelp),sw('tr',s.minimizeToTray,'minimizeToTray')):''}
-            ${s.canStartWithFortnite?row(esc(T.withFortnite),esc(T.withFortniteHelp),sw('wf',s.startWithFortnite,'startWithFortnite')):''}
-            ${row(esc(T.updates),'',sel('updateMode',s.updateMode,[['prompt',T.upPrompt],['auto',T.upAuto],['off',T.upOff]]))}
-            <div class="row"><div style="flex:1"><div class="t">${esc(T.demos)}</div>${s.demosExists?'':`<div class="h">${esc(T.demosMissing)}</div>`}<div class="actions" style="margin-top:6px"><input type="text" id="demos" value="${esc(s.demos)}"><button class="b" onclick="api('demosFolder',$('#demos').value)">${esc(T.save)}</button></div></div></div></div>`;
-          h+=`<h2 class="sec ttl">${esc(T.goals)}</h2><div class="card"><p class="note" style="margin-top:0">${esc(T.goalsHelp)}</p>
-            ${row(esc(T.goalDaily),'',`<div class="actions"><input type="number" id="gday" min="0" step="1" value="${s.dailyGoal||''}" placeholder="0" style="width:110px"><button class="b" onclick="api('dailyGoal',$('#gday').value||'0')">${esc(T.save)}</button></div>`)}
-            ${row(esc(T.goalWeekly),'',`<div class="actions"><input type="number" id="gweek" min="0" step="1" value="${s.weeklyGoal||''}" placeholder="0" style="width:110px"><button class="b" onclick="api('weeklyGoal',$('#gweek').value||'0')">${esc(T.save)}</button></div>`)}</div>
-            <h2 class="sec ttl">Discord</h2><div class="card"><p class="note" style="margin-top:0">${esc(T.discordHelp)}</p>
-            <div class="row"><div style="flex:1"><div class="t">${esc(T.discordUrl)}</div><div class="actions" style="margin-top:6px"><input type="text" id="dhook" value="${esc(s.discordWebhook)}" placeholder="https://discord.com/api/webhooks/…"><button class="b" onclick="saveDiscord()">${esc(T.save)}</button><button class="b" onclick="testDiscord()">${esc(T.discordTest)}</button></div>${discordMsg?`<div class="h" style="margin-top:6px">${esc(discordMsg)}</div>`:''}</div></div>
-            ${row(esc(T.discordMode),'',sel('discordMode',s.discordMode,[['match',T.discordAll],['treasure',T.discordNotable]]))}</div>`;
-          return h;
+          const look=scard('palette',esc(T.grpLook),esc(T.themeHelp),themePicker(s)+row(esc(T.language),'',sel('language',s.language,s.languages)),'wide');
+          const perf=scard('bolt',esc(T.perf)+(s.performanceRecommended&&!s.performanceMode?`<span class="perfbadge">${esc(T.perfRecommended)}</span>`:''),esc(T.grpPerfHelp),row(esc(T.perfOn),esc(T.perfHelp),sw('pm',s.performanceMode,'performanceMode')));
+          const time=scard('clock',esc(T.grpTime),esc(T.timesHelp),row(esc(T.times),'',sel('timeZone',s.timeZone,[['local',fmt(T.timesLocal,s.localZone)],['utc',T.timesUtc]]))
+            +row(esc(T.clock),'',sel('clockFormat',s.clockFormat,[['auto',fmt(T.clockAuto,s.windowsClock==='24'?T.h24:T.h12)],['12',T.clock12],['24',T.clock24]])));
+          const win=scard('window',esc(T.grpWindow),esc(T.grpWindowHelp),(s.windowed?row(esc(T.tray),esc(T.trayHelp),sw('tr',s.minimizeToTray,'minimizeToTray')):'')
+            +(s.canStartWithFortnite?row(esc(T.withFortnite),esc(T.withFortniteHelp),sw('wf',s.startWithFortnite,'startWithFortnite')):'')
+            +row(esc(T.updates),'',sel('updateMode',s.updateMode,[['prompt',T.upPrompt],['auto',T.upAuto],['off',T.upOff]])));
+          const replays=scard('folder',esc(T.grpReplays),esc(T.grpReplaysHelp),(S.profiles.length>1?row(esc(T.profile),'',sel('profile',S.profileKey,S.profiles.map(p=>[p.key,p.name+' ('+p.matches+' · '+p.chests+')']))):'')
+            +`<div class="row"><div style="flex:1"><div class="t">${esc(T.demos)}</div>${s.demosExists?'':`<div class="h">${esc(T.demosMissing)}</div>`}<div class="actions" style="margin-top:6px"><input type="text" id="demos" value="${esc(s.demos)}" style="flex:1;min-width:0"><button class="b" onclick="api('demosFolder',$('#demos').value)">${esc(T.save)}</button></div></div></div>`);
+          const goals=scard('target',esc(T.goals),esc(T.goalsHelp),row(esc(T.goalDaily),'',`<div class="actions"><input type="number" id="gday" min="0" step="1" value="${s.dailyGoal||''}" placeholder="0" style="width:100px"><button class="b" onclick="api('dailyGoal',$('#gday').value||'0')">${esc(T.save)}</button></div>`)
+            +row(esc(T.goalWeekly),'',`<div class="actions"><input type="number" id="gweek" min="0" step="1" value="${s.weeklyGoal||''}" placeholder="0" style="width:100px"><button class="b" onclick="api('weeklyGoal',$('#gweek').value||'0')">${esc(T.save)}</button></div>`));
+          const discord=scard('chat','Discord',esc(T.discordHelp),`<div class="row"><div style="flex:1"><div class="t">${esc(T.discordUrl)}</div><div class="actions" style="margin-top:6px"><input type="text" id="dhook" value="${esc(s.discordWebhook)}" placeholder="https://discord.com/api/webhooks/…" style="flex:1;min-width:0"><button class="b" onclick="saveDiscord()">${esc(T.save)}</button><button class="b" onclick="testDiscord()">${esc(T.discordTest)}</button></div>${discordMsg?`<div class="h" style="margin-top:6px">${esc(discordMsg)}</div>`:''}</div></div>`
+            +row(esc(T.discordMode),'',sel('discordMode',s.discordMode,[['match',T.discordAll],['treasure',T.discordNotable]])));
+          return header(T,'')+`<div class="cards">${look}${perf}${time}${win}${replays}${goals}${discord}</div>`;
         }
         function perfRow(T,s,id){return row(esc(T.perf)+(s.performanceRecommended&&!s.performanceMode?`<span class="perfbadge">${esc(T.perfRecommended)}</span>`:''),esc(T.perfHelp),sw(id,s.performanceMode,'performanceMode'))}
         let discordMsg='';
@@ -613,10 +786,11 @@ public static class GuiPage
         window.addEventListener('message',e=>{if(e.origin===location.origin&&e.data&&e.data.cc==='editChests'&&S)openManual()});
         async function copyObs(){await api('copyObsPath');copied=true;render(true);setTimeout(()=>{copied=false;render(true)},2000)}
         function help(T){
-          return header(T,'')+`<div class="card"><p style="margin-top:0">${esc(T.helpText)}</p><div class="actions"><button class="b" onclick="api('openDataFolder')">${esc(T.dataFolder)}</button>${S.paths.errorLog?`<button class="b" onclick="api('openErrorLog')">${esc(T.errorLog)}</button>`:''}<button class="b" onclick="api('openIssues')">${esc(T.issue)}</button><button class="b" onclick="api('openRepo')">${esc(T.project)}</button></div></div>
-          ${S.canUninstall?`<h2 class="sec ttl">${esc(T.uninstall)}</h2><div class="card"><span class="path">${esc(S.paths.data)}</span>
-          <div class="actions"><button class="b danger" onclick="uninstall(false)">${esc(T.uninstall)} · ${esc(T.keepData)}</button><button class="b danger" onclick="uninstall(true)">${esc(T.uninstall)} · ${esc(T.deleteData)}</button></div></div>`:''}
-          <p class="note" style="color:var(--muted)">${esc(S.settings.windowed?T.footerWindow:T.footer)}</p>`;
+          const how=scard('help',esc(T.howTitle),'',`<p>${esc(T.helpText)}</p>`);
+          const dataC=scard('folder',esc(T.dataTitle),esc(T.dataHelp),`<span class="path">${esc(S.paths.data)}</span><div class="actions" style="margin-top:10px"><button class="b" onclick="api('openDataFolder')">${IC.folder}${esc(T.dataFolder)}</button>${S.paths.errorLog?`<button class="b" onclick="api('openErrorLog')">${IC.bug}${esc(T.errorLog)}</button>`:''}</div>`);
+          const support=scard('chat',esc(T.supportTitle),esc(T.supportHelp),`<div class="actions" style="margin-top:10px"><button class="b" onclick="api('openIssues')">${IC.bug}${esc(T.issue)}</button><button class="b" onclick="api('openRepo')">${IC.report}${esc(T.project)}</button></div>`);
+          const remove=S.canUninstall?scard('trash',esc(T.uninstall),esc(T.uninstallHelp),`<div class="actions" style="margin-top:10px"><button class="b danger" onclick="uninstall(false)">${esc(T.uninstallKeep)}</button><button class="b danger" onclick="uninstall(true)">${esc(T.uninstallAll)}</button></div>`):'';
+          return header(T,'')+`<div class="cards">${how}${dataC}${support}${remove}</div><p class="note" style="color:var(--muted);text-align:center">${esc(S.settings.windowed?T.footerWindow:T.footer)}</p>`;
         }
         function closedView(){stopped=true;$('#app').innerHTML='<div class="card">'+esc(S.txt.closed)+'</div>';appHtml=null;$('#activityPane').classList.add('hidden');$('#reportPane').classList.add('hidden')}
         async function uninstall(all){if(!confirm(S.txt.uninstallConfirm))return;await api('uninstall',all);closedView()}

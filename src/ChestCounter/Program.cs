@@ -1249,6 +1249,7 @@ object? RunGuiAction(string name, System.Text.Json.JsonElement value)
             break;
         case "copyObsPath": CopyToClipboard(Path.GetFullPath(store.OverlayPath)); settingsChanged = false; break;
         case "openDataFolder": Open(store.Folder); settingsChanged = false; break;
+        case "mapData": result = MapView.Data(Profiles.View(data, config)); settingsChanged = false; break;
         case "openReportFile": if (File.Exists(store.ReportPath)) Open(store.ReportPath); settingsChanged = false; break;
         case "openErrorLog": if (File.Exists(store.ErrorLogPath)) Open(store.ErrorLogPath); settingsChanged = false; break;
         case "openIssues": Open(AppInfo.IssuesUrl); settingsChanged = false; break;

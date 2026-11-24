@@ -55,7 +55,19 @@ public static class Icons
         ["power"] = "<path d=\"M12 3v8\"/><path d=\"M6.5 6.5a8 8 0 1 0 11 0\"/>",
         ["lock"] = "<rect x=\"5\" y=\"10.5\" width=\"14\" height=\"10\" rx=\"2\"/><path d=\"M8 10.5V7.5a4 4 0 0 1 8 0v3\"/>",
         ["eye"] = "<path d=\"M2.5 12S6 5.5 12 5.5 21.5 12 21.5 12 18 18.5 12 18.5 2.5 12 2.5 12z\"/><circle cx=\"12\" cy=\"12\" r=\"3\"/>",
-        ["refresh"] = "<path d=\"M20 11a8 8 0 0 0-14.6-4.5L4 8\"/><path d=\"M4 4v4h4\"/><path d=\"M4 13a8 8 0 0 0 14.6 4.5L20 16\"/><path d=\"M20 20v-4h-4\"/>",
+        ["palette"] = "<path d=\"M12 3a9 9 0 1 0 0 18c1.4 0 2-1 1.6-2.1-.5-1.3.4-2.4 1.8-2.4H18a3 3 0 0 0 3-3c0-5.5-4-10.5-9-10.5z\"/><circle cx=\"7.5\" cy=\"11\" r=\"1.2\"/><circle cx=\"10.5\" cy=\"7\" r=\"1.2\"/><circle cx=\"15.5\" cy=\"7.5\" r=\"1.2\"/>",
+        ["folder"] = "<path d=\"M3 7.5A1.5 1.5 0 0 1 4.5 6h4.4l2 2.2h8.6A1.5 1.5 0 0 1 21 9.7v8.8a1.5 1.5 0 0 1-1.5 1.5h-15A1.5 1.5 0 0 1 3 18.5z\"/>",
+        ["keyboard"] = "<rect x=\"2.5\" y=\"6\" width=\"19\" height=\"12\" rx=\"2\"/><path d=\"M6 9.5h.01M9.5 9.5h.01M13 9.5h.01M16.5 9.5h.01M6 13h.01M18 13h.01M9 15h6\"/>",
+        ["chat"] = "<path d=\"M4 5.5h16a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1H9l-4.5 3.5V17.5H4a1 1 0 0 1-1-1v-10a1 1 0 0 1 1-1z\"/><path d=\"M7.5 10h9M7.5 13.5h6\"/>",
+        ["bug"] = "<rect x=\"7.5\" y=\"7\" width=\"9\" height=\"13\" rx=\"4.5\"/><path d=\"M9.5 7a2.5 2.5 0 0 1 5 0M12 11v9M3.5 11h4M16.5 11h4M4 17h3.5M16.5 17H20M5 5l2.5 2.5M19 5l-2.5 2.5\"/>",
+        ["trash"] = "<path d=\"M4 7h16M9.5 7V4.5h5V7M6 7l1 13h10l1-13\"/><path d=\"M10 11v5.5M14 11v5.5\"/>",
+        ["plus"] = "<path d=\"M12 5v14M5 12h14\"/>",
+        ["minus"] = "<path d=\"M5 12h14\"/>",
+        ["crosshair"] = "<circle cx=\"12\" cy=\"12\" r=\"7\"/><path d=\"M12 2.5v4M12 17.5v4M2.5 12h4M17.5 12h4\"/>",
+        ["layers"] = "<path d=\"m12 3 9 5-9 5-9-5z\"/><path d=\"m3 13 9 5 9-5\"/>",
+        ["window"] = "<rect x=\"3\" y=\"4.5\" width=\"18\" height=\"15\" rx=\"2\"/><path d=\"M3 9h18M6.5 6.8h.01M9 6.8h.01\"/>",
+        ["dots"] = "<circle cx=\"7\" cy=\"8\" r=\"1.6\"/><circle cx=\"15\" cy=\"7\" r=\"1.6\"/><circle cx=\"11\" cy=\"13\" r=\"1.6\"/><circle cx=\"17\" cy=\"15\" r=\"1.6\"/><circle cx=\"7\" cy=\"17\" r=\"1.6\"/>",
+        ["refresh"] ="<path d=\"M20 11a8 8 0 0 0-14.6-4.5L4 8\"/><path d=\"M4 4v4h4\"/><path d=\"M4 13a8 8 0 0 0 14.6 4.5L20 16\"/><path d=\"M20 20v-4h-4\"/>",
     };
 
     /// <summary>An icon as inline SVG ("chest", "trophy"...). <paramref name="fill"/>: filled shape (the star of a treasure).</summary>

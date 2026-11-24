@@ -2,6 +2,13 @@
 
 > **Ative os replays no Fortnite primeiro**: *Configurações → Jogo → Replays → Gravar Replays: Ativado*. A ferramenta só lê esses arquivos de replay: nenhuma modificação no jogo, nenhum acesso à memória do jogo.
 
+**Novidades da 1.10.0**
+- **Aba Mapa nova e leve**: o mapa dos baús agora é desenhado direto na janela, sem travar mesmo com milhares de baús. Tem zoom com a roda do mouse, arrastar para mover, modo calor (onde você mais abre baús), filtros e a lista dos locais ao lado
+- **Telas grandes**: o conteúdo fica centralizado, com uma largura confortável, em vez de esticar
+- **Configurações** em cartões por assunto, com os temas em miniatura para escolher com um clique
+- **Overlay** com prévia ao vivo e a lista de atalhos
+- **Ajuda** em cartões, e o Relatório sem o cabeçalho repetido
+
 **Novidades da 1.9.0**
 - **Nova interface**: menu lateral (Início, Relatório, Mapa, Overlay, Configurações, Ajuda), o total em destaque com os baús dos últimos 14 dias, os números lado a lado, metas e conquistas em anéis de progresso e a atividade numa coluna ao lado
 - **Novos temas**: Noite (escuro e sóbrio) e Arena (vibrante, no estilo do HUD do jogo), além do Pirata (padrão), Brasil, Neon, Gelo e Lava. O tema muda a janela, o relatório e o overlay
@@ -30,6 +37,13 @@ O Windows pode mostrar *"O Windows protegeu o computador"* (exe sem assinatura):
 ---
 
 **English** · Download **`ChestCounter.exe`** below and run it. Already using it? The counter offers the update on its home tab. Your history and settings are kept.
+
+**What's new in 1.10.0**
+- **New, light Map tab**: the map of your chests is drawn right in the window, smooth even with thousands of chests. Wheel to zoom, drag to move, heat mode (where you open the most), filters and the list of places next to it
+- **Large screens**: the content stays centered at a comfortable width instead of stretching
+- **Settings** in cards by topic, with the themes as previews to pick in one click
+- **Overlay** with a live preview and the list of shortcuts
+- **Help** in cards, and the Report without its repeated header
 
 **What's new in 1.9.0**
 - **New interface**: side menu (Home, Report, Map, Overlay, Settings, Help), the total with the chests of the last 14 days, the figures side by side, goals and achievements as progress rings and the activity in a column of its own

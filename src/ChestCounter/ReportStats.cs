@@ -21,6 +21,9 @@ public static class ReportStats
         :root[data-accent="noite"] .pirate{font-family:"Segoe UI",system-ui,sans-serif;font-weight:700;font-size:.85em}
         :root[data-accent="arena"] .pirate{font-family:Bahnschrift,"Segoe UI",sans-serif;font-weight:700;font-style:italic;text-transform:uppercase;font-size:.85em}
         #mapa{scroll-margin-top:16px}
+        html.incounter #mapa{display:none} /* the window has its own Map tab */
+        html.incounter main>header{display:none} /* the window shows its own title */
+        html.incounter main{padding-top:4px}
         .goals{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin-top:12px}
         @media (max-width:820px){.goals{grid-template-columns:1fr}}
         .goal{background:var(--card);color:var(--cink);border:1px solid var(--line);border-radius:8px;padding:12px 16px}
@@ -161,13 +164,10 @@ public static class ReportStats
         var last = matches.OrderByDescending(Goals.When).First();
 
         // Crop on the island: the named places and the chests, with a margin, as a square (picture units 0..1000).
-        var us = points.Select(p => MapData.Project(p.c.X!.Value, p.c.Y!.Value)).Concat(pois.Select(p => MapData.Project(p.X, p.Y))).ToList();
-        double u0 = us.Min(p => p.U), u1 = us.Max(p => p.U), v0 = us.Min(p => p.V), v1 = us.Max(p => p.V);
-        var size = Math.Clamp(Math.Max(u1 - u0, v1 - v0) + 0.08, 0.15, 1.0);
-        var cu = Math.Clamp((u0 + u1) / 2, size / 2, 1 - size / 2);
-        var cv = Math.Clamp((v0 + v1) / 2, size / 2, 1 - size / 2);
+        var mapPoints = MapView.Points(matches);
+        var (cropU, cropV, size) = MapView.Crop(mapPoints, pois);
         string N1(double v) => v.ToString("0.#", System.Globalization.CultureInfo.InvariantCulture);
-        var box = $"{N1((cu - size / 2) * 1000)} {N1((cv - size / 2) * 1000)} {N1(size * 1000)} {N1(size * 1000)}";
+        var box = $"{N1(cropU * 1000)} {N1(cropV * 1000)} {N1(size * 1000)} {N1(size * 1000)}";
         var r = size * 1000 * 0.0065;
         var font = size * 1000 * 0.021;
 
@@ -194,9 +194,7 @@ public static class ReportStats
             $"<span><span class=\"sw\" style=\"background:{ReportWriter.KindColor.GetValueOrDefault(g.Key, "#9a8f7a")}\"></span>{H(L.Name(g.Key))} · {L.N(g.Count())}</span>"));
 
         // Where: the named place closest to each chest (within 300 m).
-        var places = points.GroupBy(p => MapData.Nearest(pois, p.c.X!.Value, p.c.Y!.Value)?.Name ?? L.T("Entre deux lieux", "Between places", "Entre lugares", "Entre locais"))
-            .Select(g => (Name: g.Key, Count: g.Count(), Matches: g.Select(x => x.m.SessionId).Distinct().Count()))
-            .OrderByDescending(x => x.Count).Take(10).ToList();
+        var places = MapView.Places(mapPoints, pois);
         var top = Math.Max(1, places.Count > 0 ? places.Max(x => x.Count) : 1);
         var placesHtml = new StringBuilder($"<div class=\"card\"><b>{L.T("Là où tu en ouvres le plus", "Where you open the most", "Donde más abres", "Onde você mais abre")}</b><table>");
         foreach (var p in places)
