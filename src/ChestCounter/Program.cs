@@ -874,11 +874,11 @@ void AfterNewMatches(HashSet<string> known)
     Console.ForegroundColor = ConsoleColor.DarkGreen;
     foreach (var a in unlocked)
     {
-        Console.WriteLine($"   {a.Icon} {L.T("Succès débloqué", "Achievement unlocked", "Logro desbloqueado", "Conquista desbloqueada")}: {a.Name} — {a.Description}");
+        Console.WriteLine($"   {L.T("Succès débloqué", "Achievement unlocked", "Logro desbloqueado", "Conquista desbloqueada")}: {a.Name} — {a.Description}");
     }
     foreach (var g in reached)
     {
-        Console.WriteLine($"   🎯 {L.T("Objectif atteint", "Goal reached", "Meta cumplida", "Meta batida")}: {g.Label} ({g.Text})");
+        Console.WriteLine($"   {L.T("Objectif atteint", "Goal reached", "Meta cumplida", "Meta batida")}: {g.Label} ({g.Text})");
     }
     Console.ResetColor();
 
@@ -991,7 +991,7 @@ object BuildGuiState()
         treasures = L.N(matches.Sum(m => m.TreasureFinds.Count)),
         matches = L.N(matches.Count),
         average = matches.Count > 0 ? ((double)view.CountedChests / matches.Count).ToString("F1", L.Culture) : "0",
-        goals = Goals.Of(matches, tracker.LiveMatch?.ChestsOpened ?? 0).Select(g => new { label = g.Label, text = g.Text, pct = g.Percent, done = g.Done }).ToList(),
+        goals = Goals.Of(matches, tracker.LiveMatch?.ChestsOpened ?? 0).Select(g => new { label = g.Label, text = g.Text, pct = g.Percent, done = g.Done, left = L.N(Math.Max(0, g.Target - g.Value)) }).ToList(),
         achievements = Performance.On ? null : $"{Achievements.Unlocked(ProgressStats.From(matches, view.ManualAdjust)).Count} / {Achievements.All.Length}",
         perf = Performance.On,
         progress = progress == null ? null : new { done = progress.Done, total = progress.Total },

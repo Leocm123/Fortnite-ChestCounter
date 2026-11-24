@@ -17,6 +17,7 @@ public static class ReportStats
         .trend{font-weight:700}.trend.up{color:#2f7d4f}.trend.down{color:var(--warn)}
         td.sub{color:var(--cmuted);font-size:13px;white-space:nowrap;text-align:right}
         th.r{text-align:right}
+        .ic{display:inline-block;flex:none}.ici{width:1.05em;height:1.05em;vertical-align:-.18em}
         .goals{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin-top:12px}
         @media (max-width:820px){.goals{grid-template-columns:1fr}}
         .goal{background:var(--card);color:var(--cink);border:1px solid var(--line);border-radius:8px;padding:12px 16px}
@@ -26,9 +27,12 @@ public static class ReportStats
         .gbar i{display:block;height:8px;background:var(--gold)}.goal.done .gbar i{background:var(--team)}
         .achs{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:10px}
         .ach{display:flex;gap:12px;align-items:flex-start;background:var(--card);color:var(--cink);border:1px solid var(--line);border-radius:8px;padding:12px 14px}
-        .ach .ai{font-size:26px;line-height:1;flex:none;width:32px;text-align:center}
+        .ach .ai{flex:none;width:38px;height:38px;border-radius:50%;display:grid;place-items:center;background:var(--track);color:var(--cmuted)}.ach .ai .ic{width:22px;height:22px}
+        .ach.on .ai{background:var(--hero,#7a4a1e);color:var(--heroink,#ffd36a)}
+        .goal .gl{display:flex;align-items:center;gap:8px}.goal .gl .ic{width:18px;height:18px;color:var(--gold)}
+        .rank{display:inline-grid;place-items:center;width:26px;font-weight:700;color:var(--cmuted)}.rank .ic{width:24px;height:24px}.rank.r1{color:#c9a227}.rank.r2{color:#8f9aa6}.rank.r3{color:#b0703a}
         .ach .an{font-weight:700}.ach .ad{font-size:13px;color:var(--cmuted)}
-        .ach.locked{opacity:.62}.ach.locked .ai{filter:grayscale(1)}
+        .ach.locked{opacity:.7}
         .ach.on{border-color:var(--gold);box-shadow:inset 0 0 0 1px var(--gold)}
         .ach .gbar{height:5px;margin-top:6px}.ach .ap{font-size:12px;color:var(--cmuted);margin-top:2px}
         .phases{display:flex;height:26px;border-radius:6px;overflow:hidden;margin:8px 0 6px}
@@ -129,7 +133,7 @@ public static class ReportStats
 
         var goals = Goals.Of(matches);
         var goalsHtml = goals.Count == 0 ? "" : "<div class=\"goals\">" + string.Concat(goals.Select(g =>
-            $"<div class=\"goal{(g.Done ? " done" : "")}\"><div class=\"gh\"><span>🎯 {H(g.Label)}</span><span class=\"num\">{H(g.Text)}</span></div><span class=\"gbar\"><i style=\"width:{g.Percent}%\"></i></span></div>")) + "</div>";
+            $"<div class=\"goal{(g.Done ? " done" : "")}\"><div class=\"gh\"><span class=\"gl\">{Icons.Svg("target")}{H(g.Label)}</span><span class=\"num\">{H(g.Text)}</span></div><span class=\"gbar\"><i style=\"width:{g.Percent}%\"></i></span></div>")) + "</div>";
 
         return $"<section>{Title(L.T("Tes statistiques", "Your stats", "Tus estadísticas", "Suas estatísticas"))}<section class=\"tiles stats\">{pace}{streak}{week}{form}</section>{goalsHtml}</section>";
     }
@@ -222,7 +226,7 @@ public static class ReportStats
             var on = a.Unlocked(stats);
             var value = Math.Min(a.Value(stats), a.Target);
             var progress = on ? "" : $"<span class=\"gbar\"><i style=\"width:{(int)Math.Round(100.0 * value / a.Target)}%\"></i></span><div class=\"ap num\">{L.N(value)} / {L.N(a.Target)}</div>";
-            sb.Append($"<div class=\"ach{(on ? " on" : " locked")}\" title=\"{H(a.Description)}\"><span class=\"ai\" aria-hidden=\"true\">{a.Icon}</span><div style=\"flex:1;min-width:0\"><div class=\"an\">{H(a.Name)}</div><div class=\"ad\">{H(a.Description)}</div>{progress}</div></div>");
+            sb.Append($"<div class=\"ach{(on ? " on" : " locked")}\" title=\"{H(a.Description)}\"><span class=\"ai\">{Icons.Svg(a.Icon)}</span><div style=\"flex:1;min-width:0\"><div class=\"an\">{H(a.Name)}</div><div class=\"ad\">{H(a.Description)}</div>{progress}</div></div>");
         }
         return sb.Append("</div></section>").ToString();
     }
@@ -373,7 +377,7 @@ public static class ReportStats
         {
             var r = rows[i];
             var avg = (double)r.Chests / r.Matches;
-            var medal = i switch { 0 => "🥇", 1 => "🥈", 2 => "🥉", _ => L.N(i + 1) };
+            var medal = i < 3 ? $"<span class=\"rank r{i + 1}\">{Icons.Medal(i + 1)}</span>" : $"<span class=\"rank\">{L.N(i + 1)}</span>";
             sb.Append($"<tr><td class=\"num\">{medal}</td><td>{(r.You ? $"<b>{H(r.Name)}</b> ({L.T("toi", "you", "tú", "você")})" : H(r.Name))}</td>"
                 + $"<td style=\"width:150px\">{Bar((int)Math.Round(100 * avg / top), r.You ? "var(--team)" : null)}</td>"
                 + $"<td class=\"n num big\">{F1(avg)}</td><td class=\"sub num\">{L.N(r.Chests)}</td><td class=\"sub num\">{L.N(r.Matches)}</td></tr>");

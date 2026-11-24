@@ -2,6 +2,11 @@
 
 > **Ative os replays no Fortnite primeiro**: *Configurações → Jogo → Replays → Gravar Replays: Ativado*. A ferramenta só lê esses arquivos de replay: nenhuma modificação no jogo, nenhum acesso à memória do jogo.
 
+**Novidades da 1.8.1**
+- **Aba Início redesenhada**: painel com o total em destaque e os outros números no mesmo formato (rótulo, número, detalhe), e a média por partida separada dos tesouros
+- **Atividade** em linha do tempo: um evento por linha, com ícone, horário e os detalhes da partida agrupados
+- **Ícones próprios** no lugar dos emojis, em todo o app: conquistas, metas, ranking, avisos e Hora do Tesouro. As mensagens do Discord também ficam sem emoji
+
 **Novidades da 1.8.0**
 - **Mapa dos seus baús** no relatório: cada baú que você abre aparece na ilha, com cor por tipo, filtros (tudo, esta semana, última partida) e os locais onde você mais abre baús. O mapa e os nomes dos locais vêm de fortnite-api.com e são atualizados toda semana. Os replays que ainda estão no seu PC são analisados de novo para entrar no mapa
 - **Modo desempenho** (Configurações), para PCs mais fracos: não lê o replay durante a partida (os baús são contados alguns segundos depois do fim), roda com prioridade mínima, libera a janela da memória ao minimizar, atualiza a janela com menos frequência e deixa o relatório só com o essencial. O contador sugere o modo quando o PC tem até 4 núcleos ou até 8 GB de RAM
@@ -20,6 +25,11 @@ O Windows pode mostrar *"O Windows protegeu o computador"* (exe sem assinatura):
 ---
 
 **English** · Download **`ChestCounter.exe`** below and run it. Already using it? The counter offers the update on its home tab. Your history and settings are kept.
+
+**What's new in 1.8.1**
+- **Redesigned home tab**: the total stands out, the other figures share one layout (label, figure, detail), and the average per match is apart from the treasures
+- **Activity** as a timeline: one event per row, with its icon, its time and the match details grouped under it
+- **The app's own icons** instead of emoji everywhere: achievements, goals, ranking, warnings and Treasure Hours. Discord messages have no emoji either
 
 **What's new in 1.8.0**
 - **Map of your chests** in the report: every chest you open on the island, colored by kind, with filters (all, this week, last match) and the places where you open the most. Map and place names from fortnite-api.com, refreshed weekly. The replays still on your PC are analyzed again to fill it

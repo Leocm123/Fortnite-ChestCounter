@@ -41,15 +41,15 @@ public static class DiscordNotify
         };
         foreach (var f in m.TreasureFinds)
         {
-            lines.Add($"★ **{f.DisplayName}**");
+            lines.Add($"{L.T("Trésor", "Treasure", "Tesoro", "Tesouro")}{L.T(" : ", ": ", ": ", ": ")}**{f.DisplayName}**");
         }
         foreach (var a in unlocked)
         {
-            lines.Add($"{a.Icon} {L.T("Succès débloqué", "Achievement unlocked", "Logro desbloqueado", "Conquista desbloqueada")} : **{a.Name}** — {a.Description}");
+            lines.Add($"{L.T("Succès débloqué", "Achievement unlocked", "Logro desbloqueado", "Conquista desbloqueada")}{L.T(" : ", ": ", ": ", ": ")}**{a.Name}** — {a.Description}");
         }
         foreach (var g in goalsReached)
         {
-            lines.Add($"🎯 {L.T("Objectif atteint", "Goal reached", "Meta cumplida", "Meta batida")} : **{g.Label}** ({g.Text})");
+            lines.Add($"{L.T("Objectif atteint", "Goal reached", "Meta cumplida", "Meta batida")}{L.T(" : ", ": ", ": ", ": ")}**{g.Label}** ({g.Text})");
         }
 
         var fields = new List<object>
@@ -69,7 +69,7 @@ public static class DiscordNotify
             {
                 new
                 {
-                    title = $"📦 {L.Count(m.ChestsOpened, "coffre", "chest", "cofre", "baú")}" + (m.PlayerName is { Length: > 0 } p ? $" · {p}" : ""),
+                    title = $"{L.Count(m.ChestsOpened, "coffre", "chest", "cofre", "baú")}" + (m.PlayerName is { Length: > 0 } p ? $" · {p}" : ""),
                     description = string.Join("\n", lines),
                     color = Color,
                     fields,
@@ -96,7 +96,7 @@ public static class DiscordNotify
             var payload = new
             {
                 username = L.T("Compteur de coffres", "Chest Counter", "Contador de cofres", "Contador de Baús"),
-                content = "📦 " + L.T("Le compteur de coffres est connecté à ce salon.", "The chest counter is connected to this channel.",
+                content = L.T("Le compteur de coffres est connecté à ce salon.", "The chest counter is connected to this channel.",
                     "El contador de cofres está conectado a este canal.", "O contador de baús está conectado a este canal."),
             };
             using var response = await Http.PostAsJsonAsync(url!.Trim(), payload);

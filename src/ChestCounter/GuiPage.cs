@@ -93,7 +93,12 @@ public static class GuiPage
             "Um número de baús para abrir: aparece no overlay, no Início e no relatório. 0 = sem meta."),
         ["goalDaily"] = L.T("Objectif du jour", "Daily goal", "Meta del día", "Meta do dia"),
         ["goalWeekly"] = L.T("Objectif de la semaine (depuis lundi)", "Weekly goal (from Monday)", "Meta de la semana (desde el lunes)", "Meta da semana (a partir de segunda)"),
-        ["achievements"] = L.T("succès débloqués (détails dans le rapport)", "achievements unlocked (details in the report)", "logros desbloqueados (detalles en el informe)", "conquistas desbloqueadas (detalhes no relatório)"),
+        ["achievements"] = L.T("Succès", "Achievements", "Logros", "Conquistas"),
+        ["achievementsSub"] = L.T("détails dans le rapport", "details in the report", "detalles en el informe", "detalhes no relatório"),
+        ["avgTile"] = L.T("Moyenne par partie", "Average per match", "Media por partida", "Média por partida"),
+        ["inMatches"] = L.T("sur {0} parties", "over {0} matches", "en {0} partidas", "em {0} partidas"),
+        ["goalDone"] = L.T("objectif atteint", "goal reached", "meta cumplida", "meta batida"),
+        ["goalLeft"] = L.T("encore {0} coffres", "{0} chests to go", "faltan {0} cofres", "faltam {0} baús"),
         ["discordHelp"] = L.T("Optionnel : colle le webhook d'un salon (Paramètres du salon → Intégrations → Webhooks) pour y publier un résumé après chaque partie. Rien d'autre n'est envoyé ; vide = désactivé.",
             "Optional: paste a channel's webhook (Channel settings → Integrations → Webhooks) to post a summary there after each match. Nothing else is sent; empty = off.",
             "Opcional: pega el webhook de un canal (Ajustes del canal → Integraciones → Webhooks) para publicar un resumen tras cada partida. No se envía nada más; vacío = desactivado.",
@@ -163,7 +168,7 @@ public static class GuiPage
         ["footer"] = L.T("Fermer cette fenêtre ne coupe pas le compteur.", "Closing this window does not stop the counter.", "Cerrar esta ventana no detiene el contador.", "Fechar esta janela não para o contador."),
     };
 
-    public static string Html(string token) => Template.Replace("__TOKEN__", token).Replace("__FONT__", ReportWriter.FontFaceCss).Replace("__PENCIL__", ReportWriter.PencilIcon).Replace("__THEMES__", Themes.Css);
+    public static string Html(string token) => Template.Replace("__TOKEN__", token).Replace("__FONT__", ReportWriter.FontFaceCss).Replace("__PENCIL__", ReportWriter.PencilIcon).Replace("__THEMES__", Themes.Css).Replace("__ICONS__", Icons.Json());
 
     private const string Template = """
         <!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
@@ -197,9 +202,17 @@ public static class GuiPage
         nav button.on{background:var(--gold);color:var(--cink)}
         h2{margin:0 0 10px;font-size:24px;color:var(--title)}
         .tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px}
-        .tile{background:var(--card);color:var(--cink);border:1px solid var(--line);border-radius:8px;padding:14px 16px}
-        .tile .v{font-size:36px;font-weight:700;line-height:1.1}
+        .tile{background:var(--card);color:var(--cink);border:1px solid var(--line);border-radius:10px;padding:14px 16px;display:flex;flex-direction:column;gap:2px;min-width:0}
+        .tile .k{display:flex;align-items:center;gap:7px;font-size:11.5px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:var(--cmuted)}
+        .tile .k .ic{width:16px;height:16px;color:var(--gold)}
+        .tile .k .badge{text-transform:none;letter-spacing:0;margin-left:2px}
+        .tile .v{font-size:34px;font-weight:700;line-height:1.05;margin-top:6px}
+        .tile .s{font-size:13px;color:var(--cmuted);margin-top:2px;overflow:hidden;text-overflow:ellipsis}
         .tile .l{font-size:13px;color:var(--cmuted)}
+        .tile .bar{margin-top:8px}.tile .bar.done i{background:var(--team)}
+        .dash{display:grid;grid-template-columns:minmax(0,1.25fr) repeat(2,minmax(0,1fr));gap:12px}
+        .dash .tile.hero{justify-content:center;padding:20px 22px}
+        @media (max-width:700px){.dash{grid-template-columns:repeat(2,minmax(0,1fr))}.dash .tile.hero{grid-column:span 2;grid-row:auto!important}}
         .tile.hero{position:relative;background:var(--hero,#7a4a1e);color:var(--herotext,#fbecc4);border:2px solid var(--heroline,#e7b440)}
         .editbtn{position:absolute;top:10px;right:10px;width:36px;height:36px;padding:0;border-radius:8px;border:1px solid var(--heroline,#e7b440);background:transparent;color:var(--heroink,#ffd36a);cursor:pointer;display:grid;place-items:center}
         .editbtn:hover{background:rgba(231,180,64,.18)}.editbtn:focus-visible{outline:3px solid var(--heroink,#ffd36a);outline-offset:2px}
@@ -208,7 +221,8 @@ public static class GuiPage
         .dhead{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:6px}
         .dhead h2{margin:0;color:var(--hero,#7a4a1e)}
         .dclose{width:40px;height:40px;border-radius:8px;border:1px solid var(--line);background:transparent;color:var(--cink);font-size:22px;line-height:1;cursor:pointer}
-        .tile.hero .v{font-size:54px;color:var(--heroink,#ffd36a)}.tile.hero .l{color:var(--herotext,#fbecc4)}
+        .tile.hero .v{font-size:64px;color:var(--heroink,#ffd36a);margin-top:8px}.tile.hero .l,.tile.hero .s{color:var(--herotext,#fbecc4)}
+        .tile.hero .k{color:var(--herokey,#f3cf7a)}.tile.hero .k .ic{width:18px;height:18px;color:var(--heroink,#ffd36a)}
         .card{background:var(--card);color:var(--cink);border:1px solid var(--line);border-radius:8px;padding:16px}
         .row{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:12px 0;border-bottom:1px solid var(--line)}
         .row:last-child{border-bottom:none}
@@ -227,8 +241,25 @@ public static class GuiPage
         .switch input:checked+span{background:var(--team)}.switch input:checked+span:after{transform:translateX(22px)}
         .switch input:focus-visible+span{outline:3px solid var(--gold)}
         .badge{display:inline-block;margin-left:6px;padding:1px 8px;border-radius:999px;background:#f6d8c9;color:var(--warn);font-size:12px;font-weight:700;vertical-align:1px;cursor:help}
-        .log{font:13px/1.55 Consolas,"Cascadia Mono",monospace;max-height:260px;overflow:auto;white-space:pre-wrap}
-        .log .err{color:#b3261e}.log .warn{color:#9a5b00}.log .ok{color:#1d7a3c}.log .info{color:#1f6f8b}.log .tre{color:#6c3fb5}.log .mut{color:var(--cmuted)}
+        .ic{display:inline-block;flex:none}
+        .log{max-height:340px;overflow:auto;padding:4px 16px}
+        .feed{list-style:none;margin:0;padding:0}
+        .feed>li{display:flex;gap:12px;align-items:flex-start;padding:11px 0;border-bottom:1px solid var(--line)}
+        .feed>li:last-child{border-bottom:none}
+        .feed .fi{flex:none;width:30px;height:30px;border-radius:50%;display:grid;place-items:center;background:var(--track);color:var(--cmuted)}
+        .feed .fi .ic{width:17px;height:17px}
+        .feed .fb{flex:1;min-width:0}
+        .feed .ft{font-size:14px;font-weight:600;line-height:1.4;padding-top:5px}
+        .feed .fs{display:flex;gap:7px;align-items:flex-start;font-size:13px;line-height:1.45;color:var(--cmuted);margin-top:5px}
+        .feed .fs .ic{width:14px;height:14px;margin-top:2px}
+        .feed time{flex:none;font-size:13px;color:var(--cmuted);padding-top:6px}
+        .feed .ok .fi,.feed .fs.ok .ic{color:#1d7a3c}.feed .ok .fi{background:#dcebd2}
+        .feed .warn .fi,.feed .fs.warn .ic{color:#9a5b00}.feed .warn .fi{background:#f6e3bf}
+        .feed .err .fi,.feed .fs.err .ic{color:#b3261e}.feed .err .fi{background:#f6d6cf}
+        .feed .tre .fi,.feed .fs.tre .ic{color:#6c3fb5}.feed .tre .fi{background:#e6dbf6}
+        .feed .info .fi,.feed .fs.info .ic{color:#1f6f8b}.feed .info .fi{background:#d5e9ef}
+        .feed .fs.ok,.feed .fs.tre{color:var(--cink)}
+        .fempty{display:flex;align-items:center;gap:10px;padding:14px 0;color:var(--cmuted);font-size:14px}.fempty .ic{width:18px;height:18px}
         .bar{height:8px;background:var(--line);border-radius:4px;overflow:hidden;margin-top:8px}.bar i{display:block;height:100%;background:#b9821c}
         .path{font:13px Consolas,monospace;word-break:break-all;background:var(--track);padding:6px 8px;border-radius:6px;display:block;margin:6px 0}
         .note{font-size:13px;color:var(--muted)}
@@ -284,7 +315,7 @@ public static class GuiPage
         </div></div><div id="scroll"><main><div id="app"><p class="note">…</p></div><section id="activityPane" class="hidden"><h2 class="pirate"></h2><div class="card log"></div></section><section id="reportPane" class="hidden"><iframe id="rep" title="Report" scrolling="no"></iframe></section><div id="foot"></div></main></div>
         <dialog id="dlg" aria-labelledby="dlgT"><div class="dhead"><h2 class="pirate" id="dlgT"></h2><button type="button" class="dclose" id="dlgX">×</button></div><div id="dlgB"></div></dialog>
         <script>
-        const TOKEN='__TOKEN__';let S=null,tab=(()=>{const h=location.hash.slice(1);if(['home','report','overlay','settings','help'].includes(h))return h;try{return localStorage.getItem('cc-gui-tab')||'home'}catch(e){return 'home'}})(),estimate=null,stopped=false,copied=false;
+        const TOKEN='__TOKEN__',IC=__ICONS__;let S=null,tab=(()=>{const h=location.hash.slice(1);if(['home','report','overlay','settings','help'].includes(h))return h;try{return localStorage.getItem('cc-gui-tab')||'home'}catch(e){return 'home'}})(),estimate=null,stopped=false,copied=false;
         const $=s=>document.querySelector(s);
         // In the counter's own window (?w=1): the title bar of the page, its buttons sent to the window.
         const host=window.chrome&&window.chrome.webview;let maximized=false;
@@ -328,6 +359,32 @@ public static class GuiPage
         document.addEventListener('pointerdown',()=>{pressedAt=Date.now()},true);
         ['pointerup','pointercancel'].forEach(t=>document.addEventListener(t,()=>{pressedAt=0},true));
         let activityHtml=null;
+        // The activity as a timeline, newest first: one entry per event (its time on the right, an icon for its kind),
+        // the indented lines that follow it (match counted, treasure, warning...) as its details. The console's own
+        // marks (✔ ⚠ ⚑ ★) give way to the icons.
+        const FEED_ICON={ok:'check-circle',warn:'warning',err:'error',info:'info',tre:'star','':'clock'};
+        function feed(T){
+          if(!S.activity.length)return `<div class="fempty">${IC.clock}<span>${esc(T.noActivity)}</span></div>`;
+          // A line with no time right after another one with no time is the rest of the same message.
+          const items=[];let plain=false;
+          for(const line of S.activity){
+            let text=line.map(s=>s.t).join('');
+            // Its kind: the color of the first colored part (the mark at its start), not of a figure inside it.
+            const cls=(line.find(s=>s.t.trim()&&['err','warn','tre','ok','info'].includes(s.c))||{}).c||'';
+            const indented=/^\s{2,}/.test(text);
+            text=text.trim();
+            let time='';const m=text.match(/^\[([^\]]+)\]\s*/);
+            if(m){time=m[1].replace(/:\d\d(?=\s|$)/,'');text=text.slice(m[0].length)}
+            text=text.replace(/^[✔↻⚠⚑★✓]+\s*/,'');
+            if(!text){plain=false;continue}
+            if(items.length&&(indented||(plain&&!m)))items[items.length-1].sub.push({text,cls});
+            else items.push({text,cls,time,sub:[]});
+            if(!indented)plain=!m;
+          }
+          // A plain event ("Match over: analyzing…") takes the kind of what came of it (match counted, treasure).
+          for(const it of items)if(!it.cls)it.cls=(it.sub.find(s=>s.cls==='ok'||s.cls==='tre')||{}).cls||'';
+          return '<ul class="feed">'+items.reverse().map(it=>`<li class="${it.cls}"><span class="fi">${IC[FEED_ICON[it.cls]]}</span><div class="fb"><div class="ft">${esc(it.text)}</div>${it.sub.map(s=>`<div class="fs ${s.cls}">${IC[s.cls?FEED_ICON[s.cls]:'arrow']}<span>${esc(s.text)}</span></div>`).join('')}</div>${it.time?`<time class="num">${esc(it.time)}</time>`:''}</li>`).join('')+'</ul>';
+        }
         function showActivity(T){
           const pane=$('#activityPane');
           pane.classList.toggle('hidden',tab!=='home');
@@ -335,7 +392,7 @@ public static class GuiPage
           pane.querySelector('h2').textContent=T.activity;
           // Keep the scrolling element mounted while new log entries arrive.
           const log=pane.querySelector('.log');
-          const html=S.activity.length?S.activity.map(l=>l.map(s=>`<span class="${s.c}">${esc(s.t)}</span>`).join('')).join('\n'):esc(T.noActivity);
+          const html=feed(T);
           if(activityHtml===html)return;
           const top=log.scrollTop;
           log.innerHTML=html;
@@ -368,12 +425,20 @@ public static class GuiPage
           if(S.progress)h+=`<div class="card"><b>${esc(T.analyzing)} ${S.progress.done} / ${S.progress.total}</b><div class="bar"><i style="width:${Math.round(100*S.progress.done/Math.max(1,S.progress.total))}%"></i></div></div>`;
           if(S.whatsNew&&S.whatsNew.length)h+=`<div class="card"><h2 class="pirate" style="color:var(--hero,#7a4a1e)">${esc(fmt(T.whatsNew,S.version))}</h2><ul>${S.whatsNew.map(n=>`<li>${esc(n)}</li>`).join('')}</ul><button class="b main" onclick="api('dismissWhatsNew')">${esc(T.ok)}</button></div>`;
           if(S.update)h+=`<div class="card"><h2 class="pirate">${esc(fmt(T.newVersion,S.update.version))}</h2><ul>${S.update.notes.map(n=>`<li>${esc(n)}</li>`).join('')}</ul><button class="b main" onclick="api('installUpdate')">${esc(T.install)}</button></div>`;
-          h+=`<section class="tiles"><div class="tile hero"><button type="button" class="editbtn" onclick="openManual()" title="${esc(T.editChests)}" aria-label="${esc(T.editChests)}">__PENCIL__</button><div class="l">${esc(T.total)}</div><div class="v num">${esc(S.total)}</div><div class="l">${esc(T.totalSub)}${S.manual?'<br>'+esc(fmt(T.byHand,S.manualText.replace('+',''))):''}</div></div>
-            <div class="tile"><div class="v num">${esc(S.session)}</div><div class="l">${esc(T.session)} · ${esc(S.sessionMatches)} ${esc(T.matches)}</div></div>
-            <div class="tile"><div class="v num">${esc(S.last?S.last.chests:'—')}</div><div class="l">${esc(T.last)}${S.last?'<br>'+esc(S.last.when)+' · '+esc(S.last.mode):''}</div></div>
-            ${S.squad?`<div class="tile"><div class="v num">${esc(S.squad.total)}</div><div class="l">${esc(T.squad)}<span class="badge" title="${esc(T.inaccurateWhy)}">${esc(T.inaccurate)}</span><br>${esc(fmt(T.squadSub,S.squad.team))}</div></div>`:''}
-            <div class="tile"><div class="v num">★ ${esc(S.treasures)}</div><div class="l">${esc(T.treasures)} · ${esc(S.matches)} ${esc(T.matches)} · ${esc(fmt(T.perMatch,S.average))}</div></div></section>`;
-          if(S.goals&&S.goals.length)h+=`<section class="tiles">${S.goals.map(g=>`<div class="tile"><div class="v num">${esc(g.text)}</div><div class="l">🎯 ${esc(g.label)}</div><div class="bar"><i style="width:${g.pct}%;${g.done?'background:var(--team)':''}"></i></div></div>`).join('')}${S.achievements?`<div class="tile"><div class="v num">🏆 ${esc(S.achievements)}</div><div class="l">${esc(T.achievements)}</div></div>`:''}</section>`;
+          // Figures: the total on the left, the other tiles in a grid next to it. Every tile reads the same way:
+          // small label with its icon, the figure, one line of detail.
+          const tile=(icon,label,value,sub,extra)=>`<div class="tile"><div class="k">${IC[icon]}<span>${label}</span></div><div class="v num">${value}</div>${extra||''}${sub?`<div class="s">${sub}</div>`:''}</div>`;
+          const small=[
+            tile('session',esc(T.session),esc(S.session),esc(S.sessionMatches)+' '+esc(T.matches)),
+            tile('last',esc(T.last),esc(S.last?S.last.chests:'—'),S.last?esc(S.last.when)+' · '+esc(S.last.mode):''),
+            tile('chest',esc(T.avgTile),esc(S.average),esc(fmt(T.inMatches,S.matches))),
+            tile('star',esc(T.treasures),esc(S.treasures),''),
+          ];
+          if(S.squad)small.push(tile('team',esc(T.squad)+`<span class="badge" title="${esc(T.inaccurateWhy)}">${esc(T.inaccurate)}</span>`,esc(S.squad.total),esc(fmt(T.squadSub,S.squad.team))));
+          h+=`<section class="dash"><div class="tile hero" style="grid-row:span ${Math.ceil(small.length/2)}"><button type="button" class="editbtn" onclick="openManual()" title="${esc(T.editChests)}" aria-label="${esc(T.editChests)}">__PENCIL__</button><div class="k">${IC.chest}<span>${esc(T.total)}</span></div><div class="v num">${esc(S.total)}</div><div class="s">${esc(T.totalSub)}${S.manual?'<br>'+esc(fmt(T.byHand,S.manualText.replace('+',''))):''}</div></div>${small.join('')}</section>`;
+          const goals=(S.goals||[]).map(g=>tile('target',esc(g.label),esc(g.text.replace(' ✓','')),g.done?esc(T.goalDone):esc(fmt(T.goalLeft,g.left)),`<div class="bar${g.done?' done':''}"><i style="width:${g.pct}%"></i></div>`));
+          if(S.achievements)goals.push(tile('trophy',esc(T.achievements),esc(S.achievements),esc(T.achievementsSub)));
+          if(goals.length)h+=`<section class="tiles">${goals.join('')}</section>`;
           h+=`<div class="actions"><button class="b main" onclick="setTab('report')">${esc(T.openReport)}</button>`;
           if(S.overlay.running)h+=`<button class="b" onclick="api('toggleOverlayVisible')">${esc(S.overlay.visible?T.hideOverlay:T.showOverlay)}</button><button class="b" onclick="api('toggleOverlayLock')">${esc(S.overlay.locked?T.unlock:T.lock)}</button>`;
           if(!S.update&&S.updatesOn)h+=`<button class="b" onclick="api('checkUpdate')">${esc(T.checkUpdate)}</button>`;
