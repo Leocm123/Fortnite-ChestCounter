@@ -1022,7 +1022,7 @@ public sealed class ReplayAnalyzer : FortniteReplayReader.ReplayReader
                 : null;
             seen.Add(new SeenPrize
             {
-                Player = who?.PlayerName ?? (who?.IsBot == true ? "Bot" : L.T("joueur inconnu", "unknown player", "jugador desconocido")),
+                Player = who?.PlayerName ?? (who?.IsBot == true ? "Bot" : L.T("joueur inconnu", "unknown player", "jugador desconocido", "jogador desconhecido")),
                 PrizeId = pz.PrizeId,
                 TimeSeconds = MathF.Round(pz.Time, 1),
             });
@@ -1260,7 +1260,7 @@ public static class TreasureNames
         }
         if (Guid.TryParse(item, out _))
         {
-            return L.T("Récompense de coffre doré", "Golden chest reward", "Recompensa de cofre dorado") + $" ({item[..8]})";
+            return L.T("Récompense de coffre doré", "Golden chest reward", "Recompensa de cofre dorado", "Recompensa de baú dourado") + $" ({item[..8]})";
         }
         if (item.Contains(':'))
         {
@@ -1271,10 +1271,10 @@ public static class TreasureNames
             if (item.StartsWith(UnknownPrefix, StringComparison.OrdinalIgnoreCase) || item.StartsWith(OldUnknownPrefix, StringComparison.OrdinalIgnoreCase))
             {
                 // No golden chest seen and no item seen: which treasure it was is not in the replay.
-                return L.T(UnknownFr, UnknownEn, UnknownEs);
+                return L.T(UnknownFr, UnknownEn, UnknownEs, "Tesouro (tipo desconhecido)");
             }
             // A prize whose reward is not known yet: its id is shown, so that it can be named in a later version.
-            return L.T("Récompense de coffre doré", "Golden chest reward", "Recompensa de cofre dorado") + $" ({item[(item.IndexOf(':') + 1)..]})";
+            return L.T("Récompense de coffre doré", "Golden chest reward", "Recompensa de cofre dorado", "Recompensa de baú dourado") + $" ({item[(item.IndexOf(':') + 1)..]})";
         }
 
         var i = item.ToLowerInvariant();

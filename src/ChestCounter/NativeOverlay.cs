@@ -28,7 +28,7 @@ public static class NativeOverlay
     private static int _headerH, _bigH, _captionH, _rowH, _col1W, _col2W, _labelW;
     private static IntPtr _fontHeader, _fontCaption, _fontLabel;
     private static IntPtr _brushBorder, _brushLine;
-    private static string Header => L.T("COFFRES", "CHESTS", "COFRES");
+    private static string Header => L.T("COFFRES", "CHESTS", "COFRES", "BAÚS");
     private const string CaptionTotal = "total";
     private static Action<int, int>? _onMoved;
     private static Action<bool>? _onLockChanged;
@@ -131,7 +131,7 @@ public static class NativeOverlay
             }
             catch (Exception ex)
             {
-                Console.WriteLine(L.T($"Overlay indisponible : {ex.Message}", $"Overlay unavailable: {ex.Message}", $"Overlay no disponible: {ex.Message}"));
+                Console.WriteLine(L.T($"Overlay indisponible : {ex.Message}", $"Overlay unavailable: {ex.Message}", $"Overlay no disponible: {ex.Message}", $"Overlay indisponível: {ex.Message}"));
                 ready.Set();
             }
             finally
@@ -239,7 +239,7 @@ public static class NativeOverlay
         _hwnd = CreateWindowExW(
             // Opaque (no WS_EX_LAYERED alpha): nothing for the compositor to blend every frame.
             WS_EX_TOPMOST | WS_EX_TOOLWINDOW | WS_EX_NOACTIVATE,
-            wc.lpszClassName, L.T("Coffres", "Chests", "Cofres"), WS_POPUP,
+            wc.lpszClassName, L.T("Coffres", "Chests", "Cofres", "Baús"), WS_POPUP,
 
             posX, posY, w, h, IntPtr.Zero, IntPtr.Zero, hInstance, IntPtr.Zero);
         if (_hwnd == IntPtr.Zero)
@@ -401,10 +401,10 @@ public static class NativeOverlay
             Console.WriteLine(locked
                 ? L.T($"Overlay verrouillé : la souris passe au travers. {(LockHotkeyRegistered ? "Ctrl+Maj+L" : "« Déverrouiller l'overlay » dans le compteur")} pour le déverrouiller.",
                       $"Overlay locked: the mouse goes through it. {(LockHotkeyRegistered ? "Ctrl+Shift+L" : "\"Unlock the overlay\" in the counter")} to unlock it.",
-                      $"Overlay bloqueado: el ratón lo atraviesa. {(LockHotkeyRegistered ? "Ctrl+Mayús+L" : "«Desbloquear el overlay» en el contador")} para desbloquearlo.")
+                      $"Overlay bloqueado: el ratón lo atraviesa. {(LockHotkeyRegistered ? "Ctrl+Mayús+L" : "«Desbloquear el overlay» en el contador")} para desbloquearlo.", $"Overlay travado: o mouse passa através dele. {(LockHotkeyRegistered ? "Ctrl+Shift+L" : "\"Destravar para mover\" no contador")} para destravar.")
                 : L.T("Overlay déverrouillé : clic gauche maintenu pour le déplacer, cadenas pour le reverrouiller.",
                       "Overlay unlocked: hold the left mouse button to move it, click the padlock to lock it again.",
-                      "Overlay desbloqueado: arrástralo con el clic izquierdo; el candado lo vuelve a bloquear."));
+                      "Overlay desbloqueado: arrástralo con el clic izquierdo; el candado lo vuelve a bloquear.", "Overlay destravado: segure o botão esquerdo do mouse para mover, clique no cadeado para travar de novo."));
         }
     }
 
@@ -419,8 +419,8 @@ public static class NativeOverlay
         {
             ShowWindow(hwnd, SW_HIDE);
             Console.WriteLine(HotkeyRegistered
-                ? L.T("Overlay masqué : Ctrl+Maj+O (n'importe où) pour le réafficher.", "Overlay hidden: Ctrl+Shift+O (anywhere) to show it again.", "Overlay oculto: Ctrl+Mayús+O (desde cualquier sitio) para volver a mostrarlo.")
-                : L.T("Overlay masqué : « Afficher l'overlay » dans le compteur pour le réafficher.", "Overlay hidden: \"Show the overlay\" in the counter to show it again.", "Overlay oculto: «Mostrar el overlay» en el contador para volver a mostrarlo."));
+                ? L.T("Overlay masqué : Ctrl+Maj+O (n'importe où) pour le réafficher.", "Overlay hidden: Ctrl+Shift+O (anywhere) to show it again.", "Overlay oculto: Ctrl+Mayús+O (desde cualquier sitio) para volver a mostrarlo.", "Overlay escondido: Ctrl+Shift+O (em qualquer lugar) para mostrar de novo.")
+                : L.T("Overlay masqué : « Afficher l'overlay » dans le compteur pour le réafficher.", "Overlay hidden: \"Show the overlay\" in the counter to show it again.", "Overlay oculto: «Mostrar el overlay» en el contador para volver a mostrarlo.", "Overlay escondido: \"Mostrar o overlay\" no contador para mostrar de novo."));
         }
     }
 
@@ -565,7 +565,7 @@ public static class NativeOverlay
 
             // Counters: total | match in progress
             var x2 = x + _col1W + S(ColGap);
-            Text(hdc, _fontBig, Rgb(242, 184, 75), v.Total, x - S(1), y, x + _col1W + S(4), y + _bigH);
+            Text(hdc, _fontBig, Rgb(Themes.Current.ClassicTotal), v.Total, x - S(1), y, x + _col1W + S(4), y + _bigH);
             Text(hdc, _fontBig, v.Current == null ? Rgb(80, 80, 92) : v.CurrentLive ? Rgb(110, 224, 150) : Rgb(226, 226, 232), v.Current ?? "—", x2 - S(1), y, right + S(4), y + _bigH);
             var sep = new RECT { Left = x + _col1W + S(ColGap) / 2, Top = y + S(8), Right = x + _col1W + S(ColGap) / 2 + 1, Bottom = y + _bigH + _captionH };
             FillRect(hdc, ref sep, _brushLine);
@@ -605,7 +605,7 @@ public static class NativeOverlay
 
     private sealed record HudRow(string Label, string Value);
 
-    private static HudRow StateRow(OverlayView v) => new(L.T("Dernière", "Last", "Última"), v.Last ?? "—");
+    private static HudRow StateRow(OverlayView v) => new(L.T("Dernière", "Last", "Última", "Última"), v.Last ?? "—");
 
     /// <summary>The figures of the match in progress are readable (its chests are already in the total).</summary>
     private static bool LiveFigures(OverlayView v) => v.CurrentLive && v.Current is { } cur && cur != "…";
@@ -625,7 +625,7 @@ public static class NativeOverlay
             var lockW = Sc(22);
             var bigW = TextWidth(hdc, _fontHudBig, v.Total, out _hudBigH);
             var state = StateRow(v);
-            var sessionLabel = L.T("Session", "Session", "Sesión");
+            var sessionLabel = L.T("Session", "Session", "Sesión", "Sessão");
             var rowsW = new[]
             {
                 TextWidth(hdc, _fontHudSmall, state.Label + Sep + state.Value, out _hudSmallH),
@@ -751,13 +751,13 @@ public static class NativeOverlay
     {
         if (value.Length == 0)
         {
-            Outlined(hdc, _fontHudSmall, Rgb(255, 233, 166), label, left, top, right, top + height, DT_RIGHT, thin: true);
+            Outlined(hdc, _fontHudSmall, Rgb(Themes.Current.Label), label, left, top, right, top + height, DT_RIGHT, thin: true);
             return right - TextWidth(hdc, _fontHudSmall, label, out _);
         }
         var valueW = TextWidth(hdc, _fontHudSmall, value, out _);
         Outlined(hdc, _fontHudSmall, valueColor, value, left, top, right, top + height, DT_RIGHT, thin: true);
         var labelRight = right - valueW;
-        Outlined(hdc, _fontHudSmall, Rgb(255, 233, 166), label + Sep, left, top, labelRight, top + height, DT_RIGHT, thin: true);
+        Outlined(hdc, _fontHudSmall, Rgb(Themes.Current.Label), label + Sep, left, top, labelRight, top + height, DT_RIGHT, thin: true);
         return labelRight - TextWidth(hdc, _fontHudSmall, label + Sep, out _);
     }
 
@@ -772,7 +772,7 @@ public static class NativeOverlay
         var pad = Sc(8);
         var right = rc.Right - pad - Sc(12); // italic glyphs and their outline lean past the measured width
         var white = Rgb(255, 255, 255);
-        var gold = Rgb(255, 210, 63);
+        var gold = Rgb(Themes.Current.Accent);
         var ink = Rgb(11, 15, 24);
 
         // Unlocked: a dark backdrop to grab it, and the padlock (locked, only the figures remain, mouse goes through).
@@ -804,7 +804,7 @@ public static class NativeOverlay
         var iw = Sc(26);
         var ih = Sc(22);
         var ix = right - bigW - Sc(8) - iw;
-        Chest(hdc, ix, y + (_hudBigH - ih) / 2, iw, ih, gold, Rgb(224, 165, 38), ink, ink);
+        Chest(hdc, ix, y + (_hudBigH - ih) / 2, iw, ih, gold, Rgb(Themes.Current.AccentDeep), ink, ink);
         if (v.CurrentLive)
         {
             var d = Sc(11);
@@ -816,7 +816,7 @@ public static class NativeOverlay
         var rowH = _hudSmallH;
         LabelValue(hdc, state.Label, state.Value, left, right, y, rowH, white);
         y += rowH + Sc(2);
-        LabelValue(hdc, L.T("Session", "Session", "Sesión"), v.Session, left, right, y, rowH, white);
+        LabelValue(hdc, L.T("Session", "Session", "Sesión", "Sessão"), v.Session, left, right, y, rowH, white);
         y += rowH + Sc(2);
         if (v.Squad != null)
         {
@@ -829,6 +829,7 @@ public static class NativeOverlay
     }
 
     private static uint Rgb(byte r, byte g, byte b) => (uint)(r | (g << 8) | (b << 16));
+    private static uint Rgb((byte R, byte G, byte B) c) => Rgb(c.R, c.G, c.B);
 
     // ---- Win32 ------------------------------------------------------------------------------
     private delegate IntPtr WndProcDelegate(IntPtr hwnd, uint msg, IntPtr wParam, IntPtr lParam);

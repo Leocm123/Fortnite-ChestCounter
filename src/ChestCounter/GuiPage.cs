@@ -9,139 +9,143 @@ public static class GuiPage
     /// <summary>Every text of the page, in the chosen language.</summary>
     public static Dictionary<string, string> Texts() => new()
     {
-        ["home"] = L.T("Accueil", "Home", "Inicio"),
-        ["report"] = L.T("Rapport", "Report", "Informe"),
-        ["overlay"] = L.T("Overlay", "Overlay", "Overlay"),
-        ["settings"] = L.T("Réglages", "Settings", "Ajustes"),
-        ["help"] = L.T("Aide", "Help", "Ayuda"),
-        ["total"] = L.T("Coffres au total", "Chests in total", "Cofres en total"),
-        ["totalSub"] = L.T("ouverts ou détruits par toi", "opened or destroyed by you", "abiertos o destruidos por ti"),
-        ["byHand"] = L.T("dont {0} ajoutés à la main", "{0} of them added by hand", "de ellos, {0} añadidos a mano"),
-        ["session"] = L.T("Session", "Session", "Sesión"),
-        ["last"] = L.T("Dernière partie", "Last match", "Última partida"),
-        ["squad"] = L.T("Total d'équipe", "Squad total", "Total del equipo"),
-        ["squadSub"] = L.T("toi + {0} par tes coéquipiers", "you + {0} by your teammates", "tú + {0} de tus compañeros"),
-        ["inaccurate"] = L.T("imprécis", "inaccurate", "impreciso"),
+        ["home"] = L.T("Accueil", "Home", "Inicio", "Início"),
+        ["report"] = L.T("Rapport", "Report", "Informe", "Relatório"),
+        ["overlay"] = L.T("Overlay", "Overlay", "Overlay", "Overlay"),
+        ["settings"] = L.T("Réglages", "Settings", "Ajustes", "Configurações"),
+        ["help"] = L.T("Aide", "Help", "Ayuda", "Ajuda"),
+        ["total"] = L.T("Coffres au total", "Chests in total", "Cofres en total", "Baús no total"),
+        ["totalSub"] = L.T("ouverts ou détruits par toi", "opened or destroyed by you", "abiertos o destruidos por ti", "abertos ou destruídos por você"),
+        ["byHand"] = L.T("dont {0} ajoutés à la main", "{0} of them added by hand", "de ellos, {0} añadidos a mano", "{0} deles adicionados manualmente"),
+        ["session"] = L.T("Session", "Session", "Sesión", "Sessão"),
+        ["last"] = L.T("Dernière partie", "Last match", "Última partida", "Última partida"),
+        ["squad"] = L.T("Total d'équipe", "Squad total", "Total del equipo", "Total do esquadrão"),
+        ["squadSub"] = L.T("toi + {0} par tes coéquipiers", "you + {0} by your teammates", "tú + {0} de tus compañeros", "você + {0} dos seus colegas de equipe"),
+        ["inaccurate"] = L.T("imprécis", "inaccurate", "impreciso", "impreciso"),
         ["inaccurateWhy"] = L.T("Compté dans TES replays : un coffre ouvert par un coéquipier à plus de 150 m de toi n'y est pas, et rien n'est enregistré après ton départ de la partie. Le vrai total de l'équipe est plus haut.",
             "Counted in YOUR replays: a chest a teammate opens more than 150 m away from you is not in them, and nothing is recorded once you leave the match. The real squad total is higher.",
-            "Contado en TUS repeticiones: un cofre que un compañero abre a más de 150 m de ti no está en ellas, y no se graba nada después de que salgas de la partida. El total real del equipo es mayor."),
-        ["treasures"] = L.T("Trésors", "Treasures", "Tesoros"),
-        ["matches"] = L.T("parties", "matches", "partidas"),
-        ["perMatch"] = L.T("{0} par partie", "{0} per match", "{0} por partida"),
-        ["openReport"] = L.T("Ouvrir le rapport", "Open the report", "Abrir el informe"),
-        ["showOverlay"] = L.T("Afficher l'overlay", "Show the overlay", "Mostrar el overlay"),
-        ["hideOverlay"] = L.T("Masquer l'overlay", "Hide the overlay", "Ocultar el overlay"),
-        ["lock"] = L.T("Verrouiller l'overlay", "Lock the overlay", "Bloquear el overlay"),
-        ["unlock"] = L.T("Déverrouiller pour le déplacer", "Unlock to move it", "Desbloquear para moverlo"),
-        ["activity"] = L.T("Activité", "Activity", "Actividad"),
-        ["noActivity"] = L.T("Rien pour l'instant.", "Nothing yet.", "Nada por ahora."),
-        ["analyzing"] = L.T("Analyse de tes replays…", "Analyzing your replays…", "Analizando tus repeticiones…"),
-        ["whatsNew"] = L.T("Nouveautés de la {0}", "What's new in {0}", "Novedades de la {0}"),
-        ["newVersion"] = L.T("Nouvelle version {0} disponible", "New version {0} available", "Nueva versión {0} disponible"),
-        ["install"] = L.T("Installer", "Install", "Instalar"),
-        ["checkUpdate"] = L.T("Rechercher une mise à jour", "Check for updates", "Buscar actualizaciones"),
-        ["welcome"] = L.T("Bienvenue !", "Welcome!", "¡Bienvenido!"),
+            "Contado en TUS repeticiones: un cofre que un compañero abre a más de 150 m de ti no está en ellas, y no se graba nada después de que salgas de la partida. El total real del equipo es mayor.", "Contado nos SEUS replays: um baú que um colega abre a mais de 150 m de você não aparece neles, e nada é gravado depois que você sai da partida. O total real do esquadrão é maior."),
+        ["treasures"] = L.T("Trésors", "Treasures", "Tesoros", "Tesouros"),
+        ["matches"] = L.T("parties", "matches", "partidas", "partidas"),
+        ["perMatch"] = L.T("{0} par partie", "{0} per match", "{0} por partida", "{0} por partida"),
+        ["openReport"] = L.T("Ouvrir le rapport", "Open the report", "Abrir el informe", "Abrir o relatório"),
+        ["showOverlay"] = L.T("Afficher l'overlay", "Show the overlay", "Mostrar el overlay", "Mostrar o overlay"),
+        ["hideOverlay"] = L.T("Masquer l'overlay", "Hide the overlay", "Ocultar el overlay", "Esconder o overlay"),
+        ["lock"] = L.T("Verrouiller l'overlay", "Lock the overlay", "Bloquear el overlay", "Travar o overlay"),
+        ["unlock"] = L.T("Déverrouiller pour le déplacer", "Unlock to move it", "Desbloquear para moverlo", "Destravar para mover"),
+        ["activity"] = L.T("Activité", "Activity", "Actividad", "Atividade"),
+        ["noActivity"] = L.T("Rien pour l'instant.", "Nothing yet.", "Nada por ahora.", "Nada ainda."),
+        ["analyzing"] = L.T("Analyse de tes replays…", "Analyzing your replays…", "Analizando tus repeticiones…", "Analisando seus replays…"),
+        ["whatsNew"] = L.T("Nouveautés de la {0}", "What's new in {0}", "Novedades de la {0}", "Novidades da {0}"),
+        ["newVersion"] = L.T("Nouvelle version {0} disponible", "New version {0} available", "Nueva versión {0} disponible", "Nova versão {0} disponível"),
+        ["install"] = L.T("Installer", "Install", "Instalar", "Instalar"),
+        ["checkUpdate"] = L.T("Rechercher une mise à jour", "Check for updates", "Buscar actualizaciones", "Procurar atualizações"),
+        ["welcome"] = L.T("Bienvenue !", "Welcome!", "¡Bienvenido!", "Bem-vindo!"),
         ["welcomeText"] = L.T("Active d'abord les rediffusions dans Fortnite : Paramètres → Jeu → Rediffusions → Enregistrer les rediffusions. Ensuite, laisse le compteur ouvert : chaque partie est comptée quelques secondes après sa fin. Des coffres ouverts avant ? Le crayon de « Coffres au total » permet de les ajouter.",
             "First turn on replays in Fortnite: Settings → Game → Replays → Record Replays. Then keep the counter open: each match is counted a few seconds after it ends. Chests opened before? The pencil of \"Chests in total\" adds them.",
-            "Primero activa las repeticiones en Fortnite: Ajustes → Juego → Repeticiones → Grabar repeticiones. Luego deja el contador abierto: cada partida se cuenta unos segundos después de terminar. ¿Cofres abiertos antes? El lápiz de «Cofres en total» permite añadirlos."),
-        ["ok"] = L.T("OK", "OK", "OK"),
-        ["moreInfo"] = L.T("En savoir plus", "More info", "Más información"),
-        ["wMin"] = L.T("Réduire", "Minimize", "Minimizar"),
-        ["wMax"] = L.T("Agrandir", "Maximize", "Maximizar"),
-        ["wRestore"] = L.T("Niveau inférieur", "Restore down", "Restaurar"),
-        ["wClose"] = L.T("Fermer", "Close", "Cerrar"),
-        ["keepOpen"] = L.T("Garder le compteur ouvert", "Keep the counter open", "Mantener el contador abierto"),
-        ["autoCloseText"] = L.T("Fortnite est fermé : le compteur, ouvert avec Fortnite, va se fermer tout seul.", "Fortnite is closed: the counter, opened with Fortnite, is about to close by itself.", "Fortnite está cerrado: el contador, abierto con Fortnite, se va a cerrar solo."),
-        ["welcomeQuick"] = L.T("Tes premiers réglages (tu les retrouves à tout moment dans Réglages) :", "Your first settings (you find them at any time in Settings):", "Tus primeros ajustes (los encuentras en cualquier momento en Ajustes):"),
-        ["welcomeDone"] = L.T("C'est parti !", "Let's go!", "¡Vamos!"),
-        ["inGame"] = L.T("Overlay en jeu", "In-game overlay", "Overlay en el juego"),
+            "Primero activa las repeticiones en Fortnite: Ajustes → Juego → Repeticiones → Grabar repeticiones. Luego deja el contador abierto: cada partida se cuenta unos segundos después de terminar. ¿Cofres abiertos antes? El lápiz de «Cofres en total» permite añadirlos.", "Primeiro, ative os replays no Fortnite: Configurações → Jogo → Replays → Gravar Replays. Depois, deixe o contador aberto: cada partida é contada alguns segundos depois de terminar. Abriu baús antes? O lápis de \"Baús no total\" adiciona eles."),
+        ["ok"] = L.T("OK", "OK", "OK", "OK"),
+        ["moreInfo"] = L.T("En savoir plus", "More info", "Más información", "Mais informações"),
+        ["wMin"] = L.T("Réduire", "Minimize", "Minimizar", "Minimizar"),
+        ["wMax"] = L.T("Agrandir", "Maximize", "Maximizar", "Maximizar"),
+        ["wRestore"] = L.T("Niveau inférieur", "Restore down", "Restaurar", "Restaurar"),
+        ["wClose"] = L.T("Fermer", "Close", "Cerrar", "Fechar"),
+        ["keepOpen"] = L.T("Garder le compteur ouvert", "Keep the counter open", "Mantener el contador abierto", "Manter o contador aberto"),
+        ["autoCloseText"] = L.T("Fortnite est fermé : le compteur, ouvert avec Fortnite, va se fermer tout seul.", "Fortnite is closed: the counter, opened with Fortnite, is about to close by itself.", "Fortnite está cerrado: el contador, abierto con Fortnite, se va a cerrar solo.", "O Fortnite foi fechado: o contador, aberto junto com o Fortnite, vai fechar sozinho."),
+        ["welcomeQuick"] = L.T("Tes premiers réglages (tu les retrouves à tout moment dans Réglages) :", "Your first settings (you find them at any time in Settings):", "Tus primeros ajustes (los encuentras en cualquier momento en Ajustes):", "Suas primeiras configurações (você encontra elas a qualquer momento em Configurações):"),
+        ["welcomeDone"] = L.T("C'est parti !", "Let's go!", "¡Vamos!", "Bora!"),
+        ["inGame"] = L.T("Overlay en jeu", "In-game overlay", "Overlay en el juego", "Overlay no jogo"),
         ["inGameHelp"] = L.T("Petite fenêtre toujours au premier plan qui affiche tes coffres en jeu (Fortnite en « Plein écran fenêtré »). Ctrl+Maj+O : afficher / masquer, Ctrl+Maj+L : verrouiller.",
             "Small always-on-top window that shows your chests in game (Fortnite in \"Windowed Fullscreen\"). Ctrl+Shift+O: show / hide, Ctrl+Shift+L: lock.",
-            "Pequeña ventana siempre visible que muestra tus cofres en el juego (Fortnite en «Pantalla completa en ventana»). Ctrl+Mayús+O: mostrar / ocultar, Ctrl+Mayús+L: bloquear."),
-        ["style"] = L.T("Style", "Style", "Estilo"),
-        ["hud"] = L.T("HUD (intégré au jeu)", "HUD (blends into the game)", "HUD (integrado en el juego)"),
-        ["classic"] = L.T("Classique (carte sombre)", "Classic (dark card)", "Clásico (tarjeta oscura)"),
-        ["size"] = L.T("Taille", "Size", "Tamaño"),
-        ["opacity"] = L.T("Opacité", "Opacity", "Opacidad"),
-        ["squadToggle"] = L.T("Afficher le total d'équipe", "Show the squad total", "Mostrar el total del equipo"),
+            "Pequeña ventana siempre visible que muestra tus cofres en el juego (Fortnite en «Pantalla completa en ventana»). Ctrl+Mayús+O: mostrar / ocultar, Ctrl+Mayús+L: bloquear.", "Janelinha sempre por cima que mostra seus baús no jogo (Fortnite em \"Tela Cheia em Janela\"). Ctrl+Shift+O: mostrar / esconder, Ctrl+Shift+L: travar."),
+        ["style"] = L.T("Style", "Style", "Estilo", "Estilo"),
+        ["hud"] = L.T("HUD (intégré au jeu)", "HUD (blends into the game)", "HUD (integrado en el juego)", "HUD (se mistura ao jogo)"),
+        ["classic"] = L.T("Classique (carte sombre)", "Classic (dark card)", "Clásico (tarjeta oscura)", "Clássico (cartão escuro)"),
+        ["size"] = L.T("Taille", "Size", "Tamaño", "Tamanho"),
+        ["opacity"] = L.T("Opacité", "Opacity", "Opacidad", "Opacidade"),
+        ["squadToggle"] = L.T("Afficher le total d'équipe", "Show the squad total", "Mostrar el total del equipo", "Mostrar o total do esquadrão"),
         ["squadHelp"] = L.T("Tes coffres + ceux de tous tes coéquipiers (même aléatoires), sur l'overlay et l'accueil.",
             "Your chests + those of all your teammates (random ones too), on the overlay and the home tab.",
-            "Tus cofres + los de todos tus compañeros (también los aleatorios), en el overlay y el inicio."),
-        ["obs"] = L.T("Overlay pour OBS (stream)", "Overlay for OBS (stream)", "Overlay para OBS (directo)"),
+            "Tus cofres + los de todos tus compañeros (también los aleatorios), en el overlay y el inicio.", "Seus baús + os de todos os seus colegas (inclusive aleatórios), no overlay e na aba Início."),
+        ["obs"] = L.T("Overlay pour OBS (stream)", "Overlay for OBS (stream)", "Overlay para OBS (directo)", "Overlay para o OBS (stream)"),
         ["obsSteps"] = L.T("Dans OBS : Sources → + → Navigateur, coche « Fichier local », choisis ce fichier. Largeur 360, hauteur 220 (450 × 300 en classique). Pour ne l'avoir que sur le stream, désactive l'overlay en jeu : la page continue d'être mise à jour.",
             "In OBS: Sources → + → Browser, tick \"Local file\", pick this file. Width 360, height 220 (450 × 300 for classic). To have it on the stream only, turn the in-game overlay off: the page keeps being updated.",
-            "En OBS: Fuentes → + → Navegador, marca «Archivo local», elige este archivo. Ancho 360, alto 220 (450 × 300 en clásico). Para tenerlo solo en el directo, desactiva el overlay en el juego: la página se sigue actualizando."),
-        ["copy"] = L.T("Copier le chemin", "Copy the path", "Copiar la ruta"),
-        ["copied"] = L.T("Copié !", "Copied!", "¡Copiado!"),
-        ["preview"] = L.T("Aperçu", "Preview", "Vista previa"),
-        ["language"] = L.T("Langue", "Language", "Idioma"),
-        ["times"] = L.T("Heures affichées", "Times shown in", "Horas mostradas en"),
-        ["timesHelp"] = L.T("Dans le rapport et ici : semaines, heures du trésor, parties.", "In the report and here: weeks, Treasure Hours, matches.", "En el informe y aquí: semanas, horas del tesoro, partidas."),
-        ["timesLocal"] = L.T("Heure locale ({0})", "Local time ({0})", "Hora local ({0})"),
-        ["timesUtc"] = L.T("UTC (heure du jeu)", "UTC (game time)", "UTC (hora del juego)"),
-        ["clock"] = L.T("Horloge", "Clock", "Reloj"),
-        ["clockAuto"] = L.T("Comme Windows ({0})", "Same as Windows ({0})", "Como Windows ({0})"),
-        ["clock12"] = L.T("12 heures (10:54 PM)", "12-hour (10:54 PM)", "12 horas (10:54 PM)"),
-        ["clock24"] = L.T("24 heures (22:54)", "24-hour (22:54)", "24 horas (22:54)"),
-        ["h12"] = L.T("12 h", "12-hour", "12 h"),
-        ["h24"] = L.T("24 h", "24-hour", "24 h"),
-        ["tray"] = L.T("Réduire dans la zone de notification", "Minimize to the notification area", "Minimizar al área de notificación"),
+            "En OBS: Fuentes → + → Navegador, marca «Archivo local», elige este archivo. Ancho 360, alto 220 (450 × 300 en clásico). Para tenerlo solo en el directo, desactiva el overlay en el juego: la página se sigue actualizando.", "No OBS: Fontes → + → Navegador, marque \"Arquivo local\" e escolha este arquivo. Largura 360, altura 220 (450 × 300 no clássico). Para ele aparecer só na stream, desligue o overlay no jogo: a página continua sendo atualizada."),
+        ["copy"] = L.T("Copier le chemin", "Copy the path", "Copiar la ruta", "Copiar o caminho"),
+        ["copied"] = L.T("Copié !", "Copied!", "¡Copiado!", "Copiado!"),
+        ["preview"] = L.T("Aperçu", "Preview", "Vista previa", "Prévia"),
+        ["language"] = L.T("Langue", "Language", "Idioma", "Idioma"),
+        ["times"] = L.T("Heures affichées", "Times shown in", "Horas mostradas en", "Horários mostrados em"),
+        ["timesHelp"] = L.T("Dans le rapport et ici : semaines, heures du trésor, parties.", "In the report and here: weeks, Treasure Hours, matches.", "En el informe y aquí: semanas, horas del tesoro, partidas.", "No relatório e aqui: semanas, Horas do Tesouro, partidas."),
+        ["timesLocal"] = L.T("Heure locale ({0})", "Local time ({0})", "Hora local ({0})", "Horário local ({0})"),
+        ["timesUtc"] = L.T("UTC (heure du jeu)", "UTC (game time)", "UTC (hora del juego)", "UTC (horário do jogo)"),
+        ["theme"] = L.T("Thème", "Theme", "Tema", "Tema"),
+        ["themeHelp"] = L.T("Couleurs de la fenêtre, du rapport et de l'overlay.", "Colors of the window, the report and the overlay.",
+            "Colores de la ventana, del informe y del overlay.", "Cores da janela, do relatório e do overlay."),
+        ["clock"] = L.T("Horloge", "Clock", "Reloj", "Relógio"),
+        ["clockAuto"] = L.T("Comme Windows ({0})", "Same as Windows ({0})", "Como Windows ({0})", "Igual ao Windows ({0})"),
+        ["clock12"] = L.T("12 heures (10:54 PM)", "12-hour (10:54 PM)", "12 horas (10:54 PM)", "12 horas (10:54 PM)"),
+        ["clock24"] = L.T("24 heures (22:54)", "24-hour (22:54)", "24 horas (22:54)", "24 horas (22:54)"),
+        ["h12"] = L.T("12 h", "12-hour", "12 h", "12 horas"),
+        ["h24"] = L.T("24 h", "24-hour", "24 h", "24 horas"),
+        ["tray"] = L.T("Réduire dans la zone de notification", "Minimize to the notification area", "Minimizar al área de notificación", "Minimizar para a área de notificação"),
         ["trayHelp"] = L.T("Oui : réduire la fenêtre la range à côté de l'horloge, en bas à droite de la barre des tâches (icône du coffre, parfois derrière la petite flèche ^). Non : elle reste dans la barre des tâches comme une fenêtre normale. Dans les deux cas, le compteur continue de compter.",
             "Yes: minimizing the window puts it next to the clock, at the bottom right of the taskbar (chest icon, sometimes behind the small ^ arrow). No: it stays in the taskbar like a normal window. Either way, the counter keeps counting.",
-            "Sí: minimizar la ventana la coloca junto al reloj, abajo a la derecha de la barra de tareas (icono del cofre, a veces detrás de la pequeña flecha ^). No: se queda en la barra de tareas como una ventana normal. En ambos casos, el contador sigue contando."),
-        ["footerWindow"] = L.T("La croix de la fenêtre ferme le compteur (après confirmation).", "The close button of the window stops the counter (after asking).", "La cruz de la ventana cierra el contador (tras confirmarlo)."),
-        ["withFortnite"] = L.T("Ouvrir avec Fortnite", "Open with Fortnite", "Abrir con Fortnite"),
-        ["withFortniteHelp"] = L.T("Un petit processus invisible attend Fortnite et ouvre le compteur, qui se ferme après.", "A tiny invisible process waits for Fortnite and opens the counter, which closes afterwards.", "Un pequeño proceso invisible espera a Fortnite y abre el contador, que se cierra después."),
-        ["updates"] = L.T("Mises à jour", "Updates", "Actualizaciones"),
-        ["upPrompt"] = L.T("Proposées", "Offered", "Propuestas"),
-        ["upAuto"] = L.T("Installées automatiquement", "Installed automatically", "Instaladas automáticamente"),
-        ["upOff"] = L.T("Désactivées", "Off", "Desactivadas"),
-        ["profile"] = L.T("Compte (profil)", "Account (profile)", "Cuenta (perfil)"),
-        ["demos"] = L.T("Dossier des replays", "Replays folder", "Carpeta de repeticiones"),
-        ["demosMissing"] = L.T("Introuvable : Fortnite le crée à la première partie enregistrée.", "Not found: Fortnite creates it with the first recorded match.", "No encontrada: Fortnite la crea con la primera partida grabada."),
-        ["save"] = L.T("Enregistrer", "Save", "Guardar"),
-        ["editChests"] = L.T("Modifier mon nombre de coffres", "Edit my number of chests", "Modificar mi número de cofres"),
-        ["close"] = L.T("Fermer", "Close", "Cerrar"),
-        ["manual"] = L.T("Coffres ajoutés à la main", "Chests added by hand", "Cofres añadidos a mano"),
-        ["manualHelp"] = L.T("Les coffres ouverts avant d'utiliser le compteur. Chaque nombre s'ajoute à ce que tu as déjà ajouté (un nombre négatif en retire) ; la croix annule un ajout.", "The chests opened before using the counter. Each number is added to what you already added (a negative number removes some); the cross undoes an addition.", "Los cofres abiertos antes de usar el contador. Cada número se suma a lo que ya añadiste (un número negativo quita cofres); la cruz anula un añadido."),
-        ["manualTotal"] = L.T("Ajoutés à la main : {0}", "Added by hand: {0}", "Añadidos a mano: {0}"),
-        ["addBtn"] = L.T("Ajouter", "Add", "Añadir"),
-        ["removeEntry"] = L.T("Annuler cet ajout", "Undo this addition", "Anular este añadido"),
-        ["thisWeek"] = L.T("Ouverts cette semaine", "Opened this week", "Abiertos esta semana"),
-        ["thisWeekHelp"] = L.T("comptent aussi pour les trésors hebdo de la semaine {0}", "also count for the weekly treasures of week {0}", "cuentan también para los tesoros semanales de la semana {0}"),
-        ["estimate"] = L.T("Ou estimer à partir de tes parties", "Or estimate from your matches", "O estimar a partir de tus partidas"),
-        ["estimateHelp"] = L.T("Nombre de parties Battle Royale de la saison, dans Fortnite : Carrière → Statistiques.", "Number of Battle Royale matches this season, in Fortnite: Career → Stats.", "Número de partidas de Battle Royale de la temporada, en Fortnite: Carrera → Estadísticas."),
-        ["career"] = L.T("Parties jouées", "Matches played", "Partidas jugadas"),
-        ["compute"] = L.T("Calculer", "Compute", "Calcular"),
-        ["add"] = L.T("Ajouter {0} coffres", "Add {0} chests", "Añadir {0} cofres"),
-        ["estimateTooFew"] = L.T("Il faut au moins {0} parties comptées pour une moyenne fiable.", "At least {0} counted matches are needed for a reliable average.", "Hacen falta al menos {0} partidas contadas para una media fiable."),
-        ["estimateNothing"] = L.T("Rien à ajouter : tes parties comptées couvrent déjà ce nombre.", "Nothing to add: your counted matches already cover that number.", "Nada que añadir: tus partidas contadas ya cubren ese número."),
-        ["dataFolder"] = L.T("Ouvrir le dossier des données", "Open the data folder", "Abrir la carpeta de datos"),
-        ["errorLog"] = L.T("Ouvrir le journal d'erreurs", "Open the error log", "Abrir el registro de errores"),
-        ["issue"] = L.T("Signaler un problème (GitHub)", "Report a problem (GitHub)", "Informar de un problema (GitHub)"),
-        ["project"] = L.T("Page du projet (GitHub)", "Project page (GitHub)", "Página del proyecto (GitHub)"),
+            "Sí: minimizar la ventana la coloca junto al reloj, abajo a la derecha de la barra de tareas (icono del cofre, a veces detrás de la pequeña flecha ^). No: se queda en la barra de tareas como una ventana normal. En ambos casos, el contador sigue contando.", "Sim: minimizar a janela coloca ela ao lado do relógio, no canto inferior direito da barra de tarefas (ícone de baú, às vezes atrás da setinha ^). Não: ela fica na barra de tarefas como uma janela normal. Nos dois casos, o contador continua contando."),
+        ["footerWindow"] = L.T("La croix de la fenêtre ferme le compteur (après confirmation).", "The close button of the window stops the counter (after asking).", "La cruz de la ventana cierra el contador (tras confirmarlo).", "O botão de fechar da janela para o contador (depois de perguntar)."),
+        ["withFortnite"] = L.T("Ouvrir avec Fortnite", "Open with Fortnite", "Abrir con Fortnite", "Abrir com o Fortnite"),
+        ["withFortniteHelp"] = L.T("Un petit processus invisible attend Fortnite et ouvre le compteur, qui se ferme après.", "A tiny invisible process waits for Fortnite and opens the counter, which closes afterwards.", "Un pequeño proceso invisible espera a Fortnite y abre el contador, que se cierra después.", "Um processo minúsculo e invisível espera o Fortnite e abre o contador, que fecha depois."),
+        ["updates"] = L.T("Mises à jour", "Updates", "Actualizaciones", "Atualizações"),
+        ["upPrompt"] = L.T("Proposées", "Offered", "Propuestas", "Oferecidas"),
+        ["upAuto"] = L.T("Installées automatiquement", "Installed automatically", "Instaladas automáticamente", "Instaladas automaticamente"),
+        ["upOff"] = L.T("Désactivées", "Off", "Desactivadas", "Desligadas"),
+        ["profile"] = L.T("Compte (profil)", "Account (profile)", "Cuenta (perfil)", "Conta (perfil)"),
+        ["demos"] = L.T("Dossier des replays", "Replays folder", "Carpeta de repeticiones", "Pasta dos replays"),
+        ["demosMissing"] = L.T("Introuvable : Fortnite le crée à la première partie enregistrée.", "Not found: Fortnite creates it with the first recorded match.", "No encontrada: Fortnite la crea con la primera partida grabada.", "Não encontrada: o Fortnite cria ela com a primeira partida gravada."),
+        ["save"] = L.T("Enregistrer", "Save", "Guardar", "Salvar"),
+        ["editChests"] = L.T("Modifier mon nombre de coffres", "Edit my number of chests", "Modificar mi número de cofres", "Editar meu número de baús"),
+        ["close"] = L.T("Fermer", "Close", "Cerrar", "Fechar"),
+        ["manual"] = L.T("Coffres ajoutés à la main", "Chests added by hand", "Cofres añadidos a mano", "Baús adicionados manualmente"),
+        ["manualHelp"] = L.T("Les coffres ouverts avant d'utiliser le compteur. Chaque nombre s'ajoute à ce que tu as déjà ajouté (un nombre négatif en retire) ; la croix annule un ajout.", "The chests opened before using the counter. Each number is added to what you already added (a negative number removes some); the cross undoes an addition.", "Los cofres abiertos antes de usar el contador. Cada número se suma a lo que ya añadiste (un número negativo quita cofres); la cruz anula un añadido.", "Os baús abertos antes de usar o contador. Cada número é somado ao que você já adicionou (um número negativo remove); o X desfaz uma adição."),
+        ["manualTotal"] = L.T("Ajoutés à la main : {0}", "Added by hand: {0}", "Añadidos a mano: {0}", "Adicionados manualmente: {0}"),
+        ["addBtn"] = L.T("Ajouter", "Add", "Añadir", "Adicionar"),
+        ["removeEntry"] = L.T("Annuler cet ajout", "Undo this addition", "Anular este añadido", "Desfazer esta adição"),
+        ["thisWeek"] = L.T("Ouverts cette semaine", "Opened this week", "Abiertos esta semana", "Abertos nesta semana"),
+        ["thisWeekHelp"] = L.T("comptent aussi pour les trésors hebdo de la semaine {0}", "also count for the weekly treasures of week {0}", "cuentan también para los tesoros semanales de la semana {0}", "também contam para os tesouros semanais da semana {0}"),
+        ["estimate"] = L.T("Ou estimer à partir de tes parties", "Or estimate from your matches", "O estimar a partir de tus partidas", "Ou estimar pelas suas partidas"),
+        ["estimateHelp"] = L.T("Nombre de parties Battle Royale de la saison, dans Fortnite : Carrière → Statistiques.", "Number of Battle Royale matches this season, in Fortnite: Career → Stats.", "Número de partidas de Battle Royale de la temporada, en Fortnite: Carrera → Estadísticas.", "Número de partidas de Battle Royale nesta temporada, no Fortnite: Carreira → Estatísticas."),
+        ["career"] = L.T("Parties jouées", "Matches played", "Partidas jugadas", "Partidas jogadas"),
+        ["compute"] = L.T("Calculer", "Compute", "Calcular", "Calcular"),
+        ["add"] = L.T("Ajouter {0} coffres", "Add {0} chests", "Añadir {0} cofres", "Adicionar {0} baús"),
+        ["estimateTooFew"] = L.T("Il faut au moins {0} parties comptées pour une moyenne fiable.", "At least {0} counted matches are needed for a reliable average.", "Hacen falta al menos {0} partidas contadas para una media fiable.", "São necessárias pelo menos {0} partidas contadas para uma média confiável."),
+        ["estimateNothing"] = L.T("Rien à ajouter : tes parties comptées couvrent déjà ce nombre.", "Nothing to add: your counted matches already cover that number.", "Nada que añadir: tus partidas contadas ya cubren ese número.", "Nada a adicionar: suas partidas contadas já cobrem esse número."),
+        ["dataFolder"] = L.T("Ouvrir le dossier des données", "Open the data folder", "Abrir la carpeta de datos", "Abrir a pasta de dados"),
+        ["errorLog"] = L.T("Ouvrir le journal d'erreurs", "Open the error log", "Abrir el registro de errores", "Abrir o log de erros"),
+        ["issue"] = L.T("Signaler un problème (GitHub)", "Report a problem (GitHub)", "Informar de un problema (GitHub)", "Informar um problema (GitHub)"),
+        ["project"] = L.T("Page du projet (GitHub)", "Project page (GitHub)", "Página del proyecto (GitHub)", "Página do projeto (GitHub)"),
         ["helpText"] = L.T("Le compteur lit les replays que Fortnite enregistre et compte tes coffres quelques secondes après chaque partie (Battle Royale de la saison seulement). Laisse-le ouvert pendant que tu joues : tu peux réduire la fenêtre, il continue de compter.",
             "The counter reads the replays Fortnite saves and counts your chests a few seconds after each match (the season's Battle Royale only). Keep it open while you play: you can minimize the window, it keeps counting.",
-            "El contador lee las repeticiones que guarda Fortnite y cuenta tus cofres unos segundos después de cada partida (solo el Battle Royale de la temporada). Déjalo abierto mientras juegas: puedes minimizar la ventana, sigue contando."),
-        ["uninstall"] = L.T("Désinstaller ChestCounter", "Uninstall ChestCounter", "Desinstalar ChestCounter"),
-        ["keepData"] = L.T("Garder mon historique et mes réglages", "Keep my history and settings", "Conservar mi historial y mis ajustes"),
-        ["deleteData"] = L.T("Tout supprimer", "Delete everything", "Borrarlo todo"),
-        ["uninstallConfirm"] = L.T("Désinstaller maintenant ? Le compteur se ferme et ChestCounter.exe est supprimé.", "Uninstall now? The counter closes and ChestCounter.exe is deleted.", "¿Desinstalar ahora? El contador se cierra y se borra ChestCounter.exe."),
-        ["quit"] = L.T("Quitter le compteur", "Quit the counter", "Salir del contador"),
-        ["quitConfirm"] = L.T("Arrêter le compteur ? Les parties jouées ensuite ne seront comptées qu'à sa prochaine ouverture.", "Stop the counter? Matches played afterwards are only counted when it is opened again.", "¿Detener el contador? Las partidas jugadas después solo se cuentan cuando se vuelva a abrir."),
-        ["closed"] = L.T("Le compteur est arrêté. Tu peux fermer cette fenêtre.", "The counter is stopped. You can close this window.", "El contador está detenido. Puedes cerrar esta ventana."),
-        ["offline"] = L.T("Le compteur ne répond plus (fermé ?). Relance ChestCounter.exe.", "The counter does not answer (closed?). Start ChestCounter.exe again.", "El contador no responde (¿cerrado?). Vuelve a abrir ChestCounter.exe."),
-        ["footer"] = L.T("Fermer cette fenêtre ne coupe pas le compteur.", "Closing this window does not stop the counter.", "Cerrar esta ventana no detiene el contador."),
+            "El contador lee las repeticiones que guarda Fortnite y cuenta tus cofres unos segundos después de cada partida (solo el Battle Royale de la temporada). Déjalo abierto mientras juegas: puedes minimizar la ventana, sigue contando.", "O contador lê os replays que o Fortnite salva e conta seus baús alguns segundos depois de cada partida (só o Battle Royale da temporada). Deixe ele aberto enquanto joga: você pode minimizar a janela, ele continua contando."),
+        ["uninstall"] = L.T("Désinstaller ChestCounter", "Uninstall ChestCounter", "Desinstalar ChestCounter", "Desinstalar o ChestCounter"),
+        ["keepData"] = L.T("Garder mon historique et mes réglages", "Keep my history and settings", "Conservar mi historial y mis ajustes", "Manter meu histórico e configurações"),
+        ["deleteData"] = L.T("Tout supprimer", "Delete everything", "Borrarlo todo", "Apagar tudo"),
+        ["uninstallConfirm"] = L.T("Désinstaller maintenant ? Le compteur se ferme et ChestCounter.exe est supprimé.", "Uninstall now? The counter closes and ChestCounter.exe is deleted.", "¿Desinstalar ahora? El contador se cierra y se borra ChestCounter.exe.", "Desinstalar agora? O contador fecha e o ChestCounter.exe é apagado."),
+        ["quit"] = L.T("Quitter le compteur", "Quit the counter", "Salir del contador", "Sair do contador"),
+        ["quitConfirm"] = L.T("Arrêter le compteur ? Les parties jouées ensuite ne seront comptées qu'à sa prochaine ouverture.", "Stop the counter? Matches played afterwards are only counted when it is opened again.", "¿Detener el contador? Las partidas jugadas después solo se cuentan cuando se vuelva a abrir.", "Parar o contador? As partidas jogadas depois só serão contadas quando ele for aberto de novo."),
+        ["closed"] = L.T("Le compteur est arrêté. Tu peux fermer cette fenêtre.", "The counter is stopped. You can close this window.", "El contador está detenido. Puedes cerrar esta ventana.", "O contador está parado. Você pode fechar esta janela."),
+        ["offline"] = L.T("Le compteur ne répond plus (fermé ?). Relance ChestCounter.exe.", "The counter does not answer (closed?). Start ChestCounter.exe again.", "El contador no responde (¿cerrado?). Vuelve a abrir ChestCounter.exe.", "O contador não responde (fechado?). Abra o ChestCounter.exe de novo."),
+        ["footer"] = L.T("Fermer cette fenêtre ne coupe pas le compteur.", "Closing this window does not stop the counter.", "Cerrar esta ventana no detiene el contador.", "Fechar esta janela não para o contador."),
     };
 
-    public static string Html(string token) => Template.Replace("__TOKEN__", token).Replace("__FONT__", ReportWriter.FontFaceCss).Replace("__PENCIL__", ReportWriter.PencilIcon);
+    public static string Html(string token) => Template.Replace("__TOKEN__", token).Replace("__FONT__", ReportWriter.FontFaceCss).Replace("__PENCIL__", ReportWriter.PencilIcon).Replace("__THEMES__", Themes.Css);
 
     private const string Template = """
         <!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
         <title>Chest Counter</title>
         <style>__FONT__
-        :root{--bg:#0f1b24;--ink:#efe2c4;--muted:#b8b0a0;--title:#f0c057;--card:#f2e6c9;--cink:#2a1c0f;--cmuted:#6b5a44;--line:#d8c59c;--track:#e4d3ad;--gold:#c9a24f;--team:#1f7f7a;--warn:#a3361f}
+        :root{--bg:#0f1b24;--ink:#efe2c4;--muted:#b8b0a0;--title:#f0c057;--card:#f2e6c9;--cink:#2a1c0f;--cmuted:#6b5a44;--line:#d8c59c;--track:#e4d3ad;--gold:#c9a24f;--team:#1f7f7a;--warn:#a3361f;--hero:#7a4a1e;--heroline:#e7b440;--heroink:#ffd36a;--herotext:#fbecc4;--herokey:#f3cf7a}
         @media (prefers-color-scheme:light){:root{--bg:#efe4c9;--ink:#2a1c0f;--muted:#6b5a44;--title:#7a4a1e;--card:#fffaf0;--line:#e2d2ae;--track:#efe2c4}}
+        __THEMES__
         *{box-sizing:border-box}
         body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.5 "Segoe UI",system-ui,sans-serif}
         main{max-width:1080px;margin:0 auto;padding:24px 16px 40px;display:flex;flex-direction:column;gap:20px}
@@ -170,15 +174,15 @@ public static class GuiPage
         .tile{background:var(--card);color:var(--cink);border:1px solid var(--line);border-radius:8px;padding:14px 16px}
         .tile .v{font-size:36px;font-weight:700;line-height:1.1}
         .tile .l{font-size:13px;color:var(--cmuted)}
-        .tile.hero{position:relative;background:#7a4a1e;color:#fbecc4;border:2px solid #e7b440}
-        .editbtn{position:absolute;top:10px;right:10px;width:36px;height:36px;padding:0;border-radius:8px;border:1px solid #e7b440;background:transparent;color:#ffd36a;cursor:pointer;display:grid;place-items:center}
-        .editbtn:hover{background:rgba(231,180,64,.18)}.editbtn:focus-visible{outline:3px solid #ffd36a;outline-offset:2px}
+        .tile.hero{position:relative;background:var(--hero,#7a4a1e);color:var(--herotext,#fbecc4);border:2px solid var(--heroline,#e7b440)}
+        .editbtn{position:absolute;top:10px;right:10px;width:36px;height:36px;padding:0;border-radius:8px;border:1px solid var(--heroline,#e7b440);background:transparent;color:var(--heroink,#ffd36a);cursor:pointer;display:grid;place-items:center}
+        .editbtn:hover{background:rgba(231,180,64,.18)}.editbtn:focus-visible{outline:3px solid var(--heroink,#ffd36a);outline-offset:2px}
         dialog{width:min(560px,calc(100% - 32px));padding:20px 22px;border:2px solid var(--gold);border-radius:10px;background:var(--card);color:var(--cink)}
         dialog::backdrop{background:rgba(5,10,14,.6)}
         .dhead{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:6px}
-        .dhead h2{margin:0;color:#7a4a1e}
+        .dhead h2{margin:0;color:var(--hero,#7a4a1e)}
         .dclose{width:40px;height:40px;border-radius:8px;border:1px solid var(--line);background:transparent;color:var(--cink);font-size:22px;line-height:1;cursor:pointer}
-        .tile.hero .v{font-size:54px;color:#ffd36a}.tile.hero .l{color:#fbecc4}
+        .tile.hero .v{font-size:54px;color:var(--heroink,#ffd36a)}.tile.hero .l{color:var(--herotext,#fbecc4)}
         .card{background:var(--card);color:var(--cink);border:1px solid var(--line);border-radius:8px;padding:16px}
         .row{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:12px 0;border-bottom:1px solid var(--line)}
         .row:last-child{border-bottom:none}
@@ -186,7 +190,7 @@ public static class GuiPage
         .actions{display:flex;flex-wrap:wrap;gap:8px}
         button.b{min-height:40px;padding:8px 16px;border-radius:8px;border:1px solid var(--gold);background:var(--card);color:var(--cink);font:600 14px "Segoe UI",system-ui,sans-serif;cursor:pointer}
         button.b:hover{background:var(--track)}
-        button.b.main{background:#7a4a1e;color:#fbecc4;border-color:#e7b440}
+        button.b.main{background:var(--hero,#7a4a1e);color:var(--herotext,#fbecc4);border-color:var(--heroline,#e7b440)}
         button.b.danger{border-color:var(--warn);color:var(--warn)}
         select,input[type=text],input[type=number]{min-height:40px;padding:6px 10px;border-radius:6px;border:1px solid var(--line);background:#fffaf0;color:var(--cink);font:15px "Segoe UI",system-ui,sans-serif}
         input[type=text]{width:min(520px,100%)}
@@ -272,8 +276,8 @@ public static class GuiPage
         function sel(act,value,opts){return `<select onchange="api('${act}',this.value)">${opts.map(o=>`<option value="${esc(o[0])}" ${String(o[0])===String(value)?'selected':''}>${esc(o[1])}</option>`).join('')}</select>`}
         function setTab(t){tab=t;try{localStorage.setItem('cc-gui-tab',t)}catch(e){}render(true)}
         function render(force){
-          const T=S.txt;document.documentElement.lang=S.lang;
-          const head=`<header><div class="brand"><svg width="44" height="44" viewBox="0 0 56 56" aria-hidden="true"><rect x="6" y="20" width="44" height="28" rx="4" fill="#7a4a1e" stroke="#e7b440" stroke-width="3"/><path d="M6 26 Q28 4 50 26" fill="#965d27" stroke="#e7b440" stroke-width="3"/><rect x="24" y="24" width="8" height="10" rx="2" fill="#e7b440"/></svg><div><h1 class="pirate">${esc(S.appName)}</h1><div class="who">${S.profiles.length>1?`<select aria-label="${esc(T.profile)}" title="${esc(T.profile)}" onchange="api('profile',this.value)">${S.profiles.map(p=>`<option value="${esc(p.key)}" ${p.key===S.profileKey?'selected':''}>${esc(p.name)} (${esc(p.matches)})</option>`).join('')}</select>`:`<span>${esc(S.player||'')}</span>`}<span>v${esc(S.version)}</span></div></div></div><span class="pill ${S.status.kind}"><i></i>${esc(S.status.text)}</span></header>
+          const T=S.txt;document.documentElement.lang=S.lang;document.documentElement.dataset.accent=S.settings.theme||'pirate';
+          const head=`<header><div class="brand"><svg width="44" height="44" viewBox="0 0 56 56" aria-hidden="true"><rect x="6" y="20" width="44" height="28" rx="4" style="fill:var(--hero,#7a4a1e);stroke:var(--heroline,#e7b440)" stroke-width="3"/><path d="M6 26 Q28 4 50 26" fill="#965d27" style="stroke:var(--heroline,#e7b440)" stroke-width="3"/><rect x="24" y="24" width="8" height="10" rx="2" style="fill:var(--heroline,#e7b440)"/></svg><div><h1 class="pirate">${esc(S.appName)}</h1><div class="who">${S.profiles.length>1?`<select aria-label="${esc(T.profile)}" title="${esc(T.profile)}" onchange="api('profile',this.value)">${S.profiles.map(p=>`<option value="${esc(p.key)}" ${p.key===S.profileKey?'selected':''}>${esc(p.name)} (${esc(p.matches)})</option>`).join('')}</select>`:`<span>${esc(S.player||'')}</span>`}<span>v${esc(S.version)}</span></div></div></div><span class="pill ${S.status.kind}"><i></i>${esc(S.status.text)}</span></header>
           <nav>${['home','report','overlay','settings','help'].map(t=>`<button class="${t===tab?'on':''}" onclick="setTab('${t}')">${esc(T[t])}</button>`).join('')}</nav>`;
           if(!force&&busyHeader())return;
           if(!force&&busy()){$('#hdr').innerHTML=head;appHtml=null;return}
@@ -326,14 +330,14 @@ public static class GuiPage
         function home(T){
           let h='';
           if(S.autoClose)h+=`<div class="card notice warning"><b>${esc(S.status.text)}</b><br>${esc(T.autoCloseText)}<div class="actions" style="margin-top:10px"><button class="b main" onclick="api('keepOpen')">${esc(T.keepOpen)}</button></div></div>`;
-          if(S.firstRun){const s=S.settings;h+=`<div class="card welcome"><h2 class="pirate" style="color:#7a4a1e">${esc(T.welcome)}</h2><p style="margin-top:0">${esc(T.welcomeText)}</p>
+          if(S.firstRun){const s=S.settings;h+=`<div class="card welcome"><h2 class="pirate" style="color:var(--hero,#7a4a1e)">${esc(T.welcome)}</h2><p style="margin-top:0">${esc(T.welcomeText)}</p>
             <div class="t" style="font-weight:600;margin-top:14px">${esc(T.welcomeQuick)}</div>
             ${row(esc(T.language),'',sel('language',s.language,s.languages))}
             ${row(esc(T.inGame),esc(T.inGameHelp),sw('wov',S.overlay.show,'showOverlay'))}
             ${s.windowed?row(esc(T.tray),esc(T.trayHelp),sw('wtr',s.minimizeToTray,'minimizeToTray')):''}
             <div class="actions" style="margin-top:12px"><button class="b main" onclick="api('dismissWelcome')">${esc(T.welcomeDone)}</button></div></div>`}
           if(S.progress)h+=`<div class="card"><b>${esc(T.analyzing)} ${S.progress.done} / ${S.progress.total}</b><div class="bar"><i style="width:${Math.round(100*S.progress.done/Math.max(1,S.progress.total))}%"></i></div></div>`;
-          if(S.whatsNew&&S.whatsNew.length)h+=`<div class="card"><h2 class="pirate" style="color:#7a4a1e">${esc(fmt(T.whatsNew,S.version))}</h2><ul>${S.whatsNew.map(n=>`<li>${esc(n)}</li>`).join('')}</ul><button class="b main" onclick="api('dismissWhatsNew')">${esc(T.ok)}</button></div>`;
+          if(S.whatsNew&&S.whatsNew.length)h+=`<div class="card"><h2 class="pirate" style="color:var(--hero,#7a4a1e)">${esc(fmt(T.whatsNew,S.version))}</h2><ul>${S.whatsNew.map(n=>`<li>${esc(n)}</li>`).join('')}</ul><button class="b main" onclick="api('dismissWhatsNew')">${esc(T.ok)}</button></div>`;
           if(S.update)h+=`<div class="card"><h2 class="pirate">${esc(fmt(T.newVersion,S.update.version))}</h2><ul>${S.update.notes.map(n=>`<li>${esc(n)}</li>`).join('')}</ul><button class="b main" onclick="api('installUpdate')">${esc(T.install)}</button></div>`;
           h+=`<section class="tiles"><div class="tile hero"><button type="button" class="editbtn" onclick="openManual()" title="${esc(T.editChests)}" aria-label="${esc(T.editChests)}">__PENCIL__</button><div class="l">${esc(T.total)}</div><div class="v num">${esc(S.total)}</div><div class="l">${esc(T.totalSub)}${S.manual?'<br>'+esc(fmt(T.byHand,S.manualText.replace('+',''))):''}</div></div>
             <div class="tile"><div class="v num">${esc(S.session)}</div><div class="l">${esc(T.session)} · ${esc(S.sessionMatches)} ${esc(T.matches)}</div></div>
@@ -359,6 +363,7 @@ public static class GuiPage
         function settings(T){
           const s=S.settings;
           let h=`<div class="card">${row(esc(T.language),'',sel('language',s.language,s.languages))}
+            ${row(esc(T.theme),esc(T.themeHelp),sel('theme',s.theme,s.themes))}
             ${row(esc(T.times),esc(T.timesHelp),sel('timeZone',s.timeZone,[['local',fmt(T.timesLocal,s.localZone)],['utc',T.timesUtc]]))}
             ${row(esc(T.clock),'',sel('clockFormat',s.clockFormat,[['auto',fmt(T.clockAuto,s.windowsClock==='24'?T.h24:T.h12)],['12',T.clock12],['24',T.clock24]]))}
             ${S.profiles.length>1?row(esc(T.profile),'',sel('profile',S.profileKey,S.profiles.map(p=>[p.key,p.name+' ('+p.matches+' · '+p.chests+')']))):''}

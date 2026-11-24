@@ -7,9 +7,16 @@ public static class AppInfo
 
     public static string VersionText => $"{Version.Major}.{Version.Minor}.{Math.Max(0, Version.Build)}";
 
-    public const string Repo = "LED-N/Fortnite-ChestCounter";
+    /// <summary>This fork: where the updater looks for new versions of the exe (its GitHub releases).</summary>
+    public const string Repo = "Leocm123/Fortnite-ChestCounter";
     public static string RepoUrl => "https://github.com/" + Repo;
-    public static string IssuesUrl => RepoUrl + "/issues";
+
+    /// <summary>
+    /// The original project: it keeps the treasure hunt data (content.json, treasure pictures) up to date every week,
+    /// and replay-reading bugs are fixed there, so the data and the bug reports still go to it.
+    /// </summary>
+    public const string UpstreamRepo = "LED-N/Fortnite-ChestCounter";
+    public static string IssuesUrl => "https://github.com/" + UpstreamRepo + "/issues";
 
     /// <summary>Path of ChestCounter.exe when running as the published exe (null under "dotnet ChestCounter.dll").</summary>
     public static string? ExePath
