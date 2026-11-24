@@ -120,6 +120,8 @@ public sealed class MatchRecord
     /// <summary>Non-chest interactions by kind (loot cannons, ammo boxes, food boxes...).</summary>
     public Dictionary<string, int> OtherInteractions { get; set; } = new();
     public int AnalyzerVersion { get; set; } = 1;
+    /// <summary>What the replay said about the storm (diagnosis only): players with storm flags / times in the storm, safe zone phases, server clock.</summary>
+    public string? StormData { get; set; }
     /// <summary>Kept for the files of older versions; what counts is decided by <see cref="GameModes.Counts"/>.</summary>
     public bool IsBattleRoyale { get; set; } = true;
 

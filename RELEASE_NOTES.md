@@ -2,6 +2,11 @@
 
 > **Ative os replays no Fortnite primeiro**: *Configurações → Jogo → Replays → Gravar Replays: Ativado*. A ferramenta só lê esses arquivos de replay: nenhuma modificação no jogo, nenhum acesso à memória do jogo.
 
+**Novidades da 1.11.1**
+- **Nomes certos das armas e itens** em "O que seus baús dão": o Fortnite usa codinomes nos IDs internos (o Flapjack Rifle é "Chrono_Pan_Rifle"), e agora o contador tem a tabela da temporada, conferida na wiki do Fortnite. Um item que ainda não está na tabela aparece como "não identificado", nunca com um nome inventado
+- Nova raridade **Exótico** e categorias **Utilitários** e **Corpo a corpo**
+- **Baús na tempestade corrigido**: agora o contador usa o que o próprio servidor diz sobre o jogador estar na tempestade no momento em que abre o baú, em vez de calcular a posição da zona. Os replays que ainda estão no PC são analisados de novo
+
 **Novidades da 1.11.0**
 - **Baús abertos na tempestade**: o contador agora sabe se cada baú foi aberto fora da zona segura. Aparece em "Ritmo na partida" (quantos, que parte dos seus baús e o recorde numa partida), num filtro novo da aba Mapa e na conquista "Caçador na tempestade". Os replays que ainda estão no seu PC são analisados de novo
 - **Ritmo na partida** reorganizado em 4 cartões: até o 1º baú, tempo entre um baú e outro, recorde em 1 minuto e baús na tempestade
@@ -42,6 +47,11 @@ O Windows pode mostrar *"O Windows protegeu o computador"* (exe sem assinatura):
 ---
 
 **English** · Download **`ChestCounter.exe`** below and run it. Already using it? The counter offers the update on its home tab. Your history and settings are kept.
+
+**What's new in 1.11.1**
+- **Real names of weapons and items** in "What your chests give": Fortnite's internal ids use code names (the Flapjack Rifle is "Chrono_Pan_Rifle"), and the counter now has the season's table, checked against the Fortnite wiki. An item missing from the table shows as "unidentified", never under a made-up name
+- New **Exotic** rarity and **Utility** and **Melee** categories
+- **Chests in the storm fixed**: the counter now uses what the server itself says about the player being in the storm when the chest is opened, instead of working out where the zone was. The replays still on your PC are analyzed again
 
 **What's new in 1.11.0**
 - **Chests opened in the storm**: the counter now knows whether each chest was opened outside the safe zone. Shown in "Rhythm within a match" (how many, their share and the most in one match), as a new filter of the Map tab and with the "Storm hunter" achievement. The replays still on your PC are analyzed again

@@ -118,11 +118,33 @@ public sealed class ReplayAnalyzer : FortniteReplayReader.ReplayReader
     /// <summary>Server world time minus replay time (null until the game state sends its clock).</summary>
     private double? _worldOffset;
 
+    /// <summary>Each pawn's "in the storm" flag over time (bIsInAnyStorm / bIsOutsideSafeZone), as the server sends it.</summary>
+    private readonly Dictionary<uint, List<(float T, bool In)>> _stormFlags = new();
+
+    /// <summary>
+    /// Whether a chest was opened in the storm. First what the server says of the player who opened it (standing at
+    /// the chest): its last storm flag before that moment, and "not in the storm" before its first one once the replay
+    /// carries such flags at all. Otherwise the safe zone's geometry (<see cref="InZoneGeometry"/>).
+    /// </summary>
+    private bool? InStorm(double x, double y, float t, uint? opener)
+    {
+        if (_stormFlags.Count > 0 && opener is uint pawn)
+        {
+            if (_stormFlags.TryGetValue(pawn, out var flags))
+            {
+                var last = flags.LastOrDefault(f => f.T <= t + 0.25f);
+                return last != default && last.In;
+            }
+            return false; // the replay has storm flags, never set for this player: never in the storm
+        }
+        return InZoneGeometry(x, y, t);
+    }
+
     /// <summary>
     /// Whether a point was outside the safe zone at replay time t: the current circle before the phase shrinks, the one
     /// it shrinks to afterwards, and in between the two. Null when the replay has no storm data to tell.
     /// </summary>
-    private bool? InStorm(double x, double y, float t)
+    private bool? InZoneGeometry(double x, double y, float t)
     {
         if (_worldOffset is not double offset || _zones.Count == 0)
         {
@@ -245,7 +267,7 @@ public sealed class ReplayAnalyzer : FortniteReplayReader.ReplayReader
     private readonly List<GrantEvent> _grants = new();
 
     /// <summary>Bump when the analysis changes so that existing replays are re-analyzed.</summary>
-    public const int CurrentVersion = 20; // 20 (1.11.0): a treasure comes from a chest only (never an ammo box opened at that moment); 19: chests opened in the storm; 18 (1.8.0): where each chest stands (map); 17 (1.5.1): closed chests broken without an instigator counted again
+    public const int CurrentVersion = 21; // 21 (1.11.1): storm from the opener's own storm flag; 20 (1.11.0): a treasure comes from a chest only (never an ammo box opened at that moment); 19: chests opened in the storm; 18 (1.8.0): where each chest stands (map); 17 (1.5.1): closed chests broken without an instigator counted again
 
     private static readonly bool ProbeDebug = Environment.GetEnvironmentVariable("CHESTCOUNTER_DEBUG") == "4";
 
@@ -713,6 +735,15 @@ public sealed class ReplayAnalyzer : FortniteReplayReader.ReplayReader
                     {
                         Track(_pawnTrack, pawnId.Value, pawnMove.Location, 0.5f);
                     }
+                    // In the storm or not, as the server says (sent when it changes).
+                    if ((pawn.bIsInAnyStorm ?? pawn.bIsOutsideSafeZone ?? (pawn.bIsInsideSafeZone is bool inside ? !inside : null)) is bool inStorm)
+                    {
+                        if (!_stormFlags.TryGetValue(pawnId.Value, out var flags))
+                        {
+                            _stormFlags[pawnId.Value] = flags = new List<(float, bool)>();
+                        }
+                        flags.Add((Now, inStorm));
+                    }
                 }
                 break;
 
@@ -825,7 +856,7 @@ public sealed class ReplayAnalyzer : FortniteReplayReader.ReplayReader
             {
                 X = at is { } p ? (int)MathF.Round(p.X) : null,
                 Y = at is { } q ? (int)MathF.Round(q.Y) : null,
-                InStorm = at is { } s ? InStorm(s.X, s.Y, search.Time) : null,
+                InStorm = InStorm(at?.X ?? 0, at?.Y ?? 0, search.Time, search.SearcherPawn) is bool storm && (at != null || _stormFlags.Count > 0) ? storm : null,
                 TimeSeconds = MathF.Round(search.Time, 1),
                 Kind = search.Kind,
                 Blueprint = search.Label,
@@ -1126,6 +1157,7 @@ public sealed class ReplayAnalyzer : FortniteReplayReader.ReplayReader
             OtherContainersOpened = others.Where(kv => kv.Key != ChestKinds.AmmoBox).Sum(kv => kv.Value),
             OtherInteractions = others,
             AnalyzerVersion = CurrentVersion,
+            StormData = $"flags:{_stormFlags.Count}/{_stormFlags.Values.Sum(f => f.Count(x => x.In))} zones:{_zones.Count} clock:{(_worldOffset != null ? "yes" : "no")}",
             Map = header?.LevelNamesAndTimes?.Select(l => l.Item1).FirstOrDefault(l => !string.IsNullOrEmpty(l)),
             IsCustomMatch = replay.GameData?.IsCustomMatch == true,
             Chests = chests,

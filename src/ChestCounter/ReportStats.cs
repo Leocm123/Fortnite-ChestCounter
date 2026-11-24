@@ -436,7 +436,8 @@ public static class ReportStats
         var byCategory = items.GroupBy(Loot.CategoryOf).OrderByDescending(g => g.Count()).Select(g => (g.Key.Name, g.Key.Color, g.Count()));
         var rarities = items.Select(Loot.RarityOf).Where(r => r != null).Select(r => r!).ToList();
         var byRarity = Loot.Rarities.Select(r => (r.Name, r.Color, rarities.Count(x => x == r)));
-        var weapons = items.Where(i => Loot.CategoryOf(i).Id is not ("ammo" or "mats" or "other")).ToList();
+        // Only items with their real name (an id missing from the table is never shown under a made-up name).
+        var weapons = items.Where(i => Loot.NameOf(i) != null && Loot.CategoryOf(i).Id is not ("ammo" or "mats")).ToList();
         var topItems = weapons.GroupBy(Loot.Pretty).OrderByDescending(g => g.Count()).Take(10).ToList();
 
         var sb = new StringBuilder($"<section>{Title(L.T("Ce que tes coffres donnent", "What your chests give", "Lo que dan tus cofres", "O que seus baús dão"),
