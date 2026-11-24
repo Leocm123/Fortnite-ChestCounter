@@ -954,6 +954,8 @@ object BuildGuiState()
         _ => "",
     };
     var progress = ReportWriter.Progress;
+    // Achievements (not computed in performance mode, where the window does not show them).
+    var unlockedNow = Performance.On ? new List<Achievement>() : Achievements.Unlocked(ProgressStats.From(matches, view.ManualAdjust));
     return new
     {
         txt = GuiPage.Texts(),
@@ -986,13 +988,21 @@ object BuildGuiState()
         }).ToList(),
         session = L.N(session.Sum(m => m.ChestsOpened)),
         sessionMatches = L.N(session.Count),
-        last = last == null ? null : new { chests = L.N(last.ChestsOpened), when = L.DateTimeShort(L.Shown(last.MatchStartUtc ?? last.AnalyzedAtUtc)), mode = Pretty.Playlist(last.Playlist) },
+        last = last == null ? null : new { chests = L.N(last.ChestsOpened), when = L.DateTimeShort(L.Shown(last.MatchStartUtc ?? last.AnalyzedAtUtc)), mode = Pretty.Playlist(last.Playlist), place = Pretty.Placement(last) },
+        locale = L.Culture.Name,
+        todayChests = L.N(Goals.ChestsToday(matches)),
+        // The last 14 days (chests per day, today last) for the small chart of the total.
+        spark = Enumerable.Range(0, 14).Select(i => Goals.Today.AddDays(i - 13)).Select(d => matches.Where(m => Goals.When(m).Date == d).Sum(m => m.ChestsOpened)).ToList(),
+        sparkFrom = Goals.Today.AddDays(-13).ToString("dd/MM", L.Culture),
+        treasureEvery = matches.Sum(m => m.TreasureFinds.Count) is int found && found > 0 ? L.N((int)Math.Round((double)view.CountedChests / found)) : null,
+        achPct = (double)unlockedNow.Count / Achievements.All.Length,
+        achIcons = unlockedNow.TakeLast(3).Select(a => a.Icon).ToList(),
         squad = config.ShowSquadTotal && view.TeamChests > 0 ? new { total = L.N(view.SquadChests), team = L.N(view.TeamChests) } : null,
         treasures = L.N(matches.Sum(m => m.TreasureFinds.Count)),
         matches = L.N(matches.Count),
         average = matches.Count > 0 ? ((double)view.CountedChests / matches.Count).ToString("F1", L.Culture) : "0",
         goals = Goals.Of(matches, tracker.LiveMatch?.ChestsOpened ?? 0).Select(g => new { label = g.Label, text = g.Text, pct = g.Percent, done = g.Done, left = L.N(Math.Max(0, g.Target - g.Value)) }).ToList(),
-        achievements = Performance.On ? null : $"{Achievements.Unlocked(ProgressStats.From(matches, view.ManualAdjust)).Count} / {Achievements.All.Length}",
+        achievements = Performance.On ? null : $"{unlockedNow.Count} / {Achievements.All.Length}",
         perf = Performance.On,
         progress = progress == null ? null : new { done = progress.Done, total = progress.Total },
         update = u == null ? null : new { version = u.Version.ToString(3), notes = u.WhatsNew, url = u.PageUrl },
@@ -1239,6 +1249,7 @@ object? RunGuiAction(string name, System.Text.Json.JsonElement value)
             break;
         case "copyObsPath": CopyToClipboard(Path.GetFullPath(store.OverlayPath)); settingsChanged = false; break;
         case "openDataFolder": Open(store.Folder); settingsChanged = false; break;
+        case "openReportFile": if (File.Exists(store.ReportPath)) Open(store.ReportPath); settingsChanged = false; break;
         case "openErrorLog": if (File.Exists(store.ErrorLogPath)) Open(store.ErrorLogPath); settingsChanged = false; break;
         case "openIssues": Open(AppInfo.IssuesUrl); settingsChanged = false; break;
         case "openRepo": Open(AppInfo.RepoUrl); settingsChanged = false; break;

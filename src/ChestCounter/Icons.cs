@@ -44,6 +44,18 @@ public static class Icons
         ["last"] = "<path d=\"M4 4v16\"/><path d=\"M20 6.5 9 12l11 5.5z\"/>",
         ["medal"] = "<path d=\"M8 2.5l2.5 6M16 2.5l-2.5 6\"/><circle cx=\"12\" cy=\"15\" r=\"6.5\"/>",
         ["arrow"] = "<path d=\"M5 12h14M13 6l6 6-6 6\"/>",
+        ["avg"] = "<path d=\"M4 18.5 9.5 12l4 4 6.5-8\"/><path d=\"M16 8h4v4\"/>",
+        ["home"] = "<path d=\"M3.5 11 12 4l8.5 7\"/><path d=\"M5.5 9.5V20h13V9.5\"/><path d=\"M10 20v-5h4v5\"/>",
+        ["report"] = "<path d=\"M4 20V11M10 20V4.5M16 20v-6.5M21.5 20h-19\"/>",
+        ["map"] = "<path d=\"M9 4.5 3.5 6.5v13L9 17.5l6 2 5.5-2v-13L15 6.5z\"/><path d=\"M9 4.5v13M15 6.5v13\"/>",
+        ["overlay"] = "<rect x=\"3\" y=\"4\" width=\"18\" height=\"13\" rx=\"2\"/><path d=\"M8.5 21h7M12 17v4\"/><path d=\"M14 7.5h4v3.5h-4z\"/>",
+        ["gear"] = "<circle cx=\"12\" cy=\"12\" r=\"3\"/><path d=\"M12 2.5v2.6M12 18.9v2.6M4.6 4.6l1.9 1.9M17.5 17.5l1.9 1.9M2.5 12h2.6M18.9 12h2.6M4.6 19.4l1.9-1.9M17.5 6.5l1.9-1.9\"/><circle cx=\"12\" cy=\"12\" r=\"6.5\"/>",
+        ["help"] = "<circle cx=\"12\" cy=\"12\" r=\"9\"/><path d=\"M9.5 9.5a2.5 2.5 0 1 1 3.5 2.3c-.6.3-1 .9-1 1.6v.6M12 17v.2\"/>",
+        ["play"] = "<path d=\"M7.5 4.5v15l12-7.5z\"/>",
+        ["power"] = "<path d=\"M12 3v8\"/><path d=\"M6.5 6.5a8 8 0 1 0 11 0\"/>",
+        ["lock"] = "<rect x=\"5\" y=\"10.5\" width=\"14\" height=\"10\" rx=\"2\"/><path d=\"M8 10.5V7.5a4 4 0 0 1 8 0v3\"/>",
+        ["eye"] = "<path d=\"M2.5 12S6 5.5 12 5.5 21.5 12 21.5 12 18 18.5 12 18.5 2.5 12 2.5 12z\"/><circle cx=\"12\" cy=\"12\" r=\"3\"/>",
+        ["refresh"] = "<path d=\"M20 11a8 8 0 0 0-14.6-4.5L4 8\"/><path d=\"M4 4v4h4\"/><path d=\"M4 13a8 8 0 0 0 14.6 4.5L20 16\"/><path d=\"M20 20v-4h-4\"/>",
     };
 
     /// <summary>An icon as inline SVG ("chest", "trophy"...). <paramref name="fill"/>: filled shape (the star of a treasure).</summary>

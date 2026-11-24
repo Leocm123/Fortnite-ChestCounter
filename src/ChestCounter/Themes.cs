@@ -18,6 +18,12 @@ public static class Themes
     {
         new("pirate", "Pirate (original)", "Pirate (original)", "Pirata (original)", "Pirata (original)", "",
             (255, 210, 63), (224, 165, 38), (255, 233, 166), (242, 184, 75)),
+        new("noite", "Nuit", "Night", "Noche", "Noite",
+            "--bg:#0b1016;--ink:#e7edf4;--ink2:#ffffff;--muted:#8b9bb0;--title:#f2b84b;--gold:#f2b84b;--card:#121a24;--cink:#e7edf4;--cmuted:#8b9bb0;--line:#1f2b38;--track:#223041;--team:#3fbf8f;--hero:#121a24;--heroline:#f2b84b;--heroink:#ffffff;--herotext:#8b9bb0;--herokey:#f2b84b",
+            (242, 184, 75), (200, 140, 40), (230, 236, 244), (242, 184, 75)),
+        new("arena", "Arène", "Arena", "Arena", "Arena",
+            "--bg:#120f33;--ink:#ffffff;--ink2:#ffffff;--muted:#a9a6e0;--title:#ffe14d;--gold:#ffe14d;--card:#1d1946;--cink:#ffffff;--cmuted:#a9a6e0;--line:#2f2a66;--track:#2a2560;--team:#3ff0a0;--hero:#5a35e8;--heroline:#ffe14d;--heroink:#ffffff;--herotext:#e8e4ff;--herokey:#ffe14d",
+            (255, 225, 77), (255, 159, 28), (220, 215, 255), (255, 225, 77)),
         new("brasil", "Brésil", "Brazil", "Brasil", "Brasil",
             "--bg:#062b1b;--ink:#eaf4e4;--ink2:#ffffff;--muted:#a8c6b0;--title:#ffdf00;--gold:#f2c500;--card:#f6f8ee;--cink:#0d2617;--cmuted:#4d6a55;--line:#cfdcc2;--track:#e3ecd6;--team:#1f5fbf;--hero:#002776;--heroline:#ffdf00;--heroink:#ffdf00;--herotext:#e6eeff;--herokey:#a9c6ff",
             (255, 223, 0), (0, 156, 59), (205, 245, 215), (255, 223, 0)),

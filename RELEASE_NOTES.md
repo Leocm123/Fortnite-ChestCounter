@@ -2,6 +2,11 @@
 
 > **Ative os replays no Fortnite primeiro**: *Configurações → Jogo → Replays → Gravar Replays: Ativado*. A ferramenta só lê esses arquivos de replay: nenhuma modificação no jogo, nenhum acesso à memória do jogo.
 
+**Novidades da 1.9.0**
+- **Nova interface**: menu lateral (Início, Relatório, Mapa, Overlay, Configurações, Ajuda), o total em destaque com os baús dos últimos 14 dias, os números lado a lado, metas e conquistas em anéis de progresso e a atividade numa coluna ao lado
+- **Novos temas**: Noite (escuro e sóbrio) e Arena (vibrante, no estilo do HUD do jogo), além do Pirata (padrão), Brasil, Neon, Gelo e Lava. O tema muda a janela, o relatório e o overlay
+- **Aba Mapa**: abre o relatório direto no mapa dos seus baús
+
 **Novidades da 1.8.1**
 - **Aba Início redesenhada**: painel com o total em destaque e os outros números no mesmo formato (rótulo, número, detalhe), e a média por partida separada dos tesouros
 - **Atividade** em linha do tempo: um evento por linha, com ícone, horário e os detalhes da partida agrupados
@@ -25,6 +30,11 @@ O Windows pode mostrar *"O Windows protegeu o computador"* (exe sem assinatura):
 ---
 
 **English** · Download **`ChestCounter.exe`** below and run it. Already using it? The counter offers the update on its home tab. Your history and settings are kept.
+
+**What's new in 1.9.0**
+- **New interface**: side menu (Home, Report, Map, Overlay, Settings, Help), the total with the chests of the last 14 days, the figures side by side, goals and achievements as progress rings and the activity in a column of its own
+- **New themes**: Night (dark and sober) and Arena (vibrant, like the game's HUD), besides Pirate (default), Brazil, Neon, Ice and Lava. The theme changes the window, the report and the overlay
+- **Map tab**: opens the report right on the map of your chests
 
 **What's new in 1.8.1**
 - **Redesigned home tab**: the total stands out, the other figures share one layout (label, figure, detail), and the average per match is apart from the treasures

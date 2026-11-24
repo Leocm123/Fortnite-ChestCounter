@@ -18,6 +18,9 @@ public static class ReportStats
         td.sub{color:var(--cmuted);font-size:13px;white-space:nowrap;text-align:right}
         th.r{text-align:right}
         .ic{display:inline-block;flex:none}.ici{width:1.05em;height:1.05em;vertical-align:-.18em}
+        :root[data-accent="noite"] .pirate{font-family:"Segoe UI",system-ui,sans-serif;font-weight:700;font-size:.85em}
+        :root[data-accent="arena"] .pirate{font-family:Bahnschrift,"Segoe UI",sans-serif;font-weight:700;font-style:italic;text-transform:uppercase;font-size:.85em}
+        #mapa{scroll-margin-top:16px}
         .goals{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin-top:12px}
         @media (max-width:820px){.goals{grid-template-columns:1fr}}
         .goal{background:var(--card);color:var(--cink);border:1px solid var(--line);border-radius:8px;padding:12px 16px}
@@ -146,7 +149,7 @@ public static class ReportStats
         var points = matches.SelectMany(m => m.Chests.Where(c => c.X != null && c.Y != null).Select(c => (m, c))).ToList();
         if (points.Count == 0)
         {
-            return $"<section>{Title(title)}<div class=\"card\"><p class=\"items\">{L.T(
+            return $"<section id=\"mapa\">{Title(title)}<div class=\"card\"><p class=\"items\">{L.T(
                 "La carte se remplit avec les parties analysées à partir de la version 1.8 (les replays encore sur ton PC sont réanalysés).",
                 "The map fills up with the matches analyzed from version 1.8 on (the replays still on your PC are analyzed again).",
                 "El mapa se llena con las partidas analizadas desde la versión 1.8 (las repeticiones que siguen en tu PC se analizan de nuevo).",
@@ -207,7 +210,7 @@ public static class ReportStats
         // The page reloads itself: the filter chosen is kept.
         const string keepFilter = "<script>try{var f=localStorage.getItem('cc-mapf'),b=document.getElementById('mapbox'),i=f&&b.querySelector('input[value=\"'+f+'\"]');if(i){i.checked=true;b.dataset.f=f}}catch(e){}</script>";
 
-        return $"<section>{Title(title, L.T($"{L.N(points.Count)} coffres placés", $"{L.N(points.Count)} chests placed", $"{L.N(points.Count)} cofres situados", $"{L.N(points.Count)} baús no mapa"))}"
+        return $"<section id=\"mapa\">{Title(title, L.T($"{L.N(points.Count)} coffres placés", $"{L.N(points.Count)} chests placed", $"{L.N(points.Count)} cofres situados", $"{L.N(points.Count)} baús no mapa"))}"
             + $"<div class=\"mapgrid\"><div><div class=\"card mapcard\" id=\"mapbox\" data-f=\"all\"><div class=\"mapf\">{filters}</div>{svg}<div class=\"maplegend\">{legend}</div></div>"
             + (MapData.HasImage ? $"<div class=\"items\" style=\"margin-top:6px\">{L.T("Carte : fortnite-api.com", "Map: fortnite-api.com", "Mapa: fortnite-api.com", "Mapa: fortnite-api.com")}</div>" : "")
             + $"</div>{placesHtml}</div>{keepFilter}</section>";
