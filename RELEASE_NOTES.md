@@ -2,6 +2,9 @@
 
 > **Ative os replays no Fortnite primeiro**: *Configurações → Jogo → Replays → Gravar Replays: Ativado*. A ferramenta só lê esses arquivos de replay: nenhuma modificação no jogo, nenhum acesso à memória do jogo.
 
+**Novidades da 1.14.1**
+- Aba Elementais: todos os cartões com a mesma altura e os mesmos tipos de baú (os zerados ficam apagados), e a imagem do elemental segue a variante que você usou
+
 **Novidades da 1.14.0**
 - **Nova aba Elementais**: quantos baús você abriu com cada elemental, com as variantes (Amaldiçoado, Valioso...), abertos e destruídos, tipos de baú (comum, enterrado, de espírito), tesouros e baús por minuto, com a imagem de cada elemental e de cada variante. O contador sabe qual elemental você carregava no momento de cada baú, mesmo trocando várias vezes na partida
 - Os replays que ainda estão no PC são analisados de novo para pegar os elementais
@@ -71,6 +74,9 @@ O Windows pode mostrar *"O Windows protegeu o computador"* (exe sem assinatura):
 ---
 
 **English** · Download **`ChestCounter.exe`** below and run it. Already using it? The counter offers the update on its home tab. Your history and settings are kept.
+
+**What's new in 1.14.1**
+- Sprites tab: every card has the same height and the same chest kinds (zeros faded), and the sprite's picture follows the variant you used
 
 **What's new in 1.14.0**
 - **New Sprites tab**: how many chests you opened with each sprite, with its variants (Cursed, Jeweled...), opened and destroyed, chest kinds (regular, buried, sprite chest), treasures and chests per minute, with the picture of each sprite and variant. The counter knows which sprite you carried when each chest was opened, even if you switch several times in a match

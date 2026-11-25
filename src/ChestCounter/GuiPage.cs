@@ -380,7 +380,7 @@ public static class GuiPage
         .note{font-size:13px;color:var(--smuted)}
         .path{font:13px Consolas,monospace;word-break:break-all;background:var(--strack);padding:6px 8px;border-radius:6px;display:block;margin:6px 0}
         .spintro{margin:0 0 14px;color:var(--muted);font-size:13.5px}
-        .spgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(290px,1fr));gap:14px;align-items:start}
+        .spgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(290px,1fr));gap:14px;align-items:stretch}.spc{display:flex;flex-direction:column}.spc .spkl{margin-top:auto}.spc .spm{margin-bottom:12px}.spkl li.z{opacity:.5}
         .spc .sph{display:flex;gap:10px;align-items:center}.spc .sph b{font-size:15.5px}
         .spi{width:34px;height:34px;border-radius:50%;display:grid;place-items:center;background:color-mix(in srgb,var(--accent) 18%,transparent);color:var(--accent);flex:none}.spi .ic{width:20px;height:20px}
         .spi.pic{width:64px;height:64px;border-radius:14px;background:color-mix(in srgb,var(--accent) 12%,transparent)}.spi img{width:60px;height:60px;object-fit:contain}
@@ -690,7 +690,7 @@ public static class GuiPage
           const max=Math.max(1,...SD.rows.map(r=>r.chests)),n=v=>Number(v).toLocaleString(S.locale);
           h+=`<p class="spintro">${esc(fmt(T.spIntro,n(SD.total),n(SD.matches)))}${SD.skipped?' '+esc(fmt(T.spSkipped,n(SD.skipped))):''}</p><div class="spgrid">`;
           for(const r of SD.rows){
-            const kinds=r.kinds.map(k=>`<li><span>${esc(k.name)}</span><span class="spk"><i style="width:${Math.max(4,Math.round(100*k.n/r.chests))}%"></i></span><b class="num">${n(k.n)}</b></li>`).join('');
+            const kinds=r.kinds.map(k=>`<li${k.n?'':' class="z"'}><span>${esc(k.name)}</span><span class="spk"><i style="width:${r.chests?Math.round(100*k.n/r.chests):0}%"></i></span><b class="num">${n(k.n)}</b></li>`).join('');
             const vars=r.variants.length?`<div class="spv">${r.variants.map(v=>`<span>${v.img?`<img src="${v.img}" alt="">`:''}${esc(v.name)} <b>${n(v.n)}</b></span>`).join('')}</div>`:'';
             const pm=r.perMin==null?'—':r.perMin.toLocaleString(S.locale,{maximumFractionDigits:2});
             h+=`<div class="kpi spc${r.none?' none':''}"><div class="sph"><span class="spi${r.img?' pic':''}">${r.img?`<img src="${r.img}" alt="">`:IC.spirit}</span><div><b>${esc(r.name)}</b>${vars}</div></div>

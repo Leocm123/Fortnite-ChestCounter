@@ -140,6 +140,9 @@ public static class Sprites
         }
 
         var total = groups.Values.Sum(a => a.Chests);
+        // The same kinds of chest on every card (zeros included), in a fixed order: the cards keep the same height.
+        var order = new[] { ChestKinds.Normal, ChestKinds.Rare, ChestKinds.Buried, ChestKinds.Extraction };
+        var kindList = order.Concat(groups.Values.SelectMany(a => a.Kinds.Keys).Distinct().Where(k => !order.Contains(k)).OrderBy(k => k)).ToList();
         var rows = groups.Where(g => g.Value.Chests > 0 || g.Value.Seconds > 0 || g.Value.Treasures > 0)
             .OrderBy(g => g.Key.Length == 0).ThenByDescending(g => g.Value.Chests).ThenByDescending(g => g.Value.Seconds)
             .Select(g => new
@@ -157,7 +160,7 @@ public static class Sprites
                 minutes = Math.Round(g.Value.Seconds / 60.0, 1),
                 perMin = g.Value.Seconds >= 60 ? Math.Round(g.Value.Chests / (g.Value.Seconds / 60.0), 2) : (double?)null,
                 share = total == 0 ? 0 : (int)Math.Round(100.0 * g.Value.Chests / total),
-                kinds = g.Value.Kinds.OrderByDescending(k => k.Value).Select(k => new { name = L.Name(k.Key), key = k.Key, n = k.Value }),
+                kinds = kindList.Select(k => new { name = L.Name(k), key = k, n = g.Value.Kinds.GetValueOrDefault(k) }),
                 variants = g.Value.Variants.OrderByDescending(v => v.Value).Select(v => new { name = VariantName(v.Key) is { Length: > 0 } n ? n : L.T("Normal", "Normal", "Normal", "Normal"), n = v.Value, img = Image(g.Key, v.Key) }),
             })
             .ToList();
