@@ -21,6 +21,14 @@ public sealed class ChestRecord
     public string? Sprite { get; set; }
 }
 
+/// <summary>Something that happened to the player during the match: "elim" (eliminated someone), "knock" (knocked someone
+/// down), "downed" (was knocked down), "death" (was eliminated). T: seconds since the start of the replay.</summary>
+public sealed class MatchEvent
+{
+    public float T { get; set; }
+    public string Kind { get; set; } = "";
+}
+
 /// <summary>A sprite carried from one moment of the match to another (seconds since the start of the replay).</summary>
 public sealed class SpriteSpan
 {
@@ -134,6 +142,8 @@ public sealed class MatchRecord
     public string? StormData { get; set; }
     /// <summary>The sprites carried during the match, in order; null for matches analyzed before version 1.14.</summary>
     public List<SpriteSpan>? Sprites { get; set; }
+    /// <summary>Eliminations, knocks and death of the player, in order; null for matches analyzed before version 1.15.</summary>
+    public List<MatchEvent>? Events { get; set; }
     /// <summary>Kept for the files of older versions; what counts is decided by <see cref="GameModes.Counts"/>.</summary>
     public bool IsBattleRoyale { get; set; } = true;
 
@@ -193,6 +203,8 @@ public sealed class Config
     /// <summary>Chests to open per day / per week (0 = no goal), see <see cref="Goals"/>.</summary>
     public int DailyGoal { get; set; }
     public int WeeklyGoal { get; set; }
+    /// <summary>Goals suggested by the counter from the recent days and weeks (the numbers above are used while there is no history).</summary>
+    public bool AutoGoals { get; set; }
 
     /// <summary>Discord webhook the summaries are posted to (null = off), and "match" or "treasure" (see <see cref="DiscordNotify"/>).</summary>
     public string? DiscordWebhook { get; set; }
@@ -205,6 +217,7 @@ public sealed class Config
         WeeklyGoal = Math.Clamp(WeeklyGoal, 0, 1_000_000);
         Goals.Daily = DailyGoal;
         Goals.Weekly = WeeklyGoal;
+        Goals.Auto = AutoGoals;
     }
 
     /// <summary>Selected profile (Epic id or name of the account the player plays on); null = most recent one.</summary>

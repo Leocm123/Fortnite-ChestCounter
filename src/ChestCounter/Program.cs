@@ -875,6 +875,8 @@ void AfterNewMatches(HashSet<string> known)
     var unlocked = Achievements.All.Where(a => a.Unlocked(statsAfter) && !a.Unlocked(statsBefore)).ToList();
     var goalsBefore = Goals.Of(before);
     var reached = Goals.Of(view.Matches).Where(g => g.Done && !goalsBefore.Any(b => b.Label == g.Label && b.Done)).ToList();
+    var missionsBefore = Missions.Of(before);
+    var missionsDone = Missions.Of(view.Matches).Where(x => x.Done && !missionsBefore.Any(b => b.Id == x.Id && b.Done)).ToList();
 
     Console.ForegroundColor = ConsoleColor.DarkGreen;
     foreach (var a in unlocked)
@@ -884,6 +886,10 @@ void AfterNewMatches(HashSet<string> known)
     foreach (var g in reached)
     {
         Console.WriteLine($"   {L.T("Objectif atteint", "Goal reached", "Meta cumplida", "Meta batida")}: {g.Label} ({g.Text})");
+    }
+    foreach (var x in missionsDone)
+    {
+        Console.WriteLine($"   {L.T("Mission accomplie", "Mission complete", "Misión cumplida", "Missão concluída")}: {x.Title}");
     }
     var records = Insights.Broken(before, view.Matches);
     foreach (var r in records)
@@ -906,6 +912,7 @@ void AfterNewMatches(HashSet<string> known)
         lines.AddRange(records.Select(r => $"{L.T("Nouveau record", "New record", "Nuevo récord", "Novo recorde")}: {r.Name} — {r.ValueText}"));
         lines.AddRange(recent.SelectMany(m => m.TreasureFinds).Select(f => $"{L.T("Trésor", "Treasure", "Tesoro", "Tesouro")}: {f.DisplayName}"));
         lines.AddRange(reached.Select(g => $"{L.T("Objectif atteint", "Goal reached", "Meta cumplida", "Meta batida")}: {g.Label} ({g.Text.Replace(" ✓", "")})"));
+        lines.AddRange(missionsDone.Select(x => $"{L.T("Mission accomplie", "Mission complete", "Misión cumplida", "Missão concluída")}: {x.Title}"));
         lines.AddRange(unlocked.Select(a => $"{L.T("Succès", "Achievement", "Logro", "Conquista")}: {a.Name}"));
         if (lines.Count > 0)
         {
@@ -1076,6 +1083,7 @@ object BuildGuiState()
         matches = L.N(matches.Count),
         average = matches.Count > 0 ? ((double)view.CountedChests / matches.Count).ToString("F1", L.Culture) : "0",
         goals = Goals.Of(matches, tracker.LiveMatch?.ChestsOpened ?? 0).Select(g => new { label = g.Label, text = g.Text, pct = g.Percent, done = g.Done, left = L.N(Math.Max(0, g.Target - g.Value)) }).ToList(),
+        missions = Missions.Of(matches).Select(x => new { icon = x.Icon, title = x.Title, value = L.N(x.Value), target = L.N(x.Target), pct = x.Percent, done = x.Done, img = x.Image }).ToList(),
         achievements = Performance.On ? null : $"{unlockedNow.Count} / {Achievements.All.Length}",
         perf = Performance.On,
         progress = progress == null ? null : new { done = progress.Done, total = progress.Total },
@@ -1110,6 +1118,9 @@ object BuildGuiState()
             performanceRecommended = Performance.Recommended,
             dailyGoal = config.DailyGoal,
             weeklyGoal = config.WeeklyGoal,
+            autoGoals = config.AutoGoals,
+            suggestedDaily = Goals.SuggestedDaily(matches),
+            suggestedWeekly = Goals.SuggestedWeekly(matches),
             discordWebhook = config.DiscordWebhook ?? "",
             discordMode = config.DiscordMode,
             windowed = guiWindowed,
@@ -1209,6 +1220,7 @@ object? RunGuiAction(string name, System.Text.Json.JsonElement value)
         case "performanceMode": config.PerformanceMode = Bool(); Performance.Apply(config); break;
         case "dailyGoal": config.DailyGoal = Int(); config.ApplyGoals(); break;
         case "weeklyGoal": config.WeeklyGoal = Int(); config.ApplyGoals(); break;
+        case "autoGoals": config.AutoGoals = Bool(); config.ApplyGoals(); break;
         case "discordWebhook":
             if (Str().Trim() is var url && (url.Length == 0 || DiscordNotify.IsValid(url)))
             {
@@ -1326,7 +1338,7 @@ object? RunGuiAction(string name, System.Text.Json.JsonElement value)
         case "openDataFolder": Open(store.Folder); settingsChanged = false; break;
         case "spriteData": result = Sprites.Stats(Profiles.View(data, config)); settingsChanged = false; break;
         case "mapData": result = MapView.Data(Profiles.View(data, config)); settingsChanged = false; break;
-        case "recap": result = Insights.Recap(Profiles.View(data, config)); settingsChanged = false; break;
+        case "recap": result = Insights.Recap(Profiles.View(data, config), Str() == "season"); settingsChanged = false; break;
         case "dismissSession": sessionSummary = null; settingsChanged = false; break;
         case "windowsNotifications": config.WindowsNotifications = Bool(); break;
         case "openReportFile": if (File.Exists(store.ReportPath)) Open(store.ReportPath); settingsChanged = false; break;

@@ -95,6 +95,16 @@ public static class GuiPage
             "Un número de cofres que abrir: se muestra en el overlay, el inicio y el informe. 0 = sin meta.",
             "Um número de baús para abrir: aparece no overlay, no Início e no relatório. 0 = sem meta."),
         ["goalDaily"] = L.T("Objectif du jour", "Daily goal", "Meta del día", "Meta do dia"),
+        ["autoGoals"] = L.T("Objectifs automatiques", "Automatic goals", "Metas automáticas", "Meta automática"),
+        ["autoGoalsHelp"] = L.T("Le compteur fixe les objectifs d'après tes 14 derniers jours et 4 dernières semaines (+10 %).",
+            "The counter sets the goals from your last 14 days and 4 weeks (+10%).",
+            "El contador fija las metas según tus últimos 14 días y 4 semanas (+10 %).",
+            "O contador define as metas pelos seus últimos 14 dias e 4 semanas (+10%)."),
+        ["autoGoalsNow"] = L.T("En ce moment : {0} par jour · {1} par semaine", "Right now: {0} a day · {1} a week", "Ahora: {0} por día · {1} por semana", "Agora: {0} por dia · {1} por semana"),
+        ["autoGoalsNone"] = L.T("Pas encore d'historique : les nombres ci-dessous sont utilisés.", "No history yet: the numbers below are used.", "Aún no hay historial: se usan los números de abajo.", "Ainda sem histórico: os números abaixo são usados."),
+        ["goalDailyFallback"] = L.T("Objectif du jour (sans historique)", "Daily goal (without history)", "Meta del día (sin historial)", "Meta do dia (sem histórico)"),
+        ["missions"] = L.T("Missions de la semaine", "Weekly missions", "Misiones de la semana", "Missões da semana"),
+        ["missionsHelp"] = L.T("{0}/{1} accomplies · nouvelles lundi", "{0}/{1} done · new ones on Monday", "{0}/{1} cumplidas · nuevas el lunes", "{0}/{1} concluídas · novas na segunda"),
         ["goalWeekly"] = L.T("Objectif de la semaine (depuis lundi)", "Weekly goal (from Monday)", "Meta de la semana (desde el lunes)", "Meta da semana (a partir de segunda)"),
         ["achievements"] = L.T("Succès", "Achievements", "Logros", "Conquistas"),
         ["perfOn"] = L.T("Activer le mode performance", "Turn on performance mode", "Activar el modo rendimiento", "Ativar o modo desempenho"),
@@ -122,6 +132,9 @@ public static class GuiPage
         ["rcBestDay"] = L.T("meilleur jour", "best day", "mejor día", "melhor dia"),
         ["rcWins"] = L.T("Top 1", "Victory Royales", "Victorias", "Vitórias"),
         ["rcLanding"] = L.T("Atterrissage préféré", "Favourite landing", "Aterrizaje favorito", "Pouso favorito"),
+        ["rcSprite"] = L.T("Esprit préféré", "Favourite sprite", "Espíritu favorito", "Elemental favorito"),
+        ["rcSeason"] = L.T("Saison", "Season", "Temporada", "Temporada"),
+        ["rcSeasonTitle"] = L.T("Ma saison", "My season", "Mi temporada", "Minha temporada"),
         ["rcWeapon"] = L.T("Arme la plus trouvée", "Most found weapon", "Arma más encontrada", "Arma mais encontrada"),
         ["rcStreak"] = L.T("Plus longue série (jours)", "Longest streak (days)", "Racha más larga (días)", "Maior sequência (dias)"),
         ["grpLook"] =L.T("Apparence", "Look", "Apariencia", "Aparência"),
@@ -158,6 +171,13 @@ public static class GuiPage
         ["mapSource"] = L.T("Carte", "Map", "Mapa", "Mapa"),
         ["brand"] = L.T("Compteur de coffres", "Chest Counter", "Contador de cofres", "Contador de Baús"),
         ["map"] = L.T("Carte", "Map", "Mapa", "Mapa"),
+        ["tlTitle"] = L.T("Chronologie de la partie", "Match timeline", "Cronología de la partida", "Linha do tempo da partida"),
+        ["tlChest"] = L.T("Coffre ouvert", "Chest opened", "Cofre abierto", "Baú aberto"),
+        ["tlDestroyed"] = L.T("détruit", "destroyed", "destruido", "destruído"),
+        ["tlElim"] = L.T("Élimination", "Elimination", "Eliminación", "Eliminação"),
+        ["tlKnock"] = L.T("Mis à terre", "Knock", "Derribo", "Derrubada"),
+        ["tlDowned"] = L.T("Tu es à terre", "You were knocked", "Te derribaron", "Você foi derrubado"),
+        ["tlDeath"] = L.T("Éliminé", "Eliminated", "Eliminado", "Você foi eliminado"),
         ["sprites"] = L.T("Esprits", "Sprites", "Espíritus", "Elementais"),
         ["spLoading"] = L.T("Chargement…", "Loading…", "Cargando…", "Carregando…"),
         ["spEmptyT"] = L.T("Aucun esprit pour l'instant", "No sprites yet", "Aún no hay espíritus", "Nenhum elemental ainda"),
@@ -394,6 +414,25 @@ public static class GuiPage
         .spkl li{display:grid;grid-template-columns:1fr 80px 28px;gap:8px;align-items:center}.spkl b{text-align:right}
         .spk{height:6px;background:var(--strack);border-radius:3px;overflow:hidden}.spk i{display:block;height:100%;background:var(--accent)}
         .spempty{display:flex;gap:14px;align-items:flex-start}.spempty .ic{width:34px;height:34px;color:var(--accent);flex:none}.spempty p{margin:4px 0 0;color:var(--smuted)}
+        .mtl{margin-top:12px;padding-top:12px;border-top:1px solid var(--sline)}.mtl h3{margin:0 0 10px;font-size:14px}
+        .mtl .trow{position:relative;margin:0 10px}
+        .mtl .tspr{height:30px;margin-bottom:6px}
+        .tsp{position:absolute;top:0;height:28px;border-radius:8px;background:color-mix(in srgb,var(--accent) 22%,transparent);border:1px solid color-mix(in srgb,var(--accent) 45%,transparent);display:flex;align-items:center;gap:4px;overflow:hidden;box-sizing:border-box;padding:0 4px;font-size:11.5px;white-space:nowrap;min-width:6px}
+        .tsp img{width:22px;height:22px;object-fit:contain;flex:none}.tsp span{overflow:hidden;text-overflow:ellipsis}
+        .mtl .tmain{height:22px}.tline{position:absolute;left:0;right:0;top:10px;height:2px;background:var(--strack)}
+        .tc{position:absolute;top:4px;width:12px;height:12px;margin-left:-6px;border-radius:50%;background:var(--c,#c9a24f);box-shadow:0 0 0 2px var(--surface)}
+        .tc.d{background:var(--surface);border:3px solid var(--c,#c9a24f);box-sizing:border-box}.tc.s{box-shadow:0 0 0 2px #8a5cf6}
+        .mtl .tev{height:22px}
+        .tt,.te{position:absolute;top:2px;margin-left:-9px;width:18px;height:18px;display:grid;place-items:center}.tt .ic,.te .ic{width:16px;height:16px}
+        .tt{color:#b07cf0}.te.elim{color:#d64545}.te.knock{color:#e08a2e}.te.downed{color:#8a8a8a}.te.death{color:#5a5a5a}
+        .mtl .tticks{height:16px;border-top:1px dashed var(--sline);font-size:11px;color:var(--smuted)}.tticks span{position:absolute;top:2px;transform:translateX(-50%)}
+        .tleg{display:flex;flex-wrap:wrap;gap:6px 14px;margin-top:10px;font-size:12px;color:var(--smuted)}.tleg span{display:inline-flex;align-items:center;gap:5px}
+        .tleg .tc,.tleg .tt,.tleg .te{position:static;margin:0}.tleg .tt,.tleg .te{width:auto;height:auto;display:inline-flex;gap:5px;color:var(--smuted)}.tleg .tt .ic{color:#b07cf0}.tleg .te.elim .ic{color:#d64545}.tleg .te.knock .ic{color:#e08a2e}.tleg .te.downed .ic{color:#8a8a8a}.tleg .te.death .ic{color:#5a5a5a}.tleg .tc{--c:#c9a24f}
+        .missions{margin-top:16px;display:grid;gap:12px}
+        .msh{display:flex;align-items:baseline;justify-content:space-between;gap:10px}.msh h3{margin:0;font-size:15px;display:flex;align-items:center;gap:8px}.msh h3 .ic{width:17px;height:17px;color:var(--kicon)}.msh small{color:var(--smuted)}
+        .msi{display:flex;gap:12px;align-items:center}.msic{width:38px;height:38px;border-radius:10px;display:grid;place-items:center;background:color-mix(in srgb,var(--accent) 15%,transparent);color:var(--accent);flex:none}.msic .ic{width:20px;height:20px}.msic img{width:34px;height:34px;object-fit:contain}
+        .msb{flex:1;min-width:0}.mst{display:flex;justify-content:space-between;gap:10px;font-size:14px}.mst b{display:inline-flex;align-items:center;gap:4px;white-space:nowrap}.mst b .ic{width:15px;height:15px;color:#2e9b5f}
+        .msb .bar{margin-top:6px}.msi.done .bar i{background:#2e9b5f}.msi.done .mst span{opacity:.75}
         .bar{height:8px;background:var(--strack);border-radius:4px;overflow:hidden;margin-top:8px}.bar i{display:block;height:100%;background:var(--accent)}
         /* ---- Home: total, figures, goals ---- */
         .hero{position:relative;border-radius:16px;padding:22px 24px;display:grid;grid-template-columns:auto minmax(170px,1fr);gap:26px;align-items:end;background:var(--herobg);border:2px solid var(--heroline);color:var(--herotext);box-shadow:var(--shadow);overflow:hidden}
@@ -703,7 +742,8 @@ public static class GuiPage
         }
         // ---- The Map tab: drawn on a canvas (light even with thousands of chests), its data asked for when the tab opens
         // and again only when the counter rewrote its figures. Wheel: zoom around the pointer; drag: move; points or heat.
-        let MD=null,mapStamp=null,mapLang=null,mapImg=null,mapF='all',mapMode='pts',mapView=null,mapLoading=false,mapRaf=0,mapMatch=-1,mapMatchId=null,pendingMatch=null;
+        // ?match=last (address of the page): opens the newest match on the map (tests, shortcuts).
+        let MD=null,mapStamp=null,mapLang=null,mapImg=null,mapF='all',mapMode='pts',mapView=null,mapLoading=false,mapRaf=0,mapMatch=-1,mapMatchId=null,pendingMatch=new URLSearchParams(location.search).get('match');
         function showMap(T){
           const pane=$('#mapPane'),on=tab==='map';pane.classList.toggle('hidden',!on);
           if(!on)return;
@@ -715,7 +755,7 @@ public static class GuiPage
             <div class="seg" id="mapM">${[['pts',IC.dots,T.mapPoints],['heat',IC.flame,T.mapHeat]].map(([k,i,t])=>`<button type="button" data-m="${k}" class="${k===mapMode?'on':''}">${i}${esc(t)}</button>`).join('')}</div></div>
             <div class="mapsel"><select id="mapSel" aria-label="${esc(T.mapRoute)}"></select></div>
             <div class="mapcv" id="mapCv"><canvas aria-label="${esc(T.map)}" role="img"></canvas><div class="mapzoom"><button type="button" data-z="1" title="${esc(T.mapZoomIn)}">${IC.plus}</button><button type="button" data-z="-1" title="${esc(T.mapZoomOut)}">${IC.minus}</button><button type="button" data-z="0" title="${esc(T.mapReset)}">${IC.crosshair}</button></div><div class="fempty" id="mapEmpty" style="position:absolute;inset:0;justify-content:center;color:#fff;padding:24px;text-align:center" hidden>${IC.map}<span>${esc(T.mapEmpty)}</span></div></div>
-            <div class="maphint"><span>${esc(T.mapHint)}</span><span id="mapSrc"></span></div></div>
+            <div class="maphint"><span>${esc(T.mapHint)}</span><span id="mapSrc"></span></div><div class="mtl" id="mapTl" hidden></div></div>
             <div class="mapside"><div class="card" id="mapMatchCard" hidden></div><div class="card"><div class="mstats" id="mapStats"></div></div><div class="card"><h3>${esc(T.mapLegend)}</h3><div class="mleg" id="mapLeg"></div></div><div class="card"><h3>${esc(T.mapWhere)}</h3><ul class="mlist" id="mapPlaces"></ul></div></div>`;
           const seg=(id,attr,set)=>{$(id).onclick=e=>{const b=e.target.closest('button');if(!b)return;set(b.dataset[attr]);$(id).querySelectorAll('button').forEach(x=>x.classList.toggle('on',x===b));drawMap()}};
           seg('#mapF','f',v=>mapF=v);seg('#mapM','m',v=>mapMode=v);
@@ -756,15 +796,34 @@ public static class GuiPage
         }
         function fillMatchCard(){
           const c=$('#mapMatchCard'),T=S.txt;if(!c||!MD)return;
-          const m=mapMatch>=0?MD.matches[mapMatch]:null;c.hidden=!m;if(!m)return;
+          const m=mapMatch>=0?MD.matches[mapMatch]:null;c.hidden=!m;if(!m){fillTimeline(null);return}
           const pts=MD.points.filter(p=>p[4]===mapMatch).sort((a,b)=>a[5]-b[5]);
           const mmss=t=>Math.floor(t/60)+':'+String(t%60).padStart(2,'0');
+          fillTimeline(m);
           c.innerHTML=`<div class="mmh"><h3>${esc(T.mapRoute)}</h3><button class="nclose" title="${esc(T.close)}" onclick="selectMatch(-1)">×</button></div><div class="note" style="margin-bottom:8px">${esc(m.label)}</div>
             <ol class="mroute">${pts.map(p=>`<li><span class="mn" style="background:${esc((MD.kinds[p[2]]||{}).color||'#c9a24f')}">${pts.indexOf(p)+1}</span><span>${esc((MD.kinds[p[2]]||{}).name||'')}</span>${p[3]&4?`<span class="mstorm" title="${esc(T.mapStorm)}">${IC.storm}</span>`:''}<time class="num">${mmss(p[5])}</time></li>`).join('')}</ol>`;
         }
+        // The match timeline: the sprites carried as a band, then chests, treasures and the player's events at their minute.
+        function fillTimeline(m){
+          const el=$('#mapTl'),T=S.txt;if(!el)return;
+          if(!m||!m.tl||(!m.tl.chests.length&&!m.tl.ev.length&&!m.tl.spr.length)){el.hidden=true;el.innerHTML='';return}
+          const tl=m.tl,dur=Math.max(60,tl.dur),x=t=>Math.min(100,Math.max(0,100*t/dur)).toFixed(2);
+          const mmss=t=>Math.floor(t/60)+':'+String(t%60).padStart(2,'0');
+          const step=dur>1200?300:dur>600?120:60,ticks=[];for(let t=0;t<=dur;t+=step)ticks.push(t);
+          const EV={elim:['crosshair',T.tlElim],knock:['burst',T.tlKnock],downed:['warning',T.tlDowned],death:['skull',T.tlDeath]};
+          const spr=tl.spr.map(([a,b,id])=>{const sp=MD.sprites[id]||{name:id};return `<div class="tsp" style="left:${x(a)}%;width:${(x(b)-x(a)).toFixed(2)}%" title="${esc(sp.name)} · ${mmss(a)}–${mmss(b)}">${sp.img?`<img src="${sp.img}" alt="">`:''}<span>${esc(sp.name)}</span></div>`}).join('');
+          const chests=tl.chests.map(([t,c,n,d,st])=>`<i class="tc${d?' d':''}${st?' s':''}" style="left:${x(t)}%;--c:${esc(c)}" title="${esc(n)}${d?' · '+esc(T.tlDestroyed):''}${st?' · '+esc(T.mapStorm):''} · ${mmss(t)}"></i>`).join('');
+          const tre=tl.tre.map(([t,n])=>`<span class="tt" style="left:${x(t)}%" title="${esc(n)} · ${mmss(t)}">${IC.star}</span>`).join('');
+          const ev=tl.ev.map(([t,k])=>{const e=EV[k]||['dots',k];return `<span class="te ${k}" style="left:${x(t)}%" title="${esc(e[1])} · ${mmss(t)}">${IC[e[0]]}</span>`}).join('');
+          const legend=[['tc',T.tlChest],['tc d',T.tlDestroyed],['tc s',T.mapStorm]].map(([c,l])=>`<span><i class="${c}"></i>${esc(l)}</span>`).join('')
+            +`<span class="tt">${IC.star}${esc(T.treasures)}</span>`+Object.entries(EV).filter(([k])=>tl.ev.some(e=>e[1]===k)).map(([k,[i,l]])=>`<span class="te ${k}">${IC[i]}${esc(l)}</span>`).join('');
+          el.hidden=false;
+          el.innerHTML=`<h3>${esc(T.tlTitle)}</h3>${tl.spr.length?`<div class="trow tspr">${spr}</div>`:''}<div class="trow tmain"><div class="tline"></div>${chests}</div><div class="trow tev">${tre}${ev}</div>
+            <div class="trow tticks">${ticks.map(t=>`<span style="left:${x(t)}%">${mmss(t)}</span>`).join('')}</div><div class="tleg">${legend}</div>`;
+        }
         // A match clicked in the report: shown on the map.
         window.addEventListener('message',e=>{if(e.origin===location.origin&&e.data&&e.data.cc==='showMatch'&&S&&!S.perf){pendingMatch=e.data.id;setTab('map');openPendingMatch()}});
-        function openPendingMatch(){if(!pendingMatch||!MD)return;const i=MD.matches.findIndex(m=>m.id===pendingMatch);pendingMatch=null;if(i>=0)selectMatch(i)}
+        function openPendingMatch(){if(!pendingMatch||!MD)return;const i=pendingMatch==='last'?0:MD.matches.findIndex(m=>m.id===pendingMatch);pendingMatch=null;if(i>=0)selectMatch(i)}
         function clampView(){mapView.cx=Math.min(1000,Math.max(0,mapView.cx));mapView.cy=Math.min(1000,Math.max(0,mapView.cy))}
         // Zoom by f, keeping the point under (px, py) (0..1 of the canvas) where it is.
         function zoomAt(f,px,py){const v=mapView,a=v.a||1,s2=Math.min(1000,Math.max(35,v.s/f)),wx=v.cx-v.s/2+px*v.s,wy=v.cy-v.s*a/2+py*v.s*a;v.cx=wx+s2/2-px*s2;v.cy=wy+s2*a/2-py*s2*a;v.s=s2;clampView()}
@@ -849,6 +908,7 @@ public static class GuiPage
           const goals=(S.goals||[]).map(g=>`<div class="goal${g.done?' done':''}">${ring(g.pct/100,g.done?IC.check:g.pct+'%')}<div><div class="t">${esc(g.label)}</div><div class="v num">${esc(g.text.replace(' ✓','').replace('/',' / '))}</div><div class="s">${g.done?esc(T.goalDone):esc(fmt(T.goalLeft,g.left))}</div></div></div>`);
           if(S.achievements)goals.push(`<div class="goal">${ring(S.achPct,esc(S.achievements.split(' ')[0]))}<div><div class="t">${esc(T.achievements)}</div><div class="v num">${esc(S.achievements)}</div><div class="ach">${(S.achIcons||[]).map(i=>`<i>${IC[i]||''}</i>`).join('')}</div></div></div>`);
           if(goals.length)h+=`<section class="goals">${goals.join('')}</section>`;
+          if(S.missions&&S.missions.length)h+=`<section class="card missions"><div class="msh"><h3>${IC.flag}${esc(T.missions)}</h3><small>${esc(fmt(T.missionsHelp,S.missions.filter(m=>m.done).length,S.missions.length))}</small></div>${S.missions.map(m=>`<div class="msi${m.done?' done':''}"><span class="msic">${m.img?`<img src="${m.img}" alt="">`:IC[m.icon]}</span><div class="msb"><div class="mst"><span>${esc(m.title)}</span><b class="num">${m.done?IC.check:''}${esc(m.value)} / ${esc(m.target)}</b></div><div class="bar"><i style="width:${m.pct}%"></i></div></div></div>`).join('')}</section>`;
           if(!S.update&&S.updatesOn)h+=`<div><button class="b" onclick="api('checkUpdate')">${IC.refresh}${esc(T.checkUpdate)}</button></div>`;
           return h;
         }
@@ -881,7 +941,8 @@ public static class GuiPage
             +row(esc(T.updates),'',sel('updateMode',s.updateMode,[['prompt',T.upPrompt],['auto',T.upAuto],['off',T.upOff]])));
           const replays=scard('folder',esc(T.grpReplays),esc(T.grpReplaysHelp),(S.profiles.length>1?row(esc(T.profile),'',sel('profile',S.profileKey,S.profiles.map(p=>[p.key,p.name+' ('+p.matches+' · '+p.chests+')']))):'')
             +`<div class="row"><div style="flex:1"><div class="t">${esc(T.demos)}</div>${s.demosExists?'':`<div class="h">${esc(T.demosMissing)}</div>`}<div class="actions" style="margin-top:6px"><input type="text" id="demos" value="${esc(s.demos)}" style="flex:1;min-width:0"><button class="b" onclick="api('demosFolder',$('#demos').value)">${esc(T.save)}</button></div></div></div>`);
-          const goals=scard('target',esc(T.goals),esc(T.goalsHelp),row(esc(T.goalDaily),'',`<div class="actions"><input type="number" id="gday" min="0" step="1" value="${s.dailyGoal||''}" placeholder="0" style="width:100px"><button class="b" onclick="api('dailyGoal',$('#gday').value||'0')">${esc(T.save)}</button></div>`)
+          const sugg=s.suggestedDaily||s.suggestedWeekly?fmt(T.autoGoalsNow,s.suggestedDaily||'—',s.suggestedWeekly||'—'):T.autoGoalsNone;
+          const goals=scard('target',esc(T.goals),esc(T.goalsHelp),row(esc(T.autoGoals),esc(T.autoGoalsHelp)+(s.autoGoals?'<br><b>'+esc(sugg)+'</b>':''),sw('autog',s.autoGoals,'autoGoals'))+row(esc(s.autoGoals?T.goalDailyFallback:T.goalDaily),'',`<div class="actions"><input type="number" id="gday" min="0" step="1" value="${s.dailyGoal||''}" placeholder="0" style="width:100px"><button class="b" onclick="api('dailyGoal',$('#gday').value||'0')">${esc(T.save)}</button></div>`)
             +row(esc(T.goalWeekly),'',`<div class="actions"><input type="number" id="gweek" min="0" step="1" value="${s.weeklyGoal||''}" placeholder="0" style="width:100px"><button class="b" onclick="api('weeklyGoal',$('#gweek').value||'0')">${esc(T.save)}</button></div>`));
           const discord=scard('chat','Discord',esc(T.discordHelp),`<div class="row"><div style="flex:1"><div class="t">${esc(T.discordUrl)}</div><div class="actions" style="margin-top:6px"><input type="text" id="dhook" value="${esc(s.discordWebhook)}" placeholder="https://discord.com/api/webhooks/…" style="flex:1;min-width:0"><button class="b" onclick="saveDiscord()">${esc(T.save)}</button><button class="b" onclick="testDiscord()">${esc(T.discordTest)}</button></div>${discordMsg?`<div class="h" style="margin-top:6px">${esc(discordMsg)}</div>`:''}</div></div>`
             +row(esc(T.discordMode),'',sel('discordMode',s.discordMode,[['match',T.discordAll],['treasure',T.discordNotable]])));
@@ -924,21 +985,23 @@ public static class GuiPage
         $('#dlg').addEventListener('click',e=>{if(dlgDownOut&&dlgOutside(e))$('#dlg').close();dlgDownOut=false});
         window.addEventListener('message',e=>{if(e.origin===location.origin&&e.data&&e.data.cc==='editChests'&&S)openManual()});
         // ---- The season's recap: a 1080 × 1350 picture drawn in the colors of the theme, to save or copy.
-        async function openRecap(){
-          const T=S.txt,d=$('#dlg');
-          const r=await fetch('/api/action',{method:'POST',headers:{'X-Token':TOKEN,'Content-Type':'application/json'},body:JSON.stringify({action:'recap'})});
+        // ?recap=all|season (address of the page): opens the recap once the page has its state (tests, shortcuts).
+        setTimeout(()=>{const q=new URLSearchParams(location.search).get('recap');if(q&&S)openRecap(q)},1500);
+        async function openRecap(mode){
+          const T=S.txt,d=$('#dlg');mode=mode||'all';
+          const r=await fetch('/api/action',{method:'POST',headers:{'X-Token':TOKEN,'Content-Type':'application/json'},body:JSON.stringify({action:'recap',value:mode})});
           const R=(await r.json()).result;if(!R)return;
           $('#dlgT').textContent=T.recap;
-          $('#dlgB').innerHTML=`<canvas id="recapCv" width="1080" height="1350" style="width:100%;border-radius:12px;display:block"></canvas><div class="actions" style="margin-top:12px"><button class="b main" id="recapSave">${esc(T.recapSave)}</button><button class="b" id="recapCopy">${esc(T.recapCopy)}</button></div>`;
+          $('#dlgB').innerHTML=`<div class="seg" style="margin-bottom:12px">${[['all',T.mapAll],['season',T.rcSeason]].map(([k,t])=>`<button type="button" class="${k===mode?'on':''}" onclick="openRecap('${k}')">${esc(t)}</button>`).join('')}</div><canvas id="recapCv" width="1080" height="1350" style="width:100%;border-radius:12px;display:block"></canvas><div class="actions" style="margin-top:12px"><button class="b main" id="recapSave">${esc(T.recapSave)}</button><button class="b" id="recapCopy">${esc(T.recapCopy)}</button></div>`;
           d.style.width='min(520px,calc(100% - 32px))';
           if(!d.open)d.showModal();
           try{await document.fonts.load('60px "Pirata One"')}catch(e){}
-          drawRecap($('#recapCv'),R,T);
+          await drawRecap($('#recapCv'),R,T);
           $('#recapSave').onclick=()=>{const a=document.createElement('a');a.href=$('#recapCv').toDataURL('image/png');a.download='retrospectiva-baus.png';a.click()};
           $('#recapCopy').onclick=()=>$('#recapCv').toBlob(async b=>{try{await navigator.clipboard.write([new ClipboardItem({'image/png':b})]);$('#recapCopy').textContent=T.copied}catch(e){$('#recapCopy').textContent='—'}});
           d.addEventListener('close',()=>{d.style.width=''},{once:true});
         }
-        function drawRecap(c,R,T){
+        async function drawRecap(c,R,T){
           const g=c.getContext('2d'),W=c.width,H=c.height,css=n=>getComputedStyle(document.documentElement).getPropertyValue(n).trim();
           const bg=css('--bg')||'#101a22',accent=css('--title')||'#f0c057',ring=css('--ring')||accent,pirate=(S.settings.theme||'pirate')==='pirate';
           const titleFont=pirate?'"Pirata One",serif':'Bahnschrift,"Segoe UI",sans-serif',num='Bahnschrift,"Segoe UI",sans-serif';
@@ -947,7 +1010,7 @@ public static class GuiPage
           const rr=(x,y,w,h,r,fill)=>{g.beginPath();g.roundRect(x,y,w,h,r);g.fillStyle=fill;g.fill()};
           g.textBaseline='alphabetic';
           g.fillStyle=accent;g.font=`700 26px ${num}`;g.letterSpacing='6px';g.fillText(T.brand.toUpperCase(),80,110);g.letterSpacing='0px';
-          g.fillStyle='#ffffff';g.font=`${pirate?400:700} ${pirate?96:84}px ${titleFont}`;g.fillText(T.rcTitle,80,210);
+          g.fillStyle='#ffffff';g.font=`${pirate?400:700} ${pirate?96:84}px ${titleFont}`;g.fillText(R.season?T.rcSeasonTitle:T.rcTitle,80,210);
           g.fillStyle='rgba(255,255,255,.65)';g.font=`500 30px "Segoe UI",sans-serif`;g.fillText((R.player?R.player+' · ':'')+R.period,80,262);
           // The total, big.
           rr(80,310,W-160,250,28,'rgba(255,255,255,.07)');
@@ -958,8 +1021,9 @@ public static class GuiPage
           const cw=(W-160-3*20)/4,ch=150;
           cells.forEach(([v,l],i)=>{const x=80+(i%4)*(cw+20),y=590+Math.floor(i/4)*(ch+20);rr(x,y,cw,ch,22,'rgba(255,255,255,.07)');g.fillStyle='#ffffff';g.font=`700 58px ${num}`;g.fillText(String(v),x+24,y+80);g.fillStyle='rgba(255,255,255,.6)';g.font=`600 22px "Segoe UI",sans-serif`;g.fillText(String(l).toLowerCase(),x+24,y+122)});
           // Lines: favourite landing spot, most found weapon, achievements, streak.
-          const lines=[[T.rcLanding,R.landing||'—'],[T.rcWeapon,R.weapon||'—'],[T.achievements,R.achievements],[T.rcStreak,R.streak]];
-          lines.forEach(([l,v],i)=>{const y=960+i*72;g.fillStyle='rgba(255,255,255,.6)';g.font=`600 26px "Segoe UI",sans-serif`;g.fillText(l,80,y);g.fillStyle='#ffffff';g.font=`700 34px "Segoe UI",sans-serif`;g.textAlign='right';g.fillText(String(v),W-80,y);g.textAlign='left';g.fillStyle='rgba(255,255,255,.1)';g.fillRect(80,y+22,W-160,2)});
+          const lines=[[T.rcLanding,R.landing||'—'],[T.rcSprite,R.sprite||'—'],[T.rcWeapon,R.weapon||'—'],[T.achievements,R.achievements],[T.rcStreak,R.streak]];
+          let sprImg=null;if(R.spriteImg){sprImg=new Image();sprImg.src=R.spriteImg;try{await sprImg.decode()}catch(e){sprImg=null}}
+          lines.forEach(([l,v],i)=>{const y=950+i*58;if(i===1&&sprImg){g.font=`700 34px "Segoe UI",sans-serif`;const w=g.measureText(String(v)).width;g.drawImage(sprImg,W-80-w-58,y-40,50,50)}g.fillStyle='rgba(255,255,255,.6)';g.font=`600 26px "Segoe UI",sans-serif`;g.fillText(l,80,y);g.fillStyle='#ffffff';g.font=`700 34px "Segoe UI",sans-serif`;g.textAlign='right';g.fillText(String(v),W-80,y);g.textAlign='left';g.fillStyle='rgba(255,255,255,.1)';g.fillRect(80,y+18,W-160,2)});
           g.fillStyle=ring;g.fillRect(80,H-120,90,6);
           g.fillStyle='rgba(255,255,255,.55)';g.font=`600 24px "Segoe UI",sans-serif`;g.fillText('Fortnite · '+T.brand,80,H-70);
         }

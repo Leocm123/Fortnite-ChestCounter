@@ -2,6 +2,14 @@
 
 > **Ative os replays no Fortnite primeiro**: *Configurações → Jogo → Replays → Gravar Replays: Ativado*. A ferramenta só lê esses arquivos de replay: nenhuma modificação no jogo, nenhum acesso à memória do jogo.
 
+**Novidades da 1.15.0**
+- **Linha do tempo da partida**: ao escolher uma partida no Mapa (ou clicar nela no relatório), uma faixa mostra os elementais usados, cada baú (aberto, destruído, na tempestade), os tesouros, suas eliminações, derrubadas e a hora em que você caiu, cada um no seu minuto
+- **Ranking do esquadrão** com novos critérios (melhor partida, destruídos, % do esquadrão) e período: tudo, este mês ou esta semana
+- **Missões da semana** na aba Início: três desafios novos toda segunda, montados a partir do que você costuma fazer (baús enterrados, na tempestade, com o seu elemental favorito...), com aviso quando você conclui
+- **Meta automática** (Configurações → Metas): o contador define as metas do dia e da semana pela sua média recente
+- **Retrospectiva da temporada**: escolha entre Tudo e Temporada, agora com o seu elemental favorito
+- Os replays que ainda estão no PC são analisados de novo para pegar as eliminações
+
 **Novidades da 1.14.1**
 - Aba Elementais: todos os cartões com a mesma altura e os mesmos tipos de baú (os zerados ficam apagados), e a imagem do elemental segue a variante que você usou
 
@@ -74,6 +82,14 @@ O Windows pode mostrar *"O Windows protegeu o computador"* (exe sem assinatura):
 ---
 
 **English** · Download **`ChestCounter.exe`** below and run it. Already using it? The counter offers the update on its home tab. Your history and settings are kept.
+
+**What's new in 1.15.0**
+- **Match timeline**: pick a match on the Map (or click it in the report) to see the sprites you carried, each chest (opened, destroyed, in the storm), treasures, your eliminations, knocks and when you went down, each at its minute
+- **Squad ranking** with new columns (best match, destroyed, % of squad) and a period: all, this month or this week
+- **Weekly missions** on the home tab: three new challenges every Monday, built from what you usually do (buried chests, storm, your favourite sprite...), with a notice when you complete one
+- **Automatic goals** (Settings → Goals): the counter sets the daily and weekly goals from your recent average
+- **Season recap**: choose between All and Season, now with your favourite sprite
+- Replays still on your PC are analyzed again to pick up eliminations
 
 **What's new in 1.14.1**
 - Sprites tab: every card has the same height and the same chest kinds (zeros faded), and the sprite's picture follows the variant you used

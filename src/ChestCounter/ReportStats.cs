@@ -39,7 +39,7 @@ public static class ReportStats
         .heat .hc{border-radius:6px;padding:6px 4px;text-align:center;background:color-mix(in srgb,var(--gold) calc(var(--k) * 85% + 10%),transparent);color:var(--cink);line-height:1.15}
         .heat .hc b{display:block;font-size:15px}.heat .hc small{font-size:10.5px;opacity:.75}
         .heat .hc.empty{background:color-mix(in srgb,var(--cink) 5%,transparent)}
-        .sqsort{display:flex;align-items:center;justify-content:flex-end;gap:10px;margin-bottom:8px;font-size:13px;color:var(--cmuted);flex-wrap:wrap}
+        .sqsp{flex:1}.sqempty{margin:10px 0 4px;text-align:center}#squad th.on{color:var(--cink)}.sqsort{display:flex;align-items:center;justify-content:flex-end;gap:10px;margin-bottom:8px;font-size:13px;color:var(--cmuted);flex-wrap:wrap}
         .seg{display:inline-flex;gap:2px;padding:3px;border-radius:9px;background:color-mix(in srgb,var(--cink) 7%,transparent)}
         .seg button{border:0;background:transparent;color:var(--cink);font:600 12.5px "Segoe UI",system-ui,sans-serif;padding:5px 11px;border-radius:7px;cursor:pointer;opacity:.75}
         .seg button.on{background:var(--gold);color:#fff;opacity:1}
@@ -497,69 +497,116 @@ public static class ReportStats
 
     private static string SquadRanking(IReadOnlyList<MatchRecord> matches)
     {
-        var withTeam = matches.Where(m => m.TeamChests.Any(t => !t.IsBot)).ToList();
-        if (withTeam.Count == 0)
+        var all = matches.Where(m => m.TeamChests.Any(t => !t.IsBot)).ToList();
+        if (all.Count == 0)
         {
             return "";
         }
-        var mates = withTeam
-            .SelectMany(m => m.TeamChests.Where(t => !t.IsBot).Select(t => (m, t)))
-            .GroupBy(x => x.t.EpicId ?? x.t.Name)
-            .Select(g =>
-            {
-                var latest = g.OrderByDescending(x => Goals.When(x.m)).First().t.Name;
-                var treasures = g.Sum(x => x.m.TeamTreasureFinds.Count(f => f.Teammate == x.t.Name));
-                return (Name: latest, Matches: g.Select(x => x.m.SessionId).Distinct().Count(), Chests: g.Sum(x => x.t.Chests), Treasures: treasures, You: false);
-            })
-            .ToList();
         var you = matches.Select(m => m.PlayerName).FirstOrDefault(n => !string.IsNullOrEmpty(n)) ?? L.T("toi", "you", "tú", "você");
-        // The player, over the same matches (the ones played with somebody).
-        mates.Add((you, withTeam.Count, withTeam.Sum(m => m.ChestsOpened), withTeam.Sum(m => m.TreasureFinds.Count), true));
-        // Everyone is written (the most frequent teammates first, at most 60); the page sorts them by the chosen
-        // column and shows 5, then 5 more at each click, up to 15.
-        var rows = mates.OrderByDescending(x => x.Matches).ThenByDescending(x => x.Chests).Take(60)
-            .OrderByDescending(x => (double)x.Chests / x.Matches).ThenByDescending(x => x.Matches).ToList();
-        var top = Math.Max(0.1, rows.Max(x => (double)x.Chests / x.Matches));
+
+        // One table per period (this week, this month, everything); the page shows the chosen one, sorted by the chosen
+        // column. Rows: name, you, matches together, chests, average, best match, destroyed, treasures, share of the
+        // squad's chests in those matches (percent).
+        object Rows(List<MatchRecord> list)
+        {
+            int SquadTotal(MatchRecord m) => m.ChestsOpened + m.TeamChests.Where(t => !t.IsBot).Sum(t => t.Chests);
+            var rows = list
+                .SelectMany(m => m.TeamChests.Where(t => !t.IsBot).Select(t => (m, t)))
+                .GroupBy(x => x.t.EpicId ?? x.t.Name)
+                .Select(g =>
+                {
+                    var byMatch = g.GroupBy(x => x.m.SessionId).Select(mg => (M: mg.First().m, Chests: mg.Sum(x => x.t.Chests), Destroyed: mg.Sum(x => x.t.Destroyed), Name: mg.First().t.Name)).ToList();
+                    var squad = byMatch.Sum(x => SquadTotal(x.M));
+                    return new object[]
+                    {
+                        g.OrderByDescending(x => Goals.When(x.m)).First().t.Name, 0, byMatch.Count, byMatch.Sum(x => x.Chests),
+                        Math.Round((double)byMatch.Sum(x => x.Chests) / byMatch.Count, 2), byMatch.Max(x => x.Chests), byMatch.Sum(x => x.Destroyed),
+                        byMatch.Sum(x => x.M.TeamTreasureFinds.Count(f => f.Teammate == x.Name)),
+                        squad == 0 ? 0 : (int)Math.Round(100.0 * byMatch.Sum(x => x.Chests) / squad),
+                    };
+                })
+                .OrderByDescending(r => (int)r[2]).Take(60).ToList();
+            if (list.Count > 0)
+            {
+                var squad = list.Sum(SquadTotal);
+                rows.Add(new object[]
+                {
+                    you, 1, list.Count, list.Sum(m => m.ChestsOpened), Math.Round((double)list.Sum(m => m.ChestsOpened) / list.Count, 2),
+                    list.Max(m => m.ChestsOpened), list.Sum(m => m.Chests.Count(c => c.Destroyed)), list.Sum(m => m.TreasureFinds.Count),
+                    squad == 0 ? 0 : (int)Math.Round(100.0 * list.Sum(m => m.ChestsOpened) / squad),
+                });
+            }
+            return rows;
+        }
+        var weekStart = Goals.WeekStart(Goals.Today);
+        var monthStart = new DateTime(Goals.Today.Year, Goals.Today.Month, 1);
+        var data = new
+        {
+            week = Rows(all.Where(m => Goals.When(m).Date >= weekStart).ToList()),
+            month = Rows(all.Where(m => Goals.When(m).Date >= monthStart).ToList()),
+            all = Rows(all),
+            medals = new[] { Icons.Medal(1), Icons.Medal(2), Icons.Medal(3) },
+            you = L.T("toi", "you", "tú", "você"),
+            locale = L.Culture.Name,
+            empty = L.T("Aucune partie en équipe sur cette période.", "No squad match in this period.", "Ninguna partida en equipo en este periodo.", "Nenhuma partida em equipe neste período."),
+        };
 
         var sorts = new[]
         {
             ("avg", L.T("Moyenne", "Average", "Media", "Média")),
             ("c", L.T("Coffres", "Chests", "Cofres", "Baús")),
-            ("m", L.T("Parties ensemble", "Matches together", "Partidas juntos", "Partidas juntos")),
+            ("best", L.T("Meilleure partie", "Best match", "Mejor partida", "Melhor partida")),
+            ("d", L.T("Détruits", "Destroyed", "Destruidos", "Destruídos")),
+            ("share", L.T("% de l'équipe", "% of squad", "% del equipo", "% do esquadrão")),
             ("t", L.T("Trésors", "Treasures", "Tesoros", "Tesouros")),
+            ("m", L.T("Parties ensemble", "Matches together", "Partidas juntos", "Partidas juntos")),
         };
-        var seg = string.Concat(sorts.Select((s, i) => $"<button type=\"button\" data-k=\"{s.Item1}\"{(i == 0 ? " class=\"on\"" : "")}>{H(s.Item2)}</button>"));
+        var periods = new[]
+        {
+            ("all", L.T("Tout", "All", "Todo", "Tudo")),
+            ("month", L.T("Ce mois", "This month", "Este mes", "Este mês")),
+            ("week", L.T("Cette semaine", "This week", "Esta semana", "Esta semana")),
+        };
+        string Seg(string cls, IEnumerable<(string, string)> items) =>
+            $"<div class=\"seg {cls}\">" + string.Concat(items.Select((s, i) => $"<button type=\"button\" data-k=\"{s.Item1}\"{(i == 0 ? " class=\"on\"" : "")}>{H(s.Item2)}</button>")) + "</div>";
+        var json = System.Text.Json.JsonSerializer.Serialize(data);
         var sb = new StringBuilder($"<section id=\"squad\">{Title(L.T("Classement de l'équipe", "Squad ranking", "Clasificación del equipo", "Ranking do esquadrão"),
             L.T("parties jouées ensemble · imprécis au-delà de 150 m de toi", "matches played together · inaccurate beyond 150 m from you",
                 "partidas jugadas juntos · impreciso a más de 150 m de ti", "partidas jogadas junto · impreciso a mais de 150 m de você"))}"
-            + $"<div class=\"card\"><div class=\"sqsort\"><span>{L.T("Trier par", "Sort by", "Ordenar por", "Ordenar por")}</span><div class=\"seg\">{seg}</div></div>"
-            + $"<table><tr><th>#</th><th>{L.T("Joueur", "Player", "Jugador", "Jogador")}</th><th></th>"
-            + string.Concat(sorts.Select(s => $"<th class=\"r\" data-col=\"{s.Item1}\">{H(s.Item2)}</th>")) + "</tr>");
-        for (var i = 0; i < rows.Count; i++)
-        {
-            var r = rows[i];
-            var avg = (double)r.Chests / r.Matches;
-            var medal = i < 3 ? $"<span class=\"rank r{i + 1}\">{Icons.Medal(i + 1)}</span>" : $"<span class=\"rank\">{L.N(i + 1)}</span>";
-            sb.Append($"<tr data-avg=\"{avg.ToString("0.###", CultureInfo.InvariantCulture)}\" data-c=\"{r.Chests}\" data-m=\"{r.Matches}\" data-t=\"{r.Treasures}\"{(i >= 5 ? " hidden" : "")}>"
-                + $"<td class=\"num\">{medal}</td><td>{(r.You ? $"<b>{H(r.Name)}</b> ({L.T("toi", "you", "tú", "você")})" : H(r.Name))}</td>"
-                + $"<td style=\"width:150px\">{Bar((int)Math.Round(100 * avg / top), r.You ? "var(--team)" : null)}</td>"
-                + $"<td class=\"n num big\" data-col=\"avg\">{F1(avg)}</td><td class=\"sub num\" data-col=\"c\">{L.N(r.Chests)}</td><td class=\"sub num\" data-col=\"m\">{L.N(r.Matches)}</td><td class=\"sub num\" data-col=\"t\">{L.N(r.Treasures)}</td></tr>");
-        }
-        sb.Append("</table>");
-        sb.Append($"<button type=\"button\" class=\"moresq\"{(rows.Count > 5 ? "" : " hidden")}>{L.T("Afficher plus", "Show more", "Mostrar más", "Mostrar mais")}</button>");
-        var medals = System.Text.Json.JsonSerializer.Serialize(new[] { Icons.Medal(1), Icons.Medal(2), Icons.Medal(3) });
-        sb.Append("<script>(function(){var s=document.getElementById('squad'),medals=" + medals + ",shown=5,key='avg',more=s.querySelector('.moresq');"
-            + "function all(){return [].slice.call(s.querySelectorAll('tr[data-m]'))}"
-            + "function draw(){var rows=all();rows.sort(function(a,b){return (+b.dataset[key]-+a.dataset[key])||(+b.dataset.m-+a.dataset.m)||(+b.dataset.c-+a.dataset.c)});"
-            + "var top=Math.max(1e-9,+rows[0].dataset[key]),max=Math.min(15,rows.length);"
-            + "rows.forEach(function(r,i){r.parentNode.appendChild(r);r.hidden=i>=Math.min(shown,max);var k=r.cells[0].firstChild;k.className='rank'+(i<3?' r'+(i+1):'');k.innerHTML=i<3?medals[i]:(i+1).toLocaleString();"
-            + "r.querySelector('.meter i').style.width=Math.max(2,Math.round(100*+r.dataset[key]/top))+'%';"
-            + "[].forEach.call(r.querySelectorAll('td[data-col]'),function(c){var on=c.dataset.col==key;c.classList.toggle('big',on);c.classList.toggle('n',on);c.classList.toggle('sub',!on)})});"
-            + "[].forEach.call(s.querySelectorAll('.seg button'),function(b){b.classList.toggle('on',b.dataset.k==key)});"
-            + "more.hidden=shown>=max}"
-            + "[].forEach.call(s.querySelectorAll('.seg button'),function(b){b.onclick=function(){key=b.dataset.k;try{localStorage.setItem('cc-sqsort',key)}catch(e){}draw()}});"
-            + "more.onclick=function(){shown+=5;draw()};"
-            + "try{var k=localStorage.getItem('cc-sqsort');if(k&&s.querySelector('.seg button[data-k=\"'+k+'\"]'))key=k}catch(e){}draw()})()</script>");
+            + $"<div class=\"card\"><div class=\"sqsort\">{Seg("sqp", periods)}<span class=\"sqsp\"></span><span>{L.T("Trier par", "Sort by", "Ordenar por", "Ordenar por")}</span>{Seg("sqk", sorts)}</div>"
+            + $"<table><thead><tr><th>#</th><th>{L.T("Joueur", "Player", "Jugador", "Jogador")}</th><th></th>"
+            + string.Concat(sorts.Select(s => $"<th class=\"r\" data-col=\"{s.Item1}\">{H(s.Item2)}</th>")) + "</tr></thead><tbody></tbody></table>"
+            + $"<p class=\"sqempty muted\" hidden></p><button type=\"button\" class=\"moresq\" hidden>{L.T("Afficher plus", "Show more", "Mostrar más", "Mostrar mais")}</button>");
+        sb.Append($"<script type=\"application/json\" id=\"sqdata\">{json}</script>");
+        sb.Append("""
+            <script>(function(){
+            var s=document.getElementById('squad'),D=JSON.parse(document.getElementById('sqdata').textContent),tb=s.querySelector('tbody'),more=s.querySelector('.moresq'),empty=s.querySelector('.sqempty');
+            var COL={avg:4,c:3,best:5,d:6,share:8,t:7,m:2},key='avg',per='all',shown=5;
+            function get(k){try{return localStorage.getItem(k)}catch(e){return null}}function put(k,v){try{localStorage.setItem(k,v)}catch(e){}}
+            if(COL[get('cc-sqsort')]!=null)key=get('cc-sqsort');if(D[get('cc-sqper')])per=get('cc-sqper');
+            function esc(t){return String(t).replace(/[&<>"]/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]})}
+            function num(v,k){return k==='avg'?Number(v).toLocaleString(D.locale,{minimumFractionDigits:1,maximumFractionDigits:1}):k==='share'?v+'%':Number(v).toLocaleString(D.locale)}
+            function draw(){
+              var rows=D[per].slice(),i=COL[key];
+              rows.sort(function(a,b){return (b[i]-a[i])||(b[2]-a[2])||(b[3]-a[3])});
+              var max=Math.min(15,rows.length),top=rows.length?Math.max(1e-9,rows[0][i]):1,h='';
+              rows.slice(0,Math.min(shown,max)).forEach(function(r,n){
+                var rank=n<3?'<span class="rank r'+(n+1)+'">'+D.medals[n]+'</span>':'<span class="rank">'+(n+1)+'</span>';
+                h+='<tr><td class="num">'+rank+'</td><td>'+(r[1]?'<b>'+esc(r[0])+'</b> ('+esc(D.you)+')':esc(r[0]))+'</td><td style="width:150px"><span class="meter"><i style="width:'+Math.max(2,Math.round(100*r[i]/top))+'%;background:'+(r[1]?'var(--team)':'var(--gold)')+'"></i></span></td>';
+                Object.keys(COL).forEach(function(k){h+='<td class="num '+(k===key?'n big':'sub')+'" data-col="'+k+'">'+num(r[COL[k]],k)+'</td>'});
+                h+='</tr>';
+              });
+              tb.innerHTML=h;empty.hidden=rows.length>0;empty.textContent=D.empty;
+              s.querySelectorAll('th[data-col]').forEach(function(th){th.classList.toggle('on',th.dataset.col===key)});
+              s.querySelectorAll('.sqk button').forEach(function(b){b.classList.toggle('on',b.dataset.k===key)});
+              s.querySelectorAll('.sqp button').forEach(function(b){b.classList.toggle('on',b.dataset.k===per)});
+              more.hidden=shown>=max;
+            }
+            s.querySelectorAll('.sqk button').forEach(function(b){b.onclick=function(){key=b.dataset.k;put('cc-sqsort',key);draw()}});
+            s.querySelectorAll('.sqp button').forEach(function(b){b.onclick=function(){per=b.dataset.k;shown=5;put('cc-sqper',per);draw()}});
+            more.onclick=function(){shown+=5;draw()};
+            draw()})()</script>
+            """);
         return sb.Append("</div></section>").ToString();
     }
 

@@ -77,7 +77,19 @@ public static class MapView
                 storm = m.Chests.Count(c => c.InStorm == true),
                 place = Pretty.Placement(m),
                 elims = m.Eliminations,
+                // The match timeline: its length, chests [t, color, kind, destroyed, storm], treasures [t, name],
+                // sprites carried [from, to, id] and the player's events [t, kind].
+                tl = new
+                {
+                    dur = Math.Max(m.DurationSeconds ?? 0, (int)Math.Ceiling(Math.Max(m.Chests.Count > 0 ? m.Chests.Max(c => c.TimeSeconds) : 0, m.Events?.Count > 0 ? m.Events.Max(e => e.T) : 0))),
+                    chests = m.Chests.OrderBy(c => c.TimeSeconds).Select(c => new object[] { (int)Math.Round(c.TimeSeconds), ReportWriter.KindColor.GetValueOrDefault(ChestKinds.Canonical(c.Kind), "#9a8f7a"), L.Name(ChestKinds.Canonical(c.Kind)), c.Destroyed ? 1 : 0, c.InStorm == true ? 1 : 0 }),
+                    tre = m.TreasureFinds.Where(f => f.ObtainedAtSeconds != null).Select(f => new object[] { (int)Math.Round(f.ObtainedAtSeconds!.Value), f.DisplayName }),
+                    spr = (m.Sprites ?? []).Select(s => new object[] { (int)Math.Round(s.From), (int)Math.Round(s.To), s.Id }),
+                    ev = (m.Events ?? []).Select(e => new object[] { (int)Math.Round(e.T), e.Kind }),
+                },
             }).ToList(),
+            sprites = recentMatches.SelectMany(m => m.Sprites ?? []).Select(s => s.Id).Distinct()
+                .ToDictionary(id => id, id => { var (k, v) = Sprites.Parse(id); return new { name = Sprites.Name(id), img = Sprites.Image(k, v) }; }),
             pois = pois.Select(p => { var (u, v) = MapData.Project(p.X, p.Y); return new { name = p.Name, u = Math.Round(u * 1000, 1), v = Math.Round(v * 1000, 1) }; }).ToList(),
             places = Places(points, pois).Select(p => new { name = p.Name, count = L.N(p.Count), matches = L.Count(p.Matches, "partie", "parties", "match", "matches", "partida", "partidas", "partida", "partidas"), n = p.Count }).ToList(),
             total = L.N(points.Count),

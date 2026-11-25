@@ -276,7 +276,7 @@ public sealed class ReplayAnalyzer : FortniteReplayReader.ReplayReader
     private readonly List<GrantEvent> _grants = new();
 
     /// <summary>Bump when the analysis changes so that existing replays are re-analyzed.</summary>
-    public const int CurrentVersion = 22; // 22 (1.14.0): the sprite carried when each chest was opened; 21 (1.11.1): storm from the opener's own storm flag; 20 (1.11.0): a treasure comes from a chest only (never an ammo box opened at that moment); 19: chests opened in the storm; 18 (1.8.0): where each chest stands (map); 17 (1.5.1): closed chests broken without an instigator counted again
+    public const int CurrentVersion = 23; // 23 (1.15.0): eliminations, knocks and death of the player (match timeline); 22 (1.14.0): the sprite carried when each chest was opened; 21 (1.11.1): storm from the opener's own storm flag; 20 (1.11.0): a treasure comes from a chest only (never an ammo box opened at that moment); 19: chests opened in the storm; 18 (1.8.0): where each chest stands (map); 17 (1.5.1): closed chests broken without an instigator counted again
 
     private static readonly bool ProbeDebug = Environment.GetEnvironmentVariable("CHESTCOUNTER_DEBUG") == "4";
 
@@ -1234,6 +1234,26 @@ public sealed class ReplayAnalyzer : FortniteReplayReader.ReplayReader
         var isRecorder = recorderPs != null && targetPlayerStates.Contains(recorderPs.Value);
         var placement = target?.Placement ?? (isRecorder ? (int?)replay.TeamStats?.Position : null);
 
+        // The player's eliminations, knocks and death (event chunks, by Epic id), for the match timeline.
+        var events = new List<MatchEvent>();
+        if (!string.IsNullOrEmpty(target?.EpicId))
+        {
+            bool Me(string? id) => string.Equals(id, target.EpicId, StringComparison.OrdinalIgnoreCase);
+            foreach (var e in replay.Eliminations ?? [])
+            {
+                var t = MathF.Round((e.Info?.StartTime ?? 0) / 1000f, 1);
+                if (Me(e.Eliminator) && !e.IsSelfElimination)
+                {
+                    events.Add(new MatchEvent { T = t, Kind = e.Knocked ? "knock" : "elim" });
+                }
+                else if (Me(e.Eliminated))
+                {
+                    events.Add(new MatchEvent { T = t, Kind = e.Knocked ? "downed" : "death" });
+                }
+            }
+            events.Sort((a, b) => a.T.CompareTo(b.T));
+        }
+
         return new MatchRecord
         {
             SessionId = replay.GameData?.GameSessionId ?? $"{info?.Timestamp:O}-{Path.GetFileName(file)}",
@@ -1260,6 +1280,7 @@ public sealed class ReplayAnalyzer : FortniteReplayReader.ReplayReader
             Map = header?.LevelNamesAndTimes?.Select(l => l.Item1).FirstOrDefault(l => !string.IsNullOrEmpty(l)),
             IsCustomMatch = replay.GameData?.IsCustomMatch == true,
             Chests = chests,
+            Events = events,
             Sprites = spriteSpans.Select(s => new SpriteSpan { From = MathF.Round(s.From, 1), To = MathF.Round(s.To, 1), Id = s.Item }).ToList(),
             TreasureFinds = finds,
             TeamTreasureFinds = teamFinds,

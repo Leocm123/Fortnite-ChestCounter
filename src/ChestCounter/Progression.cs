@@ -9,6 +9,39 @@ public static class Goals
     /// <summary>Chests to open this week, from Monday (0 = no goal).</summary>
     public static int Weekly { get; set; }
 
+    /// <summary>Goals set by the counter from the player's recent days and weeks (Settings), instead of fixed numbers.</summary>
+    public static bool Auto { get; set; }
+
+    /// <summary>
+    /// Suggested daily goal: the average of the last 14 days played (today left out) plus 10 %, rounded up to 5, at
+    /// least 10; 0 without history.
+    /// </summary>
+    public static int SuggestedDaily(IReadOnlyList<MatchRecord> matches)
+    {
+        var today = Today;
+        var days = matches.Where(m => When(m).Date < today && When(m).Date >= today.AddDays(-14))
+            .GroupBy(m => When(m).Date).Select(g => g.Sum(m => m.ChestsOpened)).ToList();
+        return days.Count == 0 ? 0 : Math.Max(10, (int)Math.Ceiling(days.Average() * 1.1 / 5) * 5);
+    }
+
+    /// <summary>Suggested weekly goal: the average of the last 4 weeks played (this one left out) plus 10 %, rounded up to 10, at least 30.</summary>
+    public static int SuggestedWeekly(IReadOnlyList<MatchRecord> matches)
+    {
+        var week = WeekStart(Today);
+        var weeks = matches.Where(m => When(m).Date < week && When(m).Date >= week.AddDays(-28))
+            .GroupBy(m => WeekStart(When(m).Date)).Select(g => g.Sum(m => m.ChestsOpened)).ToList();
+        return weeks.Count == 0 ? 0 : Math.Max(30, (int)Math.Ceiling(weeks.Average() * 1.1 / 10) * 10);
+    }
+
+    /// <summary>The goals in force: the suggested ones when automatic (the fixed ones while there is no history).</summary>
+    public static (int Daily, int Weekly) Targets(IReadOnlyList<MatchRecord> matches)
+    {
+        if (!Auto) return (Daily, Weekly);
+        var d = SuggestedDaily(matches);
+        var w = SuggestedWeekly(matches);
+        return (d > 0 ? d : Daily, w > 0 ? w : Weekly);
+    }
+
     public sealed record Progress(string Label, int Value, int Target)
     {
         public bool Done => Value >= Target;
@@ -39,13 +72,14 @@ public static class Goals
     public static List<Progress> Of(IReadOnlyList<MatchRecord> matches, int liveChests = 0)
     {
         var list = new List<Progress>();
-        if (Daily > 0)
+        var (daily, weekly) = Targets(matches);
+        if (daily > 0)
         {
-            list.Add(new Progress(DailyLabel, ChestsToday(matches) + liveChests, Daily));
+            list.Add(new Progress(DailyLabel, ChestsToday(matches) + liveChests, daily));
         }
-        if (Weekly > 0)
+        if (weekly > 0)
         {
-            list.Add(new Progress(WeeklyLabel, ChestsThisWeek(matches) + liveChests, Weekly));
+            list.Add(new Progress(WeeklyLabel, ChestsThisWeek(matches) + liveChests, weekly));
         }
         return list;
     }

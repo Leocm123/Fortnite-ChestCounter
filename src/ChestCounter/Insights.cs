@@ -166,10 +166,22 @@ public static class Insights
 
     // ---- The season's recap (shareable picture) ----------------------------------------------------------------------
 
-    public static object Recap(TrackerData view)
+    /// <summary>"++Fortnite+Release-43.11" -> 43: the game's major version, which changes with each season.</summary>
+    private static int? Season(MatchRecord m) =>
+        m.GameVersion is { } v && System.Text.RegularExpressions.Regex.Match(v, @"Release-(\d+)\.") is { Success: true } x ? int.Parse(x.Groups[1].Value) : null;
+
+    /// <param name="season">Only the current season: the matches played on the same major version of the game as the latest one.</param>
+    public static object Recap(TrackerData view, bool season = false)
     {
         var matches = view.Matches;
-        var stats = ProgressStats.From(matches, view.ManualAdjust);
+        if (season && matches.OrderByDescending(Goals.When).Select(Season).FirstOrDefault(s => s != null) is int current)
+        {
+            matches = matches.Where(m => Season(m) == current).ToList();
+        }
+        var stats = ProgressStats.From(matches, season ? 0 : view.ManualAdjust);
+        // The sprite the most chests were opened with.
+        var sprite = matches.SelectMany(m => m.Chests).Where(c => c.Sprite != null).GroupBy(c => Sprites.Parse(c.Sprite!).Kind)
+            .OrderByDescending(g => g.Count()).FirstOrDefault();
         var landing = Landings(matches).FirstOrDefault();
         // The most found weapon (not a heal, ammo or utility item).
         var named = Loot.FromChests(matches).Where(i => Loot.NameOf(i) != null && Loot.CategoryOf(i).Id is "shotgun" or "rifle" or "smg" or "pistol" or "sniper" or "explosive" or "melee")
@@ -180,7 +192,10 @@ public static class Insights
         {
             player = matches.Select(m => m.PlayerName).FirstOrDefault(n => !string.IsNullOrEmpty(n)) ?? "",
             period = $"{first.ToString("dd/MM", L.Culture)} – {Goals.Today.ToString("dd/MM/yyyy", L.Culture)}",
-            total = L.N(view.TotalChests),
+            total = L.N(season ? matches.Sum(m => m.ChestsOpened) : view.TotalChests),
+            season,
+            sprite = sprite == null ? null : $"{Sprites.KindName(sprite.Key)} · {L.Count(sprite.Count(), "coffre", "chest", "cofre", "baú")}",
+            spriteImg = sprite == null ? null : Sprites.Image(sprite.Key, sprite.GroupBy(c => Sprites.Parse(c.Sprite!).Variant).OrderByDescending(g => g.Count()).First().Key),
             matches = L.N(matches.Count),
             average = matches.Count > 0 ? matches.Average(m => m.ChestsOpened).ToString("0.0", L.Culture) : "0",
             best = L.N(stats.BestMatch),
