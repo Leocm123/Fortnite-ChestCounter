@@ -45,15 +45,15 @@ public static class NativeOverlay
 
     /// <summary>"hud" (figures only, under the minimap, like the game's HUD) or "classic" (dark card).</summary>
     private static volatile string _style = "classic";
-    private static IntPtr _fontHudBig, _fontHudSmall, _fontHudTiny, _fontPanelBig, _fontPanelNum;
-    private static int _hudBigH, _hudSmallH;
+    private static IntPtr _fontHudBig, _fontHudSmall, _fontHudTiny, _fontPanelBig, _fontPanelNum, _fontCleanBig;
+    private static int _hudBigH, _hudSmallH, _cleanBigH;
 
     /// <summary>Pixels of this color are fully transparent (styles without a background). Almost black, so that the
     /// anti-aliased edge of the black outline around the text blends into it without any colored fringe.</summary>
     private static readonly uint KeyColor = 0x00010001;
 
-    /// <summary>"hud" (aligned block), "icons" (bars with icons), "classic" (quest panel).</summary>
-    public static string[] Styles => new[] { "hud", "icons", "classic" };
+    /// <summary>"hud" (aligned block), "icons" (bars with icons), "clean" (one line, no goals), "classic" (quest panel).</summary>
+    public static string[] Styles => new[] { "hud", "icons", "clean", "classic" };
 
     /// <summary>Changes the look of the overlay at once.</summary>
     public static void SetStyle(string style)
@@ -267,7 +267,7 @@ public static class NativeOverlay
     /// <summary>(Re)creates the fonts for the current display scaling and chosen size.</summary>
     private static void CreateFonts()
     {
-        foreach (var old in new[] { _fontBig, _fontSmall, _fontHeader, _fontCaption, _fontLabel, _fontIcon, _fontHudBig, _fontHudSmall, _fontHudTiny, _fontPanelBig, _fontPanelNum })
+        foreach (var old in new[] { _fontBig, _fontSmall, _fontHeader, _fontCaption, _fontLabel, _fontIcon, _fontHudBig, _fontHudSmall, _fontHudTiny, _fontPanelBig, _fontPanelNum, _fontCleanBig })
         {
             if (old != IntPtr.Zero) DeleteObject(old);
         }
@@ -284,6 +284,7 @@ public static class NativeOverlay
         _fontHudBig = CreateFontW(-S(40), 0, 0, 0, 700, 1, 0, 0, 1, 0, 0, 4, 0, "Bahnschrift Condensed");
         _fontHudSmall = CreateFontW(-S(18), 0, 0, 0, 600, 1, 0, 0, 1, 0, 0, 4, 0, "Bahnschrift SemiCondensed");
         _fontHudTiny = CreateFontW(-S(14), 0, 0, 0, 700, 1, 0, 0, 1, 0, 0, 4, 0, "Bahnschrift SemiCondensed");
+        _fontCleanBig = CreateFontW(-S(30), 0, 0, 0, 700, 1, 0, 0, 1, 0, 0, 4, 0, "Bahnschrift Condensed");
         // Quest panel: clean, upright figures.
         _fontPanelBig = CreateFontW(-S(30), 0, 0, 0, 700, 0, 0, 0, 1, 0, 0, 5, 0, "Bahnschrift");
         _fontPanelNum = CreateFontW(-S(15), 0, 0, 0, 700, 0, 0, 0, 1, 0, 0, 5, 0, "Bahnschrift");
@@ -440,6 +441,7 @@ public static class NativeOverlay
     // ---- Three looks, picked in the Overlay tab -----------------------------------------------------------------------
     //  "hud"     Aligned block: outlined figures like the game's HUD, the goals as bars of the same width in a column.
     //  "icons"   Bars with icons: the same figures, the goals as an icon and a bar with its number inside.
+    //  "clean"   Clean: one line of outlined figures (total, last, session, treasures), nothing else.
     //  "classic" Quest panel: a translucent dark plate, like the game's quest tracker, clean white text, thin bars.
 
     /// <summary>The small facts under the total: last match, session, squad (when shown), treasures.</summary>
@@ -522,9 +524,26 @@ public static class NativeOverlay
         UpdateWindow(hwnd); // paint now (one repaint per update, no timer)
     }
 
+    /// <summary>The clean look keeps only the main facts: no squad, no goals.</summary>
+    private static List<Fact> CleanFacts(OverlayView v) => Facts(v).Where(f => f.Label != OverlayModel.SquadLabel).ToList();
+
+    private static (int W, int H) MeasureClean(IntPtr hdc)
+    {
+        var v = _view;
+        var pad = Sc(6);
+        var bigW = TextWidth(hdc, _fontCleanBig, v.Total, out _cleanBigH);
+        var factsW = FactsWidth(hdc, CleanFacts(v), out _hudSmallH);
+        var w = Sc(22) + pad + Sc(16) + Sc(22) + Sc(7) + bigW + Sc(22) + factsW + pad + Sc(12);
+        return (w, pad + Math.Max(_cleanBigH, _hudSmallH) + pad);
+    }
+
     private static (int W, int H) MeasureHud(IntPtr hdc)
     {
         var v = _view;
+        if (_style == "clean")
+        {
+            return MeasureClean(hdc);
+        }
         var pad = Sc(8);
         var bigW = TextWidth(hdc, _fontHudBig, v.Total, out _hudBigH);
         var topW = Sc(18) + Sc(26) + Sc(8) + bigW; // room for the in-match dot is always kept
@@ -674,6 +693,11 @@ public static class NativeOverlay
         }
 
         var left = _lockRect.Right;
+        if (_style == "clean")
+        {
+            PaintClean(hdc, rc, left);
+            return;
+        }
         var y = pad;
 
         // Total, with the chest, and the red dot while a match is in progress.
@@ -690,28 +714,7 @@ public static class NativeOverlay
         }
         y += _hudBigH + Sc(2);
 
-        // "Last 6  Session 31  ★ 1", right-aligned, drawn from the right.
-        var x = right;
-        var facts = Facts(v);
-        for (var i = facts.Count - 1; i >= 0; i--)
-        {
-            var f = facts[i];
-            var vw = TextWidth(hdc, _fontHudSmall, f.Value, out _);
-            Outlined(hdc, _fontHudSmall, f.Treasure ? Rgb(214, 190, 255) : white, f.Value, left, y, x, y + _hudSmallH, DT_RIGHT, thin: true);
-            x -= vw;
-            if (f.Treasure)
-            {
-                Star(hdc, x - Sc(9), y + _hudSmallH / 2, Sc(7), Rgb(196, 155, 255), Ink);
-                x -= Sc(18);
-            }
-            else
-            {
-                x -= Sc(6);
-                Outlined(hdc, _fontHudSmall, labelColor, f.Label, left, y, x, y + _hudSmallH, DT_RIGHT, thin: true);
-                x -= TextWidth(hdc, _fontHudSmall, f.Label, out _);
-            }
-            x -= Sc(12);
-        }
+        DrawFacts(hdc, Facts(v), left, right, y);
         y += _hudSmallH + Sc(6);
 
         foreach (var g in v.Goals ?? [])
@@ -742,6 +745,58 @@ public static class NativeOverlay
                 Outlined(hdc, _fontHudSmall, labelColor, g.Short, left, y, barLeft - Sc(8), y + _goalRowH, DT_RIGHT, thin: true);
             }
             y += _goalRowH + Sc(5);
+        }
+    }
+
+    /// <summary>"Last 6  Session 31  ★ 1", right-aligned, drawn from the right. Returns where its left end is.</summary>
+    private static int DrawFacts(IntPtr hdc, List<Fact> facts, int left, int right, int y)
+    {
+        var white = Rgb(255, 255, 255);
+        var labelColor = Rgb(Themes.Current.Label);
+        var x = right;
+        for (var i = facts.Count - 1; i >= 0; i--)
+        {
+            var f = facts[i];
+            var vw = TextWidth(hdc, _fontHudSmall, f.Value, out _);
+            Outlined(hdc, _fontHudSmall, f.Treasure ? Rgb(214, 190, 255) : white, f.Value, left, y, x, y + _hudSmallH, DT_RIGHT, thin: true);
+            x -= vw;
+            if (f.Treasure)
+            {
+                Star(hdc, x - Sc(9), y + _hudSmallH / 2, Sc(7), Rgb(196, 155, 255), Ink);
+                x -= Sc(18);
+            }
+            else
+            {
+                x -= Sc(6);
+                Outlined(hdc, _fontHudSmall, labelColor, f.Label, left, y, x, y + _hudSmallH, DT_RIGHT, thin: true);
+                x -= TextWidth(hdc, _fontHudSmall, f.Label, out _);
+            }
+            x -= Sc(12);
+        }
+        return x + Sc(12);
+    }
+
+    /// <summary>The clean look: "[chest] 285   Last 8  Session 0  ★ 1" on one line, bottoms aligned.</summary>
+    private static void PaintClean(IntPtr hdc, RECT rc, int left)
+    {
+        var v = _view;
+        var pad = Sc(6);
+        var right = rc.Right - pad - Sc(12);
+        var lineH = Math.Max(_cleanBigH, _hudSmallH);
+        var gold = Rgb(Themes.Current.Accent);
+        var factsLeft = DrawFacts(hdc, CleanFacts(v), left, right, pad + lineH - _hudSmallH - Sc(2));
+        var totalRight = factsLeft - Sc(22);
+        var bigTop = pad + lineH - _cleanBigH;
+        var bigW = TextWidth(hdc, _fontCleanBig, v.Total, out _);
+        Outlined(hdc, _fontCleanBig, LiveFigures(v) ? gold : Rgb(255, 255, 255), v.Total, left, bigTop, totalRight + Sc(6), bigTop + _cleanBigH, DT_RIGHT);
+        var iw = Sc(22);
+        var ih = Sc(18);
+        var ix = totalRight - bigW - Sc(7) - iw;
+        Chest(hdc, ix, bigTop + (_cleanBigH - ih) / 2, iw, ih, gold, Rgb(Themes.Current.AccentDeep), Ink, Ink);
+        if (v.CurrentLive)
+        {
+            var d = Sc(9);
+            Disc(hdc, ix - Sc(6) - d, bigTop + (_cleanBigH - d) / 2, d, Rgb(255, 59, 48), Ink, Math.Max(1, Sc(1.5)));
         }
     }
 

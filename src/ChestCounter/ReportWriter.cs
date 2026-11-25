@@ -1228,7 +1228,7 @@ public static class ReportWriter
         return $"""<div class="profiles muted">{L.T("Autres profils sur ce PC : ", "Other profiles on this PC: ", "Otros perfiles en este PC: ", "Outros perfis neste PC: ")}{string.Join(", ", others)} · {L.T("« Changer de profil » dans le compteur", "\"Switch profile\" in the counter", "«Cambiar de perfil» en el contador", "\"Trocar perfil\" no contador")}</div>""";
     }
 
-    /// <summary>Style of the OBS page: the one chosen for the overlay ("hud", "icons" or "classic").</summary>
+    /// <summary>Style of the OBS page: the one chosen for the overlay ("hud", "icons", "clean" or "classic").</summary>
     public static volatile string OverlayStyle = "hud";
 
     /// <summary>What the overlay shows right now (also written by <see cref="WriteAll"/>, so that the OBS page never goes back).</summary>
@@ -1252,7 +1252,35 @@ public static class ReportWriter
         }
     }
 
-    public static string Overlay(OverlayView v) => OverlayStyle switch { "classic" => OverlayPanel(v), "icons" => OverlayHud(v, icons: true), _ => OverlayHud(v, icons: false) };
+    public static string Overlay(OverlayView v) => OverlayStyle switch { "classic" => OverlayPanel(v), "icons" => OverlayHud(v, icons: true), "clean" => OverlayClean(v), _ => OverlayHud(v, icons: false) };
+
+    /// <summary>The clean look as a web page, for OBS: one line of outlined figures, no goals, no background.</summary>
+    private static string OverlayClean(OverlayView v)
+    {
+        var accent = Hex(Themes.Current.Accent);
+        var label = Hex(Themes.Current.Label);
+        var live = v.CurrentLive && v.Current is { } c && c != "…";
+        var facts = string.Join("", OverlayFacts(v).Where(f => f.Label != OverlayModel.SquadLabel)
+            .Select(f => f.Treasure ? $"<span class=\"t\">★ {H(f.Value)}</span>" : $"<span><i>{H(f.Label)}</i> {H(f.Value)}</span>"));
+        return $$"""
+            <!doctype html><html lang="{{L.Code}}"><head><meta charset="utf-8"><meta http-equiv="refresh" content="5">
+            <title>{{L.T("Overlay coffres", "Chest overlay", "Overlay de cofres", "Overlay de baús")}}</title>
+            <style>
+            html,body{margin:0;background:transparent}
+            body{padding:6px 12px;display:inline-flex;align-items:baseline;gap:16px;white-space:nowrap;color:#fff;font-family:Bahnschrift,"Segoe UI",sans-serif;font-style:italic;font-weight:700;
+                 -webkit-text-stroke:4px #0b0f18;paint-order:stroke fill;letter-spacing:.01em}
+            .total{display:flex;align-items:center;gap:8px;font-size:34px;line-height:1;font-stretch:condensed}
+            .total.live{color:{{accent}}}
+            .total svg{width:24px;height:20px;flex:none}
+            .dot{width:10px;height:10px;border-radius:50%;background:#ff3b30;box-shadow:0 0 0 2px #0b0f18;flex:none}
+            .f{display:flex;gap:12px;font-size:20px;font-stretch:semi-condensed}
+            .f i{font-style:inherit;color:{{label}}}.f .t{color:#d6beff}
+            </style></head><body>
+            <div class="total{{(live ? " live" : "")}}">{{(v.CurrentLive ? "<i class=\"dot\"></i>" : "")}}{{string.Format(ChestSvg, accent, Hex(Themes.Current.AccentDeep))}}{{H(v.Total)}}</div>
+            <div class="f">{{facts}}</div>
+            </body></html>
+            """;
+    }
 
     private const string ChestSvg = """<svg viewBox="0 0 30 26" aria-hidden="true"><rect x="2" y="10" width="26" height="14" rx="2" fill="{0}" stroke="#0b0f18" stroke-width="2.5"/><path d="M2 12 Q15 -2 28 12" fill="{1}" stroke="#0b0f18" stroke-width="2.5"/><rect x="12.5" y="12" width="5" height="6" rx="1" fill="#0b0f18"/></svg>""";
 
