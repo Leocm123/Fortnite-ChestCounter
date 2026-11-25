@@ -158,6 +158,29 @@ public static class GuiPage
         ["mapSource"] = L.T("Carte", "Map", "Mapa", "Mapa"),
         ["brand"] = L.T("Compteur de coffres", "Chest Counter", "Contador de cofres", "Contador de Baús"),
         ["map"] = L.T("Carte", "Map", "Mapa", "Mapa"),
+        ["sprites"] = L.T("Esprits", "Sprites", "Espíritus", "Elementais"),
+        ["spLoading"] = L.T("Chargement…", "Loading…", "Cargando…", "Carregando…"),
+        ["spEmptyT"] = L.T("Aucun esprit pour l'instant", "No sprites yet", "Aún no hay espíritus", "Nenhum elemental ainda"),
+        ["spEmpty"] = L.T("Joue une partie avec un esprit équipé : chaque coffre sera associé à l'esprit que tu portais à ce moment-là.",
+            "Play a match with a sprite equipped: each chest is tied to the sprite you carried at that moment.",
+            "Juega una partida con un espíritu equipado: cada cofre se asocia al espíritu que llevabas en ese momento.",
+            "Jogue uma partida com um elemental equipado: cada baú fica ligado ao elemental que você carregava naquele momento."),
+        ["spOld"] = L.T("Tes parties ont été analysées avant cette version : les replays encore sur le PC sont analysés de nouveau, les plus anciens n'ont pas cette info.",
+            "Your matches were analyzed before this version: replays still on your PC are analyzed again, older ones do not have this.",
+            "Tus partidas se analizaron antes de esta versión: los replays que siguen en el PC se analizan de nuevo, los más antiguos no tienen este dato.",
+            "Suas partidas foram analisadas antes desta versão: os replays que ainda estão no PC são analisados de novo, os mais antigos não têm essa informação."),
+        ["spIntro"] = L.T("{0} coffres dans {1} parties, selon l'esprit porté à l'ouverture. Changer d'esprit en pleine partie est pris en compte.",
+            "{0} chests in {1} matches, by the sprite carried when each was opened. Switching sprites mid-match is taken into account.",
+            "{0} cofres en {1} partidas, según el espíritu que llevabas al abrir cada uno. Cambiar de espíritu en plena partida se tiene en cuenta.",
+            "{0} baús em {1} partidas, pelo elemental que você carregava ao abrir cada um. Trocar de elemental no meio da partida é levado em conta."),
+        ["spSkipped"] = L.T("{0} parties plus anciennes sans cette info.", "{0} older matches without this.", "{0} partidas más antiguas sin este dato.", "{0} partidas mais antigas sem essa informação."),
+        ["spChests"] = L.T("coffres", "chests", "cofres", "baús"),
+        ["spOpened"] = L.T("ouverts", "opened", "abiertos", "abertos"),
+        ["spDestroyed"] = L.T("détruits", "destroyed", "destruidos", "destruídos"),
+        ["spTreasures"] = L.T("trésors", "treasures", "tesoros", "tesouros"),
+        ["spPerMin"] = L.T("par minute", "per minute", "por minuto", "por minuto"),
+        ["spCarried1"] = L.T("Porté dans {0} partie · {1} min", "Carried in {0} match · {1} min", "Llevado en {0} partida · {1} min", "Usado em {0} partida · {1} min"),
+        ["spCarried"] = L.T("Porté dans {0} parties · {1} min", "Carried in {0} matches · {1} min", "Llevado en {0} partidas · {1} min", "Usado em {0} partidas · {1} min"),
         ["account"] = L.T("Compte", "Account", "Cuenta", "Conta"),
         ["recent"] = L.T("le plus récent en haut", "newest first", "lo más reciente arriba", "mais recentes no topo"),
         ["today"] = L.T("aujourd'hui", "today", "hoy", "hoje"),
@@ -356,6 +379,21 @@ public static class GuiPage
         .actions{display:flex;flex-wrap:wrap;gap:8px}
         .note{font-size:13px;color:var(--smuted)}
         .path{font:13px Consolas,monospace;word-break:break-all;background:var(--strack);padding:6px 8px;border-radius:6px;display:block;margin:6px 0}
+        .spintro{margin:0 0 14px;color:var(--muted);font-size:13.5px}
+        .spgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(290px,1fr));gap:14px;align-items:start}
+        .spc .sph{display:flex;gap:10px;align-items:center}.spc .sph b{font-size:15.5px}
+        .spi{width:34px;height:34px;border-radius:50%;display:grid;place-items:center;background:color-mix(in srgb,var(--accent) 18%,transparent);color:var(--accent);flex:none}.spi .ic{width:20px;height:20px}
+        .spi.pic{width:64px;height:64px;border-radius:14px;background:color-mix(in srgb,var(--accent) 12%,transparent)}.spi img{width:60px;height:60px;object-fit:contain}
+        .spv span{display:inline-flex;align-items:center;gap:4px}.spv img{width:22px;height:22px;object-fit:contain}
+        .spc.none .spi{background:var(--strack);color:var(--smuted)}
+        .spv{display:flex;flex-wrap:wrap;gap:4px 10px;font-size:12px;color:var(--smuted);margin-top:2px}.spv b{color:var(--sink)}
+        .spn{display:flex;align-items:baseline;gap:8px;margin-top:10px}.spn .v{margin:0}
+        .spf{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-top:12px}.spf div{display:flex;flex-direction:column}.spf b{font-size:17px}.spf span{font-size:11.5px;color:var(--smuted)}
+        .spm{margin-top:8px}
+        .spkl{list-style:none;margin:12px 0 0;padding:10px 0 0;border-top:1px solid var(--sline);display:grid;gap:5px;font-size:12.5px}
+        .spkl li{display:grid;grid-template-columns:1fr 80px 28px;gap:8px;align-items:center}.spkl b{text-align:right}
+        .spk{height:6px;background:var(--strack);border-radius:3px;overflow:hidden}.spk i{display:block;height:100%;background:var(--accent)}
+        .spempty{display:flex;gap:14px;align-items:flex-start}.spempty .ic{width:34px;height:34px;color:var(--accent);flex:none}.spempty p{margin:4px 0 0;color:var(--smuted)}
         .bar{height:8px;background:var(--strack);border-radius:4px;overflow:hidden;margin-top:8px}.bar i{display:block;height:100%;background:var(--accent)}
         /* ---- Home: total, figures, goals ---- */
         .hero{position:relative;border-radius:16px;padding:22px 24px;display:grid;grid-template-columns:auto minmax(170px,1fr);gap:26px;align-items:end;background:var(--herobg);border:2px solid var(--heroline);color:var(--herotext);box-shadow:var(--shadow);overflow:hidden}
@@ -529,7 +567,7 @@ public static class GuiPage
         <div id="shell"><aside id="side"></aside><div id="scroll"><main id="main"><div id="app"><p class="note">…</p></div><aside id="activityPane" class="panel hidden"><h3 class="ttl"></h3><div class="log"></div></aside><section id="reportPane" class="hidden"><iframe id="rep" title="Report" scrolling="no"></iframe></section><section id="mapPane" class="hidden"></section></main></div></div>
         <dialog id="dlg" aria-labelledby="dlgT"><div class="dhead"><h2 class="ttl" id="dlgT"></h2><button type="button" class="dclose" id="dlgX">×</button></div><div id="dlgB"></div></dialog>
         <script>
-        const TOKEN='__TOKEN__',IC=__ICONS__,TABS=['home','report','map','overlay','settings','help'];
+        const TOKEN='__TOKEN__',IC=__ICONS__,TABS=['home','report','map','sprites','overlay','settings','help'];
         let S=null,tab=(()=>{const h=location.hash.slice(1);if(TABS.includes(h))return h;try{const t=localStorage.getItem('cc-gui-tab');return TABS.includes(t)?t:'home'}catch(e){return 'home'}})(),estimate=null,stopped=false,copied=false;
         const $=s=>document.querySelector(s);
         // In the counter's own window (?w=1): the title bar of the page, its buttons sent to the window.
@@ -549,7 +587,7 @@ public static class GuiPage
         function row(title,help,control){return `<div class="row"><div><div class="t">${title}</div>${help?`<div class="h">${help}</div>`:''}</div><div>${control}</div></div>`}
         function sel(act,value,opts){return `<select onchange="api('${act}',this.value)">${opts.map(o=>`<option value="${esc(o[0])}" ${String(o[0])===String(value)?'selected':''}>${esc(o[1])}</option>`).join('')}</select>`}
         function setTab(t){const was=tab;tab=t;try{localStorage.setItem('cc-gui-tab',t)}catch(e){}render(true);if(t!==was)scroller().scrollTop=0}
-        const NAV={home:'home',report:'report',map:'map',overlay:'overlay',settings:'gear',help:'help'};
+        const NAV={home:'home',report:'report',map:'map',sprites:'spirit',overlay:'overlay',settings:'gear',help:'help'};
         // The side bar: the app, its tabs, and what the counter is doing (with the account and, in a browser, quit).
         function side(T){
           const tabs=TABS.filter(t=>t!=='map'||!S.perf);
@@ -573,7 +611,7 @@ public static class GuiPage
           if(!force&&pressedAt&&Date.now()-pressedAt<3000)return;
           $('#main').classList.toggle('home',tab==='home');
           let v='';
-          if(tab==='home')v=home(T);else if(tab==='report')v=header(T,`<button class="b" onclick="openRecap()">${IC.sparkle}${esc(T.recap)}</button><button class="b main" onclick="api('openReportFile')">${IC.report}${esc(T.openInBrowser)}</button>`);else if(tab==='map')v=header(T,'');else if(tab==='overlay')v=overlay(T);else if(tab==='settings')v=settings(T);else if(tab==='help')v=help(T);
+          if(tab==='home')v=home(T);else if(tab==='report')v=header(T,`<button class="b" onclick="openRecap()">${IC.sparkle}${esc(T.recap)}</button><button class="b main" onclick="api('openReportFile')">${IC.report}${esc(T.openInBrowser)}</button>`);else if(tab==='map')v=header(T,'');else if(tab==='sprites')v=sprites(T);else if(tab==='overlay')v=overlay(T);else if(tab==='settings')v=settings(T);else if(tab==='help')v=help(T);
           // Rebuilt only when something changed: the buttons stay the same elements between two refreshes.
           const app=notices(T)+v;
           if(force||app!==appHtml){$('#app').innerHTML=app;appHtml=app}
@@ -635,6 +673,33 @@ public static class GuiPage
           const y=scroller().scrollTop;repStamp=S.reportStamp;
           f.onload=()=>{fitReport();scroller().scrollTop=y;try{if(repObs)repObs.disconnect();repObs=new ResizeObserver(fitReport);repObs.observe(f.contentDocument.querySelector('main'))}catch(e){}};
           f.src='/report?t='+TOKEN+'&v='+encodeURIComponent(repStamp);
+        }
+        // ---- The Elementals tab: chests per sprite carried, asked for when the tab opens and again when the figures change.
+        let SD=null,sdKey=null,sdLoading=false;
+        async function loadSprites(key){
+          sdLoading=true;
+          try{const r=await fetch('/api/action',{method:'POST',headers:{'X-Token':TOKEN,'Content-Type':'application/json'},body:JSON.stringify({action:'spriteData'})});SD=(await r.json()).result;sdKey=key}catch(e){}
+          sdLoading=false;if(tab==='sprites')render(true);
+        }
+        function sprites(T){
+          const key=S.reportStamp+'|'+S.lang;
+          if(sdKey!==key&&!sdLoading)loadSprites(key);
+          let h=header(T,'');
+          if(!SD)return h+`<div class="card">${esc(T.spLoading)}</div>`;
+          if(!SD.rows.length)return h+`<div class="card spempty">${IC.spirit}<div><b>${esc(T.spEmptyT)}</b><p>${esc(SD.skipped?T.spOld:T.spEmpty)}</p></div></div>`;
+          const max=Math.max(1,...SD.rows.map(r=>r.chests)),n=v=>Number(v).toLocaleString(S.locale);
+          h+=`<p class="spintro">${esc(fmt(T.spIntro,n(SD.total),n(SD.matches)))}${SD.skipped?' '+esc(fmt(T.spSkipped,n(SD.skipped))):''}</p><div class="spgrid">`;
+          for(const r of SD.rows){
+            const kinds=r.kinds.map(k=>`<li><span>${esc(k.name)}</span><span class="spk"><i style="width:${Math.max(4,Math.round(100*k.n/r.chests))}%"></i></span><b class="num">${n(k.n)}</b></li>`).join('');
+            const vars=r.variants.length?`<div class="spv">${r.variants.map(v=>`<span>${v.img?`<img src="${v.img}" alt="">`:''}${esc(v.name)} <b>${n(v.n)}</b></span>`).join('')}</div>`:'';
+            const pm=r.perMin==null?'—':r.perMin.toLocaleString(S.locale,{maximumFractionDigits:2});
+            h+=`<div class="kpi spc${r.none?' none':''}"><div class="sph"><span class="spi${r.img?' pic':''}">${r.img?`<img src="${r.img}" alt="">`:IC.spirit}</span><div><b>${esc(r.name)}</b>${vars}</div></div>
+              <div class="spn"><span class="v num">${n(r.chests)}</span><span class="s">${esc(T.spChests)} · ${r.share}%</span></div><div class="bar"><i style="width:${Math.round(100*r.chests/max)}%"></i></div>
+              <div class="spf"><div><b class="num">${n(r.opened)}</b><span>${esc(T.spOpened)}</span></div><div><b class="num">${n(r.destroyed)}</b><span>${esc(T.spDestroyed)}</span></div><div><b class="num">${n(r.treasures)}</b><span>${esc(T.spTreasures)}</span></div>${r.none?'':`<div><b class="num">${pm}</b><span>${esc(T.spPerMin)}</span></div>`}</div>
+              ${r.none?'':`<div class="s spm">${esc(fmt(r.matches===1?T.spCarried1:T.spCarried,n(r.matches),r.minutes.toLocaleString(S.locale,{maximumFractionDigits:1})))}</div>`}
+              ${kinds?`<ul class="spkl">${kinds}</ul>`:''}</div>`;
+          }
+          return h+'</div>';
         }
         // ---- The Map tab: drawn on a canvas (light even with thousands of chests), its data asked for when the tab opens
         // and again only when the counter rewrote its figures. Wheel: zoom around the pointer; drag: move; points or heat.

@@ -1324,6 +1324,7 @@ object? RunGuiAction(string name, System.Text.Json.JsonElement value)
             break;
         case "copyObsPath": CopyToClipboard(Path.GetFullPath(store.OverlayPath)); settingsChanged = false; break;
         case "openDataFolder": Open(store.Folder); settingsChanged = false; break;
+        case "spriteData": result = Sprites.Stats(Profiles.View(data, config)); settingsChanged = false; break;
         case "mapData": result = MapView.Data(Profiles.View(data, config)); settingsChanged = false; break;
         case "recap": result = Insights.Recap(Profiles.View(data, config)); settingsChanged = false; break;
         case "dismissSession": sessionSummary = null; settingsChanged = false; break;

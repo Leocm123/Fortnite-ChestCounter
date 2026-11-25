@@ -40,6 +40,15 @@ public sealed class ReplayAnalyzer : FortniteReplayReader.ReplayReader
 
     private static readonly Regex VehicleClass = new(@"_Vehicle(_Static)?_C$|MeatballVehicle", RegexOptions.Compiled);
     private sealed record EquipEvent(float Time, string Item, uint Pawn);
+
+    /// <summary>
+    /// The sprite ("elemental") a player carries: its backpack actor says whose pawn it is on and which sprite it holds
+    /// ("ESD_CoinPileSprite_Variant_Cursed"). Item null with Closed: the backpack went away (sprite extracted, dropped,
+    /// player dead).
+    /// </summary>
+    private sealed record SpriteEvent(float Time, uint Channel, uint? Pawn, string? Item, bool Closed = false);
+    private readonly List<SpriteEvent> _spriteEvents = new();
+    private readonly HashSet<uint> _spriteChannels = new();
     private sealed record PrizeEvent(float Time, string PrizeId, uint? Pawn, string Container);
 
     // "DelilahPrize:dpid_item4", or a bare GUID (the Pirate Shop Access token has no prefix).
@@ -267,7 +276,7 @@ public sealed class ReplayAnalyzer : FortniteReplayReader.ReplayReader
     private readonly List<GrantEvent> _grants = new();
 
     /// <summary>Bump when the analysis changes so that existing replays are re-analyzed.</summary>
-    public const int CurrentVersion = 21; // 21 (1.11.1): storm from the opener's own storm flag; 20 (1.11.0): a treasure comes from a chest only (never an ammo box opened at that moment); 19: chests opened in the storm; 18 (1.8.0): where each chest stands (map); 17 (1.5.1): closed chests broken without an instigator counted again
+    public const int CurrentVersion = 22; // 22 (1.14.0): the sprite carried when each chest was opened; 21 (1.11.1): storm from the opener's own storm flag; 20 (1.11.0): a treasure comes from a chest only (never an ammo box opened at that moment); 19: chests opened in the storm; 18 (1.8.0): where each chest stands (map); 17 (1.5.1): closed chests broken without an instigator counted again
 
     private static readonly bool ProbeDebug = Environment.GetEnvironmentVariable("CHESTCOUNTER_DEBUG") == "4";
 
@@ -283,7 +292,8 @@ public sealed class ReplayAnalyzer : FortniteReplayReader.ReplayReader
                 ? p : "Treasure|Prize|Magpie|Inventory|Quest|Reward|Hunt|PlayerController|PlayerState|Notif", RegexOptions.IgnoreCase);
             NetGuidCache.KeepOnCleanup = true;
         }
-        RawProbe.Filter = path => path.Contains("FortAbilitySystemComponent", StringComparison.Ordinal) || debugFilter?.IsMatch(path) == true;
+        RawProbe.Filter = path => path.Contains("FortAbilitySystemComponent", StringComparison.Ordinal) || path.Contains("ExtractionBackpack_Sprite", StringComparison.Ordinal)
+            || debugFilter?.IsMatch(path) == true;
         RawProbe.Sink = (channel, group, field, data, bits) =>
         {
             // FortAbilitySystemComponent_ClassNetCache (unnamed fields) or FortAbilitySystemComponentAthena_ClassNetCache
@@ -292,6 +302,10 @@ public sealed class ReplayAnalyzer : FortniteReplayReader.ReplayReader
                 && field is "?" or "ActivatableAbilities" && _treasureHandlerGuids.Count > 0)
             {
                 ReadAbilityGrants(channel, data, bits);
+            }
+            if (group.Contains("ExtractionBackpack_Sprite", StringComparison.Ordinal) && field is "OwningPawn" or "ExtractableItemDefinition" && bits is > 0 and <= 40)
+            {
+                ReadSprite(channel, field, data);
             }
             if (debugFilter?.IsMatch(group + "." + field) == true)
             {
@@ -373,6 +387,81 @@ public sealed class ReplayAnalyzer : FortniteReplayReader.ReplayReader
             // Not a FastArray delta (or another layout): ignore.
             if (ProbeDebug) Console.Error.WriteLine($"GRANTFAIL {Now,7:F1}s ch{channel} bits={bits} pos={pos} {e.GetType().Name}");
         }
+    }
+
+    /// <summary>A sprite backpack property: the pawn carrying it, or the sprite it holds (packed object references).</summary>
+    private void ReadSprite(uint channel, string field, byte[] data)
+    {
+        uint value = 0;
+        var shift = 0;
+        foreach (var b in data)
+        {
+            value |= (uint)(b >> 1) << shift;
+            shift += 7;
+            if ((b & 1) == 0 || shift > 28) break;
+        }
+        _spriteChannels.Add(channel);
+        if (field == "OwningPawn")
+        {
+            _spriteEvents.Add(new SpriteEvent(Now, channel, value, null));
+        }
+        else if (CleanName(PathOf(value)) is { Length: > 0 } item)
+        {
+            _spriteEvents.Add(new SpriteEvent(Now, channel, null, item));
+        }
+    }
+
+    protected override void OnChannelClosing(uint channelIndex, UChannel channel, ChannelCloseReason reason)
+    {
+        base.OnChannelClosing(channelIndex, channel, reason);
+        if (_spriteChannels.Remove(channelIndex) && reason is ChannelCloseReason.Destroyed or ChannelCloseReason.TearOff)
+        {
+            _spriteEvents.Add(new SpriteEvent(Now, channelIndex, null, null, Closed: true));
+        }
+    }
+
+    /// <summary>
+    /// When each sprite was carried by one of these pawns: (from, to, sprite). Replays only send what is near the
+    /// recording player, so this is reliable for the player and the squad.
+    /// </summary>
+    private List<(float From, float To, string Item)> SpriteTimeline(HashSet<uint> pawns, float end)
+    {
+        var owner = new Dictionary<uint, uint>();
+        var item = new Dictionary<uint, string>();
+        var spans = new List<(float From, float To, string Item)>();
+        (float From, string Item)? current = null;
+        uint? currentChannel = null;
+        void Close(float t)
+        {
+            if (current is { } c && t > c.From) spans.Add((c.From, t, c.Item));
+            current = null;
+            currentChannel = null;
+        }
+        foreach (var e in _spriteEvents.OrderBy(e => e.Time))
+        {
+            if (e.Closed)
+            {
+                if (currentChannel == e.Channel) Close(e.Time);
+                owner.Remove(e.Channel);
+                item.Remove(e.Channel);
+                continue;
+            }
+            if (e.Pawn is uint p) owner[e.Channel] = p;
+            if (e.Item is string i) item[e.Channel] = i;
+            var mine = owner.TryGetValue(e.Channel, out var o) && pawns.Contains(o);
+            if (mine && item.TryGetValue(e.Channel, out var now) && (current?.Item != now || currentChannel != e.Channel))
+            {
+                Close(e.Time);
+                current = (e.Time, now);
+                currentChannel = e.Channel;
+            }
+            else if (!mine && currentChannel == e.Channel)
+            {
+                Close(e.Time);
+            }
+        }
+        Close(end);
+        return spans;
     }
 
     /// <summary>Debug 4: prints undecoded payloads with any readable text / object reference they contain.</summary>
@@ -834,6 +923,7 @@ public sealed class ReplayAnalyzer : FortniteReplayReader.ReplayReader
 
         var chests = new List<ChestRecord>();
         var others = new Dictionary<string, int>();
+        var spriteSpans = SpriteTimeline(targetPawns, Now);
         foreach (var search in interactions)
         {
             if (!ChestKinds.IsChest(search.Kind))
@@ -863,6 +953,7 @@ public sealed class ReplayAnalyzer : FortniteReplayReader.ReplayReader
                 Destroyed = search.Destroyed,
                 Items = items,
                 TreasureItems = items.Where(i => TreasureItem.IsMatch(i) && !EventItem.IsMatch(i)).ToList(),
+                Sprite = spriteSpans.FirstOrDefault(s => s.From <= search.Time && search.Time < s.To).Item,
             });
         }
 
@@ -871,6 +962,14 @@ public sealed class ReplayAnalyzer : FortniteReplayReader.ReplayReader
             string NameOfPawn(uint pawn) =>
                 _pawnToPlayerState.TryGetValue(pawn, out var ps) && _playerStateToPlayerId.TryGetValue(ps, out var pid)
                     ? players.FirstOrDefault(p => p.Id == pid)?.PlayerName ?? $"pid{pid}" : $"pawn{pawn}";
+            foreach (var e in _spriteEvents.Where(e => e.Closed || e.Item != null || e.Pawn is uint sp0 && targetPawns.Contains(sp0)))
+            {
+                Console.Error.WriteLine($"DBG sprite-ev {e.Time,7:F1}s ch{e.Channel} {(e.Closed ? "CLOSED" : e.Item ?? ("pawn " + (e.Pawn is uint pp0 ? NameOfPawn(pp0) : "?")))}");
+            }
+            foreach (var sp in SpriteTimeline(targetPawns, Now))
+            {
+                Console.Error.WriteLine($"DBG sprite {sp.From,7:F1}s -> {sp.To,7:F1}s {sp.Item}");
+            }
             foreach (var e in _equips)
             {
                 Console.Error.WriteLine($"DBG equip {e.Time,7:F1}s {e.Item} by {NameOfPawn(e.Pawn)}{(targetPawns.Contains(e.Pawn) ? " (TARGET)" : "")}");
@@ -1161,6 +1260,7 @@ public sealed class ReplayAnalyzer : FortniteReplayReader.ReplayReader
             Map = header?.LevelNamesAndTimes?.Select(l => l.Item1).FirstOrDefault(l => !string.IsNullOrEmpty(l)),
             IsCustomMatch = replay.GameData?.IsCustomMatch == true,
             Chests = chests,
+            Sprites = spriteSpans.Select(s => new SpriteSpan { From = MathF.Round(s.From, 1), To = MathF.Round(s.To, 1), Id = s.Item }).ToList(),
             TreasureFinds = finds,
             TeamTreasureFinds = teamFinds,
             SeenPrizes = seen,

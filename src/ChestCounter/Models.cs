@@ -17,6 +17,16 @@ public sealed class ChestRecord
     public bool Destroyed { get; set; }
     public List<string> Items { get; set; } = new();
     public List<string> TreasureItems { get; set; } = new();
+    /// <summary>The sprite ("elemental") the player carried at that moment ("ESD_WhiteTigerSprite_Variant_Cursed"); null without one (or before version 1.14).</summary>
+    public string? Sprite { get; set; }
+}
+
+/// <summary>A sprite carried from one moment of the match to another (seconds since the start of the replay).</summary>
+public sealed class SpriteSpan
+{
+    public float From { get; set; }
+    public float To { get; set; }
+    public string Id { get; set; } = "";
 }
 
 public sealed class TreasureFind
@@ -122,6 +132,8 @@ public sealed class MatchRecord
     public int AnalyzerVersion { get; set; } = 1;
     /// <summary>What the replay said about the storm (diagnosis only): players with storm flags / times in the storm, safe zone phases, server clock.</summary>
     public string? StormData { get; set; }
+    /// <summary>The sprites carried during the match, in order; null for matches analyzed before version 1.14.</summary>
+    public List<SpriteSpan>? Sprites { get; set; }
     /// <summary>Kept for the files of older versions; what counts is decided by <see cref="GameModes.Counts"/>.</summary>
     public bool IsBattleRoyale { get; set; } = true;
 

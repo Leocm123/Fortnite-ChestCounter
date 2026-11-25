@@ -2,6 +2,10 @@
 
 > **Ative os replays no Fortnite primeiro**: *Configurações → Jogo → Replays → Gravar Replays: Ativado*. A ferramenta só lê esses arquivos de replay: nenhuma modificação no jogo, nenhum acesso à memória do jogo.
 
+**Novidades da 1.14.0**
+- **Nova aba Elementais**: quantos baús você abriu com cada elemental, com as variantes (Amaldiçoado, Valioso...), abertos e destruídos, tipos de baú (comum, enterrado, de espírito), tesouros e baús por minuto, com a imagem de cada elemental e de cada variante. O contador sabe qual elemental você carregava no momento de cada baú, mesmo trocando várias vezes na partida
+- Os replays que ainda estão no PC são analisados de novo para pegar os elementais
+
 **Novidades da 1.13.0**
 - **Ranking do esquadrão com ordenação**: escolha entre Média, Baús, Partidas juntos e Tesouros. A escolha fica salva
 - **Novo estilo de overlay Clean empilhado**: o total e, embaixo, a última partida, a sessão e os tesouros, um por linha, sem fundo. A página do OBS também segue esse estilo
@@ -67,6 +71,10 @@ O Windows pode mostrar *"O Windows protegeu o computador"* (exe sem assinatura):
 ---
 
 **English** · Download **`ChestCounter.exe`** below and run it. Already using it? The counter offers the update on its home tab. Your history and settings are kept.
+
+**What's new in 1.14.0**
+- **New Sprites tab**: how many chests you opened with each sprite, with its variants (Cursed, Jeweled...), opened and destroyed, chest kinds (regular, buried, sprite chest), treasures and chests per minute, with the picture of each sprite and variant. The counter knows which sprite you carried when each chest was opened, even if you switch several times in a match
+- Replays still on your PC are analyzed again to pick up the sprites
 
 **What's new in 1.13.0**
 - **Sortable squad ranking**: pick Average, Chests, Matches together or Treasures. Your choice is remembered

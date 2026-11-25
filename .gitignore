@@ -7,3 +7,5 @@ dist-*/
 *.replay
 # debug dumps of the parser (ParseMode.Debug)
 cmds/
+
+replays/
