@@ -59,8 +59,9 @@ public static class GuiPage
             "Small always-on-top window that shows your chests in game (Fortnite in \"Windowed Fullscreen\"). Ctrl+Shift+O: show / hide, Ctrl+Shift+L: lock.",
             "Pequeña ventana siempre visible que muestra tus cofres en el juego (Fortnite en «Pantalla completa en ventana»). Ctrl+Mayús+O: mostrar / ocultar, Ctrl+Mayús+L: bloquear.", "Janelinha sempre por cima que mostra seus baús no jogo (Fortnite em \"Tela Cheia em Janela\"). Ctrl+Shift+O: mostrar / esconder, Ctrl+Shift+L: travar."),
         ["style"] = L.T("Style", "Style", "Estilo", "Estilo"),
-        ["hud"] = L.T("HUD (intégré au jeu)", "HUD (blends into the game)", "HUD (integrado en el juego)", "HUD (se mistura ao jogo)"),
-        ["classic"] = L.T("Classique (carte sombre)", "Classic (dark card)", "Clásico (tarjeta oscura)", "Clássico (cartão escuro)"),
+        ["hud"] = L.T("Bloc aligné (objectifs en barres)", "Aligned block (goal bars)", "Bloque alineado (metas en barras)", "Bloco alinhado (metas em barras)"),
+        ["icons"] = L.T("Barres avec icônes", "Bars with icons", "Barras con iconos", "Barras com ícones"),
+        ["classic"] = L.T("Panneau de quêtes", "Quest panel", "Panel de misiones", "Painel de missões"),
         ["size"] = L.T("Taille", "Size", "Tamaño", "Tamanho"),
         ["opacity"] = L.T("Opacité", "Opacity", "Opacidad", "Opacidade"),
         ["squadToggle"] = L.T("Afficher le total d'équipe", "Show the squad total", "Mostrar el total del equipo", "Mostrar o total do esquadrão"),
@@ -68,9 +69,9 @@ public static class GuiPage
             "Your chests + those of all your teammates (random ones too), on the overlay and the home tab.",
             "Tus cofres + los de todos tus compañeros (también los aleatorios), en el overlay y el inicio.", "Seus baús + os de todos os seus colegas (inclusive aleatórios), no overlay e na aba Início."),
         ["obs"] = L.T("Overlay pour OBS (stream)", "Overlay for OBS (stream)", "Overlay para OBS (directo)", "Overlay para o OBS (stream)"),
-        ["obsSteps"] = L.T("Dans OBS : Sources → + → Navigateur, coche « Fichier local », choisis ce fichier. Largeur 360, hauteur 220 (450 × 300 en classique). Pour ne l'avoir que sur le stream, désactive l'overlay en jeu : la page continue d'être mise à jour.",
-            "In OBS: Sources → + → Browser, tick \"Local file\", pick this file. Width 360, height 220 (450 × 300 for classic). To have it on the stream only, turn the in-game overlay off: the page keeps being updated.",
-            "En OBS: Fuentes → + → Navegador, marca «Archivo local», elige este archivo. Ancho 360, alto 220 (450 × 300 en clásico). Para tenerlo solo en el directo, desactiva el overlay en el juego: la página se sigue actualizando.", "No OBS: Fontes → + → Navegador, marque \"Arquivo local\" e escolha este arquivo. Largura 360, altura 220 (450 × 300 no clássico). Para ele aparecer só na stream, desligue o overlay no jogo: a página continua sendo atualizada."),
+        ["obsSteps"] = L.T("Dans OBS : Sources → + → Navigateur, coche « Fichier local », choisis ce fichier. Largeur 380, hauteur 300. Pour ne l'avoir que sur le stream, désactive l'overlay en jeu : la page continue d'être mise à jour.",
+            "In OBS: Sources → + → Browser, tick \"Local file\", pick this file. Width 380, height 300. To have it on the stream only, turn the in-game overlay off: the page keeps being updated.",
+            "En OBS: Fuentes → + → Navegador, marca «Archivo local», elige este archivo. Ancho 380, alto 300. Para tenerlo solo en el directo, desactiva el overlay en el juego: la página se sigue actualizando.", "No OBS: Fontes → + → Navegador, marque \"Arquivo local\" e escolha este arquivo. Largura 380, altura 300. Para ele aparecer só na stream, desligue o overlay no jogo: a página continua sendo atualizada."),
         ["copy"] = L.T("Copier le chemin", "Copy the path", "Copiar la ruta", "Copiar o caminho"),
         ["copied"] = L.T("Copié !", "Copied!", "¡Copiado!", "Copiado!"),
         ["preview"] = L.T("Aperçu", "Preview", "Vista previa", "Prévia"),
@@ -99,7 +100,29 @@ public static class GuiPage
         ["overlayCardHelp"] = L.T("Petite fenêtre toujours au premier plan avec tes coffres (Fortnite en « Plein écran fenêtré »).", "Small always-on-top window with your chests (Fortnite in \"Windowed Fullscreen\").", "Pequeña ventana siempre visible con tus cofres (Fortnite en «Pantalla completa en ventana»).", "Janelinha sempre por cima com seus baús (Fortnite em \"Tela Cheia em Janela\")."),
         ["uninstallKeep"] = L.T("Désinstaller et garder mon historique", "Uninstall, keep my history", "Desinstalar y conservar mi historial", "Desinstalar e manter meu histórico"),
         ["uninstallAll"] = L.T("Désinstaller et tout supprimer", "Uninstall and delete everything", "Desinstalar y borrarlo todo", "Desinstalar e apagar tudo"),
-        ["grpLook"] = L.T("Apparence", "Look", "Apariencia", "Aparência"),
+        ["todayTile"] = L.T("Aujourd'hui", "Today", "Hoy", "Hoje"),
+        ["sessionOver"] = L.T("Session terminée", "Session over", "Sesión terminada", "Sessão encerrada"),
+        ["sessionMinutes"] = L.T("{0} min de jeu", "{0} min of play", "{0} min de juego", "{0} min de jogo"),
+        ["chestsCap"] = L.T("coffres", "chests", "cofres", "baús"),
+        ["bestCap"] = L.T("meilleure partie", "best match", "mejor partida", "melhor partida"),
+        ["placeCap"] = L.T("classement moyen", "average placement", "puesto medio", "colocação média"),
+        ["stormCap"] = L.T("dans la tempête", "in the storm", "en la tormenta", "na tempestade"),
+        ["newRecords"] = L.T("Nouveaux records :", "New records:", "Nuevos récords:", "Novos recordes:"),
+        ["notifs"] = L.T("Notifications Windows", "Windows notifications", "Notificaciones de Windows", "Notificações do Windows"),
+        ["notifsHelp"] = L.T("Record, trésor, objectif atteint, succès et fin de session.", "Record, treasure, goal reached, achievement and end of session.", "Récord, tesoro, meta cumplida, logro y fin de sesión.", "Recorde, tesouro, meta batida, conquista e fim de sessão."),
+        ["mapAllMatches"] = L.T("Toutes les parties", "All matches", "Todas las partidas", "Todas as partidas"),
+        ["mapRoute"] = L.T("Parcours de la partie", "Match route", "Ruta de la partida", "Rota da partida"),
+        ["recap"] = L.T("Rétrospective", "Recap", "Resumen", "Retrospectiva"),
+        ["recapSave"] = L.T("Enregistrer l'image", "Save the picture", "Guardar la imagen", "Salvar imagem"),
+        ["recapCopy"] = L.T("Copier l'image", "Copy the picture", "Copiar la imagen", "Copiar imagem"),
+        ["rcTitle"] = L.T("Ma saison", "My season", "Mi temporada", "Minha temporada"),
+        ["rcChests"] = L.T("coffres ouverts", "chests opened", "cofres abiertos", "baús abertos"),
+        ["rcBestDay"] = L.T("meilleur jour", "best day", "mejor día", "melhor dia"),
+        ["rcWins"] = L.T("Top 1", "Victory Royales", "Victorias", "Vitórias"),
+        ["rcLanding"] = L.T("Atterrissage préféré", "Favourite landing", "Aterrizaje favorito", "Pouso favorito"),
+        ["rcWeapon"] = L.T("Arme la plus trouvée", "Most found weapon", "Arma más encontrada", "Arma mais encontrada"),
+        ["rcStreak"] = L.T("Plus longue série (jours)", "Longest streak (days)", "Racha más larga (días)", "Maior sequência (dias)"),
+        ["grpLook"] =L.T("Apparence", "Look", "Apariencia", "Aparência"),
         ["grpPerfHelp"] = L.T("Pour que le jeu garde toute la puissance du PC.", "So that the game keeps all the power of the PC.", "Para que el juego conserve toda la potencia del PC.", "Para o jogo ficar com toda a força do PC."),
         ["grpTime"] = L.T("Heures", "Times", "Horas", "Horários"),
         ["grpWindow"] = L.T("Fenêtre et démarrage", "Window and startup", "Ventana e inicio", "Janela e inicialização"),
@@ -457,6 +480,20 @@ public static class GuiPage
         .mstats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
         .mstats div{text-align:center}.mstats b{display:block;font-size:26px;line-height:1.1}.mstats span{font-size:12px;color:var(--smuted)}
         .mlist,.card .mlist{list-style:none;margin:0;padding:0}
+        .mapsel{margin:0 2px 10px}.mapsel select{width:100%}
+        .mmh{display:flex;justify-content:space-between;align-items:center}.mmh h3{margin:0}
+        .card .mroute{list-style:none;margin:0;padding:0;max-height:340px;overflow:auto}
+        .mroute li{display:grid;grid-template-columns:26px 1fr auto auto;gap:8px;align-items:center;padding:6px 0;border-top:1px solid var(--sline);font-size:13.5px}
+        .mroute li:first-child{border-top:0}.mroute time{color:var(--smuted);font-size:12.5px}
+        .mn{width:24px;height:24px;border-radius:50%;display:grid;place-items:center;font:700 11px Bahnschrift,"Segoe UI",sans-serif;color:#0b0f18;box-shadow:0 0 0 1.5px rgba(0,0,0,.35)}
+        .mstorm{color:var(--tre)}.mstorm .ic{width:16px;height:16px}
+        .sess .sh{display:flex;gap:12px;align-items:flex-start}
+        .sess .si{flex:none;width:40px;height:40px;border-radius:12px;display:grid;place-items:center;background:color-mix(in srgb,var(--kicon) 16%,transparent);color:var(--kicon)}.sess .si .ic{width:20px;height:20px}
+        .sgrid{display:grid;grid-template-columns:repeat(6,1fr);gap:8px;margin-top:12px}
+        @media (max-width:900px){.sgrid{grid-template-columns:repeat(3,1fr)}}
+        .sgrid div{text-align:center;padding:8px 4px;border-radius:10px;background:color-mix(in srgb,var(--sink) 5%,transparent)}
+        .sgrid b{display:block;font-size:26px;line-height:1.1}.sgrid span{font-size:12px;color:var(--smuted)}
+        .srec{display:flex;gap:8px;align-items:flex-start;margin-top:12px;font-size:13.5px}.srec .ic{width:18px;height:18px;color:var(--kicon)}
         .mlist li{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:4px 10px;padding:8px 0;border-top:1px solid var(--sline);font-size:13.5px}
         .mlist li:first-child{border-top:0}
         .mlist .mb{grid-column:1/-1;height:5px;border-radius:3px;background:var(--strack);overflow:hidden}.mlist .mb i{display:block;height:100%;background:var(--accent)}
@@ -534,7 +571,7 @@ public static class GuiPage
           if(!force&&pressedAt&&Date.now()-pressedAt<3000)return;
           $('#main').classList.toggle('home',tab==='home');
           let v='';
-          if(tab==='home')v=home(T);else if(tab==='report')v=header(T,`<button class="b main" onclick="api('openReportFile')">${IC.report}${esc(T.openInBrowser)}</button>`);else if(tab==='map')v=header(T,'');else if(tab==='overlay')v=overlay(T);else if(tab==='settings')v=settings(T);else if(tab==='help')v=help(T);
+          if(tab==='home')v=home(T);else if(tab==='report')v=header(T,`<button class="b" onclick="openRecap()">${IC.sparkle}${esc(T.recap)}</button><button class="b main" onclick="api('openReportFile')">${IC.report}${esc(T.openInBrowser)}</button>`);else if(tab==='map')v=header(T,'');else if(tab==='overlay')v=overlay(T);else if(tab==='settings')v=settings(T);else if(tab==='help')v=help(T);
           // Rebuilt only when something changed: the buttons stay the same elements between two refreshes.
           const app=notices(T)+v;
           if(force||app!==appHtml){$('#app').innerHTML=app;appHtml=app}
@@ -599,7 +636,7 @@ public static class GuiPage
         }
         // ---- The Map tab: drawn on a canvas (light even with thousands of chests), its data asked for when the tab opens
         // and again only when the counter rewrote its figures. Wheel: zoom around the pointer; drag: move; points or heat.
-        let MD=null,mapStamp=null,mapLang=null,mapImg=null,mapF='all',mapMode='pts',mapView=null,mapLoading=false,mapRaf=0;
+        let MD=null,mapStamp=null,mapLang=null,mapImg=null,mapF='all',mapMode='pts',mapView=null,mapLoading=false,mapRaf=0,mapMatch=-1,mapMatchId=null,pendingMatch=null;
         function showMap(T){
           const pane=$('#mapPane'),on=tab==='map';pane.classList.toggle('hidden',!on);
           if(!on)return;
@@ -609,11 +646,13 @@ public static class GuiPage
         function buildMap(T){
           $('#mapPane').innerHTML=`<div class="card mapbox"><div class="mapbar"><div class="seg" id="mapF">${[['all',T.mapAll],['week',T.mapWeek],['last',T.mapLast],['storm',T.mapStorm]].map(([k,t])=>`<button type="button" data-f="${k}" class="${k===mapF?'on':''}">${esc(t)}</button>`).join('')}</div>
             <div class="seg" id="mapM">${[['pts',IC.dots,T.mapPoints],['heat',IC.flame,T.mapHeat]].map(([k,i,t])=>`<button type="button" data-m="${k}" class="${k===mapMode?'on':''}">${i}${esc(t)}</button>`).join('')}</div></div>
+            <div class="mapsel"><select id="mapSel" aria-label="${esc(T.mapRoute)}"></select></div>
             <div class="mapcv" id="mapCv"><canvas aria-label="${esc(T.map)}" role="img"></canvas><div class="mapzoom"><button type="button" data-z="1" title="${esc(T.mapZoomIn)}">${IC.plus}</button><button type="button" data-z="-1" title="${esc(T.mapZoomOut)}">${IC.minus}</button><button type="button" data-z="0" title="${esc(T.mapReset)}">${IC.crosshair}</button></div><div class="fempty" id="mapEmpty" style="position:absolute;inset:0;justify-content:center;color:#fff;padding:24px;text-align:center" hidden>${IC.map}<span>${esc(T.mapEmpty)}</span></div></div>
             <div class="maphint"><span>${esc(T.mapHint)}</span><span id="mapSrc"></span></div></div>
-            <div class="mapside"><div class="card"><div class="mstats" id="mapStats"></div></div><div class="card"><h3>${esc(T.mapLegend)}</h3><div class="mleg" id="mapLeg"></div></div><div class="card"><h3>${esc(T.mapWhere)}</h3><ul class="mlist" id="mapPlaces"></ul></div></div>`;
+            <div class="mapside"><div class="card" id="mapMatchCard" hidden></div><div class="card"><div class="mstats" id="mapStats"></div></div><div class="card"><h3>${esc(T.mapLegend)}</h3><div class="mleg" id="mapLeg"></div></div><div class="card"><h3>${esc(T.mapWhere)}</h3><ul class="mlist" id="mapPlaces"></ul></div></div>`;
           const seg=(id,attr,set)=>{$(id).onclick=e=>{const b=e.target.closest('button');if(!b)return;set(b.dataset[attr]);$(id).querySelectorAll('button').forEach(x=>x.classList.toggle('on',x===b));drawMap()}};
           seg('#mapF','f',v=>mapF=v);seg('#mapM','m',v=>mapMode=v);
+          $('#mapSel').onchange=e=>selectMatch(+e.target.value);
           const cv=$('#mapCv');
           cv.querySelector('.mapzoom').onclick=e=>{const b=e.target.closest('button');if(!b||!mapView)return;const z=+b.dataset.z;if(z===0)resetView();else zoomAt(z>0?1.5:1/1.5,.5,.5);drawMap()};
           const at=e=>{const r=cv.getBoundingClientRect();return [(e.clientX-r.left)/r.width,(e.clientY-r.top)/r.height]};
@@ -632,12 +671,33 @@ public static class GuiPage
             const r=await fetch('/api/action',{method:'POST',headers:{'X-Token':TOKEN,'Content-Type':'application/json'},body:JSON.stringify({action:'mapData'})});
             MD=(await r.json()).result;mapStamp=S.reportStamp;
             if(MD.image&&(!mapImg||mapImg.dataset.src!==MD.image)){mapImg=new Image();mapImg.dataset.src=MD.image;mapImg.onload=()=>drawMap();mapImg.src=MD.image}
+            mapMatch=mapMatchId?MD.matches.findIndex(m=>m.id===mapMatchId):-1;
             if(!mapView)resetView();
-            fillMapSide();drawMap();
+            fillMapSide();drawMap();openPendingMatch();
           }catch(e){}
           mapLoading=false;
         }
-        function resetView(){if(MD)mapView={cx:MD.crop[0]+MD.crop[2]/2,cy:MD.crop[1]+MD.crop[2]/2,s:MD.crop[2]}}
+        function resetView(){if(MD)mapView={cx:MD.crop[0]+MD.crop[2]/2,cy:MD.crop[1]+MD.crop[2]/2,s:MD.crop[2],a:mapView&&mapView.a}}
+        // One match on the map (-1: all): its route, and the view framed on it.
+        function selectMatch(i){
+          mapMatch=i;mapMatchId=i>=0&&MD.matches[i]?MD.matches[i].id:null;const sel=$('#mapSel');if(sel)sel.value=String(i);
+          const pts=i>=0?MD.points.filter(p=>p[4]===i):[];
+          if(pts.length){const us=pts.map(p=>p[0]),vs=pts.map(p=>p[1]),u0=Math.min(...us),u1=Math.max(...us),v0=Math.min(...vs),v1=Math.max(...vs);mapView={cx:(u0+u1)/2,cy:(v0+v1)/2,s:Math.min(1000,Math.max(90,(Math.max(u1-u0,v1-v0))*1.5)),a:mapView&&mapView.a}}
+          else resetView();
+          ['#mapF','#mapM'].forEach(id=>{const e=$(id);if(e)e.style.opacity=i>=0?'.45':''});
+          fillMatchCard();drawMap();
+        }
+        function fillMatchCard(){
+          const c=$('#mapMatchCard'),T=S.txt;if(!c||!MD)return;
+          const m=mapMatch>=0?MD.matches[mapMatch]:null;c.hidden=!m;if(!m)return;
+          const pts=MD.points.filter(p=>p[4]===mapMatch).sort((a,b)=>a[5]-b[5]);
+          const mmss=t=>Math.floor(t/60)+':'+String(t%60).padStart(2,'0');
+          c.innerHTML=`<div class="mmh"><h3>${esc(T.mapRoute)}</h3><button class="nclose" title="${esc(T.close)}" onclick="selectMatch(-1)">×</button></div><div class="note" style="margin-bottom:8px">${esc(m.label)}</div>
+            <ol class="mroute">${pts.map(p=>`<li><span class="mn" style="background:${esc((MD.kinds[p[2]]||{}).color||'#c9a24f')}">${pts.indexOf(p)+1}</span><span>${esc((MD.kinds[p[2]]||{}).name||'')}</span>${p[3]&4?`<span class="mstorm" title="${esc(T.mapStorm)}">${IC.storm}</span>`:''}<time class="num">${mmss(p[5])}</time></li>`).join('')}</ol>`;
+        }
+        // A match clicked in the report: shown on the map.
+        window.addEventListener('message',e=>{if(e.origin===location.origin&&e.data&&e.data.cc==='showMatch'&&S&&!S.perf){pendingMatch=e.data.id;setTab('map');openPendingMatch()}});
+        function openPendingMatch(){if(!pendingMatch||!MD)return;const i=MD.matches.findIndex(m=>m.id===pendingMatch);pendingMatch=null;if(i>=0)selectMatch(i)}
         function clampView(){mapView.cx=Math.min(1000,Math.max(0,mapView.cx));mapView.cy=Math.min(1000,Math.max(0,mapView.cy))}
         // Zoom by f, keeping the point under (px, py) (0..1 of the canvas) where it is.
         function zoomAt(f,px,py){const v=mapView,a=v.a||1,s2=Math.min(1000,Math.max(35,v.s/f)),wx=v.cx-v.s/2+px*v.s,wy=v.cy-v.s*a/2+py*v.s*a;v.cx=wx+s2/2-px*s2;v.cy=wy+s2*a/2-py*s2*a;v.s=s2;clampView()}
@@ -649,6 +709,8 @@ public static class GuiPage
           $('#mapPlaces').innerHTML=MD.places.length?MD.places.map(p=>`<li><span>${esc(p.name)}</span><b class="num">${esc(p.count)}</b><span class="mb"><i style="width:${Math.max(3,Math.round(100*p.n/top))}%"></i></span><small>${esc(p.matches)}</small></li>`).join(''):`<li><small>—</small></li>`;
           $('#mapSrc').textContent=MD.source?T.mapSource+': '+MD.source:'';
           $('#mapEmpty').style.display=MD.points.length?'none':'flex';
+          $('#mapSel').innerHTML=`<option value="-1">${esc(T.mapAllMatches)}</option>`+MD.matches.map((m,i)=>`<option value="${i}" ${i===mapMatch?'selected':''}>${esc(m.label)}</option>`).join('');
+          fillMatchCard();
         }
         // The heat colors: from transparent blue to red.
         const HEAT=(()=>{const c=document.createElement('canvas');c.width=256;c.height=1;const g=c.getContext('2d'),gr=g.createLinearGradient(0,0,256,0);[[0,'rgba(43,107,255,0)'],[.2,'#2b6bff'],[.45,'#3ff0a0'],[.7,'#ffe14d'],[1,'#ff3b30']].forEach(([o,col])=>gr.addColorStop(o,col));g.fillStyle=gr;g.fillRect(0,0,256,1);return g.getImageData(0,0,256,1).data})();
@@ -663,8 +725,14 @@ public static class GuiPage
           const g=c.getContext('2d'),s=mapView.s,k=W/s,x0=mapView.cx-s/2,y0=mapView.cy-s*mapView.a/2;
           g.setTransform(1,0,0,1,0,0);g.fillStyle='#0d3a5c';g.fillRect(0,0,W,H);
           if(mapImg&&mapImg.complete&&mapImg.naturalWidth){g.setTransform(k,0,0,k,-x0*k,-y0*k);g.imageSmoothingQuality='high';g.drawImage(mapImg,0,0,1000,1000);g.setTransform(1,0,0,1,0,0)}
-          const pts=MD.points.filter(p=>mapF==='all'||p[3]&({week:1,last:2,storm:4}[mapF])),X=p=>(p[0]-x0)*k,Y=p=>(p[1]-y0)*k;
-          if(mapMode==='heat'){
+          const pts=mapMatch>=0?MD.points.filter(p=>p[4]===mapMatch).sort((a,b)=>a[5]-b[5]):MD.points.filter(p=>mapF==='all'||p[3]&({week:1,last:2,storm:4}[mapF])),X=p=>(p[0]-x0)*k,Y=p=>(p[1]-y0)*k;
+          if(mapMatch>=0){
+            // One match: its chests in the order they were opened, joined by its route, numbered.
+            g.lineJoin='round';g.lineCap='round';g.beginPath();pts.forEach((p,i)=>i?g.lineTo(X(p),Y(p)):g.moveTo(X(p),Y(p)));
+            g.lineWidth=7*dpr;g.strokeStyle='rgba(8,12,20,.75)';g.stroke();g.lineWidth=3*dpr;g.strokeStyle='#ffffff';g.setLineDash([9*dpr,7*dpr]);g.stroke();g.setLineDash([]);
+            const r=11*dpr;g.font=`700 ${Math.round(11*dpr)}px Bahnschrift,"Segoe UI",sans-serif`;g.textAlign='center';g.textBaseline='middle';
+            pts.forEach((p,i)=>{const x=X(p),y=Y(p);g.beginPath();g.arc(x,y,r,0,6.2832);g.fillStyle=(MD.kinds[p[2]]||{}).color||'#c9a24f';g.fill();g.lineWidth=(p[3]&4?4:2)*dpr;g.strokeStyle=p[3]&4?'#b48cff':'rgba(8,12,20,.9)';g.stroke();g.fillStyle='#0b0f18';g.fillText(String(i+1),x,y+.5*dpr)});
+          }else if(mapMode==='heat'){
             const R=Math.min(70*dpr,Math.max(12*dpr,20*k)),off=document.createElement('canvas');off.width=W;off.height=H;const o=off.getContext('2d');
             for(const p of pts){const x=X(p),y=Y(p);if(x<-R||y<-R||x>W+R||y>H+R)continue;const gr=o.createRadialGradient(x,y,0,x,y,R);gr.addColorStop(0,'rgba(0,0,0,.28)');gr.addColorStop(1,'rgba(0,0,0,0)');o.fillStyle=gr;o.fillRect(x-R,y-R,2*R,2*R)}
             const img=o.getImageData(0,0,W,H),d=img.data;
@@ -697,13 +765,16 @@ public static class GuiPage
           if(S.progress)h+=`<div class="card"><b>${esc(T.analyzing)} ${S.progress.done} / ${S.progress.total}</b><div class="bar"><i style="width:${Math.round(100*S.progress.done/Math.max(1,S.progress.total))}%"></i></div></div>`;
           if(S.whatsNew&&S.whatsNew.length)h+=`<div class="card"><h2 class="in ttl">${esc(fmt(T.whatsNew,S.version))}</h2><ul>${S.whatsNew.map(n=>`<li>${esc(n)}</li>`).join('')}</ul><button class="b main" onclick="api('dismissWhatsNew')">${esc(T.ok)}</button></div>`;
           if(S.update)h+=`<div class="card"><h2 class="in ttl">${esc(fmt(T.newVersion,S.update.version))}</h2><ul>${S.update.notes.map(n=>`<li>${esc(n)}</li>`).join('')}</ul><button class="b main" onclick="api('installUpdate')">${esc(T.install)}</button></div>`;
+          if(S.sessionSummary){const x=S.sessionSummary;h+=`<div class="card sess"><div class="sh"><span class="si">${IC.flag}</span><div style="flex:1"><h2 class="in ttl">${esc(T.sessionOver)}</h2><div class="note">${esc(fmt(T.sessionMinutes,x.minutes))}</div></div><button class="nclose" title="${esc(T.close)}" onclick="api('dismissSession')">×</button></div>
+            <div class="sgrid">${[[x.matches,T.matches],[x.chests,T.chestsCap],[x.best,T.bestCap],[x.placement,T.placeCap],[x.treasures,T.treasures],[x.storm,T.stormCap]].map(([v,l])=>`<div><b class="num">${esc(v)}</b><span>${esc(l)}</span></div>`).join('')}</div>
+            ${x.records.length?`<div class="srec">${IC.trophy}<span><b>${esc(T.newRecords)}</b> ${x.records.map(esc).join(' · ')}</span></div>`:''}</div>`}
           // The total, with the chests of the last 14 days (today stands out).
           const sp=S.spark||[],max=Math.max(1,...sp);
           h+=`<section class="hero"><button type="button" class="editbtn" onclick="openManual()" title="${esc(T.editChests)}" aria-label="${esc(T.editChests)}">__PENCIL__</button>
             <div><div class="k">${IC.chest}${esc(T.total)}</div><div class="v num">${esc(S.total)}</div><div class="d"><b>+${esc(S.todayChests)} ${esc(T.today)}</b> · ${esc(T.totalSub)}${S.manual?' · '+esc(fmt(T.byHand,S.manualText.replace('+',''))):''}</div></div>
             <div><div class="spark" role="img" aria-label="${esc(T.last14)}">${sp.map((d,i)=>`<i class="${i===sp.length-1?'hi':''}" style="height:${Math.max(3,Math.round(d/max*100))}%" title="${d}"></i>`).join('')}</div><div class="spark-l"><span>${esc(S.sparkFrom)}</span><span>${esc(T.last14)}</span><span>${esc(T.today)}</span></div></div></section>`;
           const kpi=(icon,label,value,sub)=>`<div class="kpi"><div class="k">${IC[icon]}<span>${label}</span></div><div class="v num">${value}</div><div class="s">${sub||'&nbsp;'}</div></div>`;
-          h+=`<section class="kpis">${kpi('session',esc(T.session),esc(S.session),esc(S.sessionMatches)+' '+esc(T.matches))}
+          h+=`<section class="kpis">${kpi('calendar',esc(T.todayTile),esc(S.todayChests),esc(S.todayMatches)+' '+esc(T.matches)+' · '+esc(T.session).toLowerCase()+' '+esc(S.session))}
             ${kpi('last',esc(T.lastShort),esc(S.last?S.last.chests:'—'),S.last?esc(S.last.mode)+' · '+esc(S.last.place):'')}
             ${kpi('avg',esc(T.avgShort),esc(S.average),esc(fmt(T.inMatches,S.matches)))}
             ${kpi('star',esc(T.treasures),esc(S.treasures),S.treasureEvery?esc(fmt(T.every,S.treasureEvery)):'')}
@@ -722,7 +793,7 @@ public static class GuiPage
         function overlay(T){
           const o=S.overlay;
           const look=scard('overlay',esc(T.inGame),esc(T.overlayCardHelp),row(esc(T.showInGame),'',sw('ov',o.show,'showOverlay'))
-            +row(esc(T.style),'',sel('overlayStyle',o.style,[['hud',T.hud],['classic',T.classic]]))
+            +row(esc(T.style),'',sel('overlayStyle',o.style,[['hud',T.hud],['icons',T.icons],['classic',T.classic]]))
             +(o.show?row(esc(T.size),'',sel('overlaySize',o.size,o.sizes.map(x=>[x,x+' %'])))+row(esc(T.opacity),'',sel('overlayOpacity',o.opacity,o.opacities.map(x=>[x,x+' %']))):'')
             +row(esc(T.squadToggle)+`<span class="badge" title="${esc(T.inaccurateWhy)}">${esc(T.inaccurate)}</span>`,esc(T.squadHelp),sw('sq',o.squad,'showSquadTotal'))
             +(o.running?`<div class="actions" style="margin-top:12px"><button class="b" onclick="api('toggleOverlayVisible')">${IC.eye}${esc(o.visible?T.hideOverlay:T.showOverlay)}</button><button class="b" onclick="api('toggleOverlayLock')">${IC.lock}${esc(o.locked?T.unlock:T.lock)}</button></div>`:''));
@@ -738,7 +809,7 @@ public static class GuiPage
           const perf=scard('bolt',esc(T.perf)+(s.performanceRecommended&&!s.performanceMode?`<span class="perfbadge">${esc(T.perfRecommended)}</span>`:''),esc(T.grpPerfHelp),row(esc(T.perfOn),esc(T.perfHelp),sw('pm',s.performanceMode,'performanceMode')));
           const time=scard('clock',esc(T.grpTime),esc(T.timesHelp),row(esc(T.times),'',sel('timeZone',s.timeZone,[['local',fmt(T.timesLocal,s.localZone)],['utc',T.timesUtc]]))
             +row(esc(T.clock),'',sel('clockFormat',s.clockFormat,[['auto',fmt(T.clockAuto,s.windowsClock==='24'?T.h24:T.h12)],['12',T.clock12],['24',T.clock24]])));
-          const win=scard('window',esc(T.grpWindow),esc(T.grpWindowHelp),(s.windowed?row(esc(T.tray),esc(T.trayHelp),sw('tr',s.minimizeToTray,'minimizeToTray')):'')
+          const win=scard('window',esc(T.grpWindow),esc(T.grpWindowHelp),(s.windowed?row(esc(T.tray),esc(T.trayHelp),sw('tr',s.minimizeToTray,'minimizeToTray'))+row(esc(T.notifs),esc(T.notifsHelp),sw('wn',s.windowsNotifications,'windowsNotifications')):'')
             +(s.canStartWithFortnite?row(esc(T.withFortnite),esc(T.withFortniteHelp),sw('wf',s.startWithFortnite,'startWithFortnite')):'')
             +row(esc(T.updates),'',sel('updateMode',s.updateMode,[['prompt',T.upPrompt],['auto',T.upAuto],['off',T.upOff]])));
           const replays=scard('folder',esc(T.grpReplays),esc(T.grpReplaysHelp),(S.profiles.length>1?row(esc(T.profile),'',sel('profile',S.profileKey,S.profiles.map(p=>[p.key,p.name+' ('+p.matches+' · '+p.chests+')']))):'')
@@ -785,6 +856,46 @@ public static class GuiPage
         $('#dlg').addEventListener('pointerdown',e=>{dlgDownOut=dlgOutside(e)});
         $('#dlg').addEventListener('click',e=>{if(dlgDownOut&&dlgOutside(e))$('#dlg').close();dlgDownOut=false});
         window.addEventListener('message',e=>{if(e.origin===location.origin&&e.data&&e.data.cc==='editChests'&&S)openManual()});
+        // ---- The season's recap: a 1080 × 1350 picture drawn in the colors of the theme, to save or copy.
+        async function openRecap(){
+          const T=S.txt,d=$('#dlg');
+          const r=await fetch('/api/action',{method:'POST',headers:{'X-Token':TOKEN,'Content-Type':'application/json'},body:JSON.stringify({action:'recap'})});
+          const R=(await r.json()).result;if(!R)return;
+          $('#dlgT').textContent=T.recap;
+          $('#dlgB').innerHTML=`<canvas id="recapCv" width="1080" height="1350" style="width:100%;border-radius:12px;display:block"></canvas><div class="actions" style="margin-top:12px"><button class="b main" id="recapSave">${esc(T.recapSave)}</button><button class="b" id="recapCopy">${esc(T.recapCopy)}</button></div>`;
+          d.style.width='min(520px,calc(100% - 32px))';
+          if(!d.open)d.showModal();
+          try{await document.fonts.load('60px "Pirata One"')}catch(e){}
+          drawRecap($('#recapCv'),R,T);
+          $('#recapSave').onclick=()=>{const a=document.createElement('a');a.href=$('#recapCv').toDataURL('image/png');a.download='retrospectiva-baus.png';a.click()};
+          $('#recapCopy').onclick=()=>$('#recapCv').toBlob(async b=>{try{await navigator.clipboard.write([new ClipboardItem({'image/png':b})]);$('#recapCopy').textContent=T.copied}catch(e){$('#recapCopy').textContent='—'}});
+          d.addEventListener('close',()=>{d.style.width=''},{once:true});
+        }
+        function drawRecap(c,R,T){
+          const g=c.getContext('2d'),W=c.width,H=c.height,css=n=>getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+          const bg=css('--bg')||'#101a22',accent=css('--title')||'#f0c057',ring=css('--ring')||accent,pirate=(S.settings.theme||'pirate')==='pirate';
+          const titleFont=pirate?'"Pirata One",serif':'Bahnschrift,"Segoe UI",sans-serif',num='Bahnschrift,"Segoe UI",sans-serif';
+          g.fillStyle=bg;g.fillRect(0,0,W,H);
+          const glow=g.createRadialGradient(W*.85,0,0,W*.85,0,W);glow.addColorStop(0,accent+'55');glow.addColorStop(1,'transparent');g.fillStyle=glow;g.fillRect(0,0,W,H);
+          const rr=(x,y,w,h,r,fill)=>{g.beginPath();g.roundRect(x,y,w,h,r);g.fillStyle=fill;g.fill()};
+          g.textBaseline='alphabetic';
+          g.fillStyle=accent;g.font=`700 26px ${num}`;g.letterSpacing='6px';g.fillText(T.brand.toUpperCase(),80,110);g.letterSpacing='0px';
+          g.fillStyle='#ffffff';g.font=`${pirate?400:700} ${pirate?96:84}px ${titleFont}`;g.fillText(T.rcTitle,80,210);
+          g.fillStyle='rgba(255,255,255,.65)';g.font=`500 30px "Segoe UI",sans-serif`;g.fillText((R.player?R.player+' · ':'')+R.period,80,262);
+          // The total, big.
+          rr(80,310,W-160,250,28,'rgba(255,255,255,.07)');
+          g.fillStyle=accent;g.font=`700 150px ${num}`;g.fillText(R.total,120,480);
+          g.fillStyle='rgba(255,255,255,.8)';g.font=`600 34px "Segoe UI",sans-serif`;g.fillText(T.rcChests,124,530);
+          // Eight figures in a grid.
+          const cells=[[R.matches,T.matches],[R.average,T.avgShort],[R.best,T.bestCap],[R.bestDay,T.rcBestDay],[R.treasures,T.treasures],[R.storm,T.stormCap],[R.wins,T.rcWins],[R.top10,'Top 10']];
+          const cw=(W-160-3*20)/4,ch=150;
+          cells.forEach(([v,l],i)=>{const x=80+(i%4)*(cw+20),y=590+Math.floor(i/4)*(ch+20);rr(x,y,cw,ch,22,'rgba(255,255,255,.07)');g.fillStyle='#ffffff';g.font=`700 58px ${num}`;g.fillText(String(v),x+24,y+80);g.fillStyle='rgba(255,255,255,.6)';g.font=`600 22px "Segoe UI",sans-serif`;g.fillText(String(l).toLowerCase(),x+24,y+122)});
+          // Lines: favourite landing spot, most found weapon, achievements, streak.
+          const lines=[[T.rcLanding,R.landing||'—'],[T.rcWeapon,R.weapon||'—'],[T.achievements,R.achievements],[T.rcStreak,R.streak]];
+          lines.forEach(([l,v],i)=>{const y=960+i*72;g.fillStyle='rgba(255,255,255,.6)';g.font=`600 26px "Segoe UI",sans-serif`;g.fillText(l,80,y);g.fillStyle='#ffffff';g.font=`700 34px "Segoe UI",sans-serif`;g.textAlign='right';g.fillText(String(v),W-80,y);g.textAlign='left';g.fillStyle='rgba(255,255,255,.1)';g.fillRect(80,y+22,W-160,2)});
+          g.fillStyle=ring;g.fillRect(80,H-120,90,6);
+          g.fillStyle='rgba(255,255,255,.55)';g.font=`600 24px "Segoe UI",sans-serif`;g.fillText('Fortnite · '+T.brand,80,H-70);
+        }
         async function copyObs(){await api('copyObsPath');copied=true;render(true);setTimeout(()=>{copied=false;render(true)},2000)}
         function help(T){
           const how=scard('help',esc(T.howTitle),'',`<p>${esc(T.helpText)}</p>`);

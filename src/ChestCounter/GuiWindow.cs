@@ -317,6 +317,51 @@ public static class GuiWindow
         _view.Visible = true;
     }
 
+    /// <summary>
+    /// A Windows notification (record, treasure, goal...). Shown through the notification area icon, made visible
+    /// for the time of the notice when the window is not in the tray.
+    /// </summary>
+    public static void Notify(string title, string text)
+    {
+        var form = _form;
+        if (form == null || form.IsDisposed || _tray == null)
+        {
+            return;
+        }
+        try
+        {
+            form.BeginInvoke(() =>
+            {
+                var tray = _tray;
+                if (tray == null)
+                {
+                    return;
+                }
+                tray.Visible = true;
+                tray.BalloonTipTitle = title;
+                tray.BalloonTipText = text.Length > 250 ? text[..250] : text;
+                tray.BalloonTipIcon = ToolTipIcon.None;
+                tray.ShowBalloonTip(7000);
+                var timer = new System.Windows.Forms.Timer { Interval = 10000 };
+                timer.Tick += (_, _) =>
+                {
+                    timer.Stop();
+                    timer.Dispose();
+                    // Back as it was: the icon stays only while the window waits in the notification area.
+                    if (_tray != null && !form.IsDisposed)
+                    {
+                        _tray.Visible = !form.Visible;
+                    }
+                };
+                timer.Start();
+            });
+        }
+        catch
+        {
+            // the window is closing
+        }
+    }
+
     /// <summary>Shows the window again and puts it in front (from the taskbar or the notification area).</summary>
     public static void Restore()
     {

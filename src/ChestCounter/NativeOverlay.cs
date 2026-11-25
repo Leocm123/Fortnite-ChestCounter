@@ -24,8 +24,7 @@ public static class NativeOverlay
     private static IntPtr _hwnd;
     private static volatile OverlayView _view = new("0", null, OverlayModel.LastMatchCaption, false, null, Array.Empty<OverlayRow>());
 
-    // Layout (computed by Relayout, used by Paint; both on the overlay thread).
-    private static int _headerH, _bigH, _captionH, _rowH, _col1W, _col2W, _labelW;
+    // Layout: computed by Relayout, used by Paint (both on the overlay thread).
     private static IntPtr _fontHeader, _fontCaption, _fontLabel;
     private static IntPtr _brushBorder, _brushLine;
     private static string Header => L.T("COFFRES", "CHESTS", "COFRES", "BAÚS");
@@ -46,14 +45,15 @@ public static class NativeOverlay
 
     /// <summary>"hud" (figures only, under the minimap, like the game's HUD) or "classic" (dark card).</summary>
     private static volatile string _style = "classic";
-    private static IntPtr _fontHudBig, _fontHudSmall;
+    private static IntPtr _fontHudBig, _fontHudSmall, _fontHudTiny, _fontPanelBig, _fontPanelNum;
     private static int _hudBigH, _hudSmallH;
 
     /// <summary>Pixels of this color are fully transparent (styles without a background). Almost black, so that the
     /// anti-aliased edge of the black outline around the text blends into it without any colored fringe.</summary>
     private static readonly uint KeyColor = 0x00010001;
 
-    public static string[] Styles => new[] { "hud", "classic" };
+    /// <summary>"hud" (aligned block), "icons" (bars with icons), "classic" (quest panel).</summary>
+    public static string[] Styles => new[] { "hud", "icons", "classic" };
 
     /// <summary>Changes the look of the overlay at once.</summary>
     public static void SetStyle(string style)
@@ -211,8 +211,8 @@ public static class NativeOverlay
         int S(int v) => (int)Math.Round(v * _scale);
 
         CreateFonts();
-        _brushBg = CreateSolidBrush(Rgb(18, 18, 22));
-        _brushBorder = CreateSolidBrush(Rgb(58, 58, 66));
+        _brushBg = CreateSolidBrush(Rgb(14, 20, 34)); // the quest panel's plate (made translucent by the opacity)
+        _brushBorder = CreateSolidBrush(Rgb(44, 56, 80));
         _brushLine = CreateSolidBrush(Rgb(44, 44, 52));
 
         var hInstance = GetModuleHandleW(null);
@@ -267,7 +267,7 @@ public static class NativeOverlay
     /// <summary>(Re)creates the fonts for the current display scaling and chosen size.</summary>
     private static void CreateFonts()
     {
-        foreach (var old in new[] { _fontBig, _fontSmall, _fontHeader, _fontCaption, _fontLabel, _fontIcon, _fontHudBig, _fontHudSmall })
+        foreach (var old in new[] { _fontBig, _fontSmall, _fontHeader, _fontCaption, _fontLabel, _fontIcon, _fontHudBig, _fontHudSmall, _fontHudTiny, _fontPanelBig, _fontPanelNum })
         {
             if (old != IntPtr.Zero) DeleteObject(old);
         }
@@ -283,6 +283,10 @@ public static class NativeOverlay
         // background is made transparent).
         _fontHudBig = CreateFontW(-S(40), 0, 0, 0, 700, 1, 0, 0, 1, 0, 0, 4, 0, "Bahnschrift Condensed");
         _fontHudSmall = CreateFontW(-S(18), 0, 0, 0, 600, 1, 0, 0, 1, 0, 0, 4, 0, "Bahnschrift SemiCondensed");
+        _fontHudTiny = CreateFontW(-S(14), 0, 0, 0, 700, 1, 0, 0, 1, 0, 0, 4, 0, "Bahnschrift SemiCondensed");
+        // Quest panel: clean, upright figures.
+        _fontPanelBig = CreateFontW(-S(30), 0, 0, 0, 700, 0, 0, 0, 1, 0, 0, 5, 0, "Bahnschrift");
+        _fontPanelNum = CreateFontW(-S(15), 0, 0, 0, 700, 0, 0, 0, 1, 0, 0, 5, 0, "Bahnschrift");
     }
 
     private static IntPtr WndProc(IntPtr hwnd, uint msg, IntPtr wParam, IntPtr lParam)
@@ -433,78 +437,153 @@ public static class NativeOverlay
         return r.Right - r.Left;
     }
 
-    /// <summary>Measures the text and resizes the window (and its rounded region) to fit it.</summary>
+    // ---- Three looks, picked in the Overlay tab -----------------------------------------------------------------------
+    //  "hud"     Aligned block: outlined figures like the game's HUD, the goals as bars of the same width in a column.
+    //  "icons"   Bars with icons: the same figures, the goals as an icon and a bar with its number inside.
+    //  "classic" Quest panel: a translucent dark plate, like the game's quest tracker, clean white text, thin bars.
+
+    /// <summary>The small facts under the total: last match, session, squad (when shown), treasures.</summary>
+    private sealed record Fact(string Label, string Value, bool Treasure = false);
+
+    private static List<Fact> Facts(OverlayView v)
+    {
+        var facts = new List<Fact>
+        {
+            new(L.T("Dernière", "Last", "Última", "Última"), v.Last ?? "—"),
+            new(L.T("Session", "Session", "Sesión", "Sessão"), v.Session),
+        };
+        if (v.Squad != null)
+        {
+            facts.Add(new(OverlayModel.SquadLabel, v.Squad));
+        }
+        facts.Add(new(L.T("Trésors", "Treasures", "Tesoros", "Tesouros"), v.Treasures, Treasure: true));
+        return facts;
+    }
+
+    private static uint Green => Rgb(63, 220, 138);
+    private static uint Ink => Rgb(11, 15, 24);
+
+    /// <summary>The figures of the match in progress are readable (its chests are already in the total).</summary>
+    private static bool LiveFigures(OverlayView v) => v.CurrentLive && v.Current is { } cur && cur != "…";
+
+    private static int Sc(double v) => (int)Math.Round(v * _scale);
+
+    // Layout of the HUD styles (computed by Relayout, used by Paint).
+    private static int _goalRowH, _goalLabelW, _goalNumW;
+    private const int HudBarW = 118, IconBarW = 150;
+
+    /// <summary>Measures the content and resizes the window to fit it (it never shrinks while the look stays the same).</summary>
     private static void Relayout(IntPtr hwnd)
     {
-        if (Keyed)
-        {
-            RelayoutStyled(hwnd);
-            return;
-        }
-        int S(int v) => (int)Math.Round(v * _scale);
-        var v = _view;
         var hdc = GetDC(hwnd);
+        int w, h;
         try
         {
-            // Header: "COFFRES" ... "● EN DIRECT" [lock]
-            var headerW = TextWidth(hdc, _fontHeader, Header, out _headerH) + S(16) + (v.Badge != null ? TextWidth(hdc, _fontHeader, v.Badge, out _) : 0) + S(30);
-
-            // Two counters side by side.
-            _col1W = Math.Max(TextWidth(hdc, _fontBig, v.Total, out _bigH), TextWidth(hdc, _fontCaption, CaptionTotal, out _captionH));
-            _col2W = Math.Max(TextWidth(hdc, _fontBig, v.Current ?? "—", out _), Math.Max(TextWidth(hdc, _fontCaption, v.CurrentCaption, out _), TextWidth(hdc, _fontCaption, OverlayModel.LastMatchCaption, out _)));
-            var countersW = _col1W + S(ColGap) + _col2W;
-
-            // Detail rows: grey label column + value.
-            _labelW = 0;
-            var valueW = 0;
-            _rowH = 0;
-            foreach (var row in v.Rows)
-            {
-                _labelW = Math.Max(_labelW, TextWidth(hdc, _fontLabel, row.Label, out var lh));
-                valueW = Math.Max(valueW, TextWidth(hdc, _fontSmall, row.Value, out var vh)
-                    + (row.Detail != null ? S(6) + TextWidth(hdc, _fontCaption, row.Detail, out _) : 0));
-                _rowH = Math.Max(_rowH, Math.Max(lh, vh));
-            }
-            var rowsW = v.Rows.Count > 0 ? _labelW + S(12) + valueW : 0;
-
-            // Never shrinks: the overlay keeps the same size between a match in progress and the end of the match.
-            var w = Math.Max(_stableW, Math.Max(S(MinWidth), Math.Max(headerW, Math.Max(countersW, rowsW)) + 2 * S(Pad)));
-            _stableW = w;
-            var h = S(12) + _headerH + S(6) + _bigH + _captionH + S(12);
-            if (v.Rows.Count > 0)
-            {
-                h += 1 + S(10) + v.Rows.Count * (_rowH + S(4)) + S(4);
-            }
-            _lockRect = new RECT { Left = w - S(Pad) - S(18), Top = S(6), Right = w - S(6), Bottom = S(12) + _headerH + S(6) };
-            // Keep it fully on its screen: on the right half of the screen it grows to the left, and it is
-            // pushed back inside when it would overflow (a wider overlay used to be cut by the screen edge).
-            GetWindowRect(hwnd, out var cur);
-            int nx = cur.Left, ny = cur.Top;
-            var mi = new MONITORINFO { cbSize = (uint)Marshal.SizeOf<MONITORINFO>() };
-            if (!_offscreen && GetMonitorInfoW(MonitorFromWindow(hwnd, MONITOR_DEFAULTTONEAREST), ref mi))
-            {
-                var work = mi.rcWork;
-                if (cur.Right - cur.Left > 0 && (cur.Left + cur.Right) / 2 > (work.Left + work.Right) / 2)
-                {
-                    nx = cur.Right - w; // anchored on the right edge
-                }
-                nx = Math.Max(work.Left, Math.Min(nx, work.Right - w));
-                ny = Math.Max(work.Top, Math.Min(ny, work.Bottom - h));
-            }
-            SetWindowPos(hwnd, HWND_TOPMOST, nx, ny, w, h, SWP_NOACTIVATE);
-            SetWindowRgn(hwnd, CreateRoundRectRgn(0, 0, w + 1, h + 1, S(18), S(18)), true); // window owns the region
-            if (nx != cur.Left || ny != cur.Top)
-            {
-                _onMoved?.Invoke(nx, ny);
-            }
+            (w, h) = Keyed ? MeasureHud(hdc) : MeasurePanel(hdc);
         }
         finally
         {
             ReleaseDC(hwnd, hdc);
         }
+        w = Math.Max(_stableW, w);
+        _stableW = w;
+        if (Keyed)
+        {
+            _lockRect = new RECT { Left = Sc(2), Top = 0, Right = Sc(22), Bottom = h };
+        }
+        else
+        {
+            _lockRect = new RECT { Left = w - Sc(30), Top = Sc(6), Right = w - Sc(6), Bottom = Sc(30) };
+        }
+
+        // Kept fully on its screen: on the right half it grows to the left (under the minimap), and it is pushed back
+        // inside when it would overflow.
+        GetWindowRect(hwnd, out var cur);
+        int nx = cur.Left, ny = cur.Top;
+        var mi = new MONITORINFO { cbSize = (uint)Marshal.SizeOf<MONITORINFO>() };
+        if (!_offscreen && GetMonitorInfoW(MonitorFromWindow(hwnd, MONITOR_DEFAULTTONEAREST), ref mi))
+        {
+            var work = mi.rcWork;
+            if (cur.Right - cur.Left > 0 && (cur.Left + cur.Right) / 2 > (work.Left + work.Right) / 2)
+            {
+                nx = cur.Right - w;
+            }
+            nx = Math.Max(work.Left, Math.Min(nx, work.Right - w));
+            ny = Math.Max(work.Top, Math.Min(ny, work.Bottom - h));
+        }
+        SetWindowPos(hwnd, HWND_TOPMOST, nx, ny, w, h, SWP_NOACTIVATE);
+        // The panel has rounded corners; the HUD looks are a plain rectangle whose background is made invisible.
+        SetWindowRgn(hwnd, Keyed ? IntPtr.Zero : CreateRoundRectRgn(0, 0, w + 1, h + 1, Sc(12), Sc(12)), true);
+        if (nx != cur.Left || ny != cur.Top)
+        {
+            _onMoved?.Invoke(nx, ny);
+        }
         InvalidateRect(hwnd, IntPtr.Zero, true);
         UpdateWindow(hwnd); // paint now (one repaint per update, no timer)
     }
+
+    private static (int W, int H) MeasureHud(IntPtr hdc)
+    {
+        var v = _view;
+        var pad = Sc(8);
+        var bigW = TextWidth(hdc, _fontHudBig, v.Total, out _hudBigH);
+        var topW = Sc(18) + Sc(26) + Sc(8) + bigW; // room for the in-match dot is always kept
+        var chipsW = FactsWidth(hdc, Facts(v), out _hudSmallH);
+        var goals = v.Goals ?? [];
+        var goalsW = 0;
+        if (goals.Count > 0)
+        {
+            if (_style == "icons")
+            {
+                _goalRowH = Math.Max(Sc(22), Sc(20));
+                goalsW = Sc(22) + Sc(7) + Sc(IconBarW);
+            }
+            else
+            {
+                _goalLabelW = goals.Max(g => TextWidth(hdc, _fontHudSmall, g.Short, out _));
+                _goalNumW = goals.Max(g => TextWidth(hdc, _fontHudSmall, g.Numbers, out _));
+                _goalRowH = _hudSmallH;
+                goalsW = _goalLabelW + Sc(8) + Sc(HudBarW) + Sc(8) + _goalNumW;
+            }
+        }
+        var w = Sc(22) + pad + Math.Max(topW, Math.Max(chipsW, goalsW)) + pad + Sc(14); // italic glyphs lean right
+        var h = pad + _hudBigH + Sc(2) + _hudSmallH + (goals.Count > 0 ? Sc(6) + goals.Count * (_goalRowH + Sc(5)) : 0) + pad;
+        return (w, h);
+    }
+
+    /// <summary>"Last 6  Session 31  ★ 1": its width, and the height of the line.</summary>
+    private static int FactsWidth(IntPtr hdc, List<Fact> facts, out int height)
+    {
+        height = 0;
+        var w = 0;
+        foreach (var f in facts)
+        {
+            w += TextWidth(hdc, _fontHudSmall, f.Value, out var hh) + (f.Treasure ? Sc(18) : TextWidth(hdc, _fontHudSmall, f.Label, out _) + Sc(6));
+            height = Math.Max(height, hh);
+        }
+        return w + (facts.Count - 1) * Sc(12);
+    }
+
+    private static int _panelTop, _panelFactsH, _panelGoalH, _panelNumH;
+
+    private static (int W, int H) MeasurePanel(IntPtr hdc)
+    {
+        var v = _view;
+        var facts = Facts(v);
+        var totalW = Sc(26) + Sc(8) + TextWidth(hdc, _fontPanelBig, v.Total, out _panelTop) + Sc(10) + TextWidth(hdc, _fontCaption, CaptionTotalLine1, out _) + Sc(30);
+        var factsW = facts.Sum(f => TextWidth(hdc, _fontCaption, f.Label, out _) + Sc(4) + TextWidth(hdc, _fontPanelNum, f.Value, out _)) + (facts.Count - 1) * Sc(14);
+        TextWidth(hdc, _fontPanelNum, "0", out _panelNumH);
+        _panelFactsH = _panelNumH;
+        var goals = v.Goals ?? [];
+        var goalsW = goals.Count == 0 ? 0 : goals.Max(g => TextWidth(hdc, _fontLabel, g.Label, out _) + Sc(16) + TextWidth(hdc, _fontPanelNum, g.Numbers, out _));
+        _panelGoalH = _panelNumH + Sc(4) + Sc(7);
+        var inner = Math.Max(Sc(212), Math.Max(totalW, Math.Max(factsW, goalsW)));
+        var h = Sc(12) + _panelTop + Sc(8) + _panelFactsH + goals.Count * (Sc(9) + _panelGoalH) + Sc(14);
+        return (inner + 2 * Sc(14), h);
+    }
+
+    private static string CaptionTotalLine1 => L.T("coffres", "chests", "cofres", "baús");
+    private static string CaptionTotalLine2 => L.T("au total", "in total", "en total", "no total");
 
     private static void Text(IntPtr hdc, IntPtr font, uint color, string text, int left, int top, int right, int bottom, uint align = DT_LEFT)
     {
@@ -531,141 +610,236 @@ public static class NativeOverlay
     {
         if (Keyed)
         {
-            PaintStyled(hwnd, hdc);
-            return;
+            PaintHud(hwnd, hdc);
         }
-        var v = _view;
+        else
         {
-            GetClientRect(hwnd, out var rc);
-            FillRect(hdc, ref rc, _brushBg);
-            SetBkMode(hdc, TRANSPARENT);
-
-            int S(int n) => (int)Math.Round(n * _scale);
-            var x = S(Pad);
-            var right = rc.Right - S(Pad);
-            var y = S(12);
-
-            // Thin border following the rounded shape.
-            var border = CreateRoundRectRgn(0, 0, rc.Right + 1, rc.Bottom + 1, S(18), S(18));
-            FrameRgn(hdc, border, _brushBorder, 1, 1);
-            DeleteObject(border);
-
-            // Header
-            Text(hdc, _fontHeader, Rgb(150, 150, 162), Header, x, y, right, y + _headerH);
-            if (v.Badge != null)
-            {
-                Text(hdc, _fontHeader, Rgb(96, 214, 128), v.Badge, x, y, _lockRect.Left - S(6), y + _headerH, DT_RIGHT);
-            }
-            // Lock button (Segoe MDL2 Assets: E785 = open padlock, E72E = closed padlock).
-            SelectObject(hdc, _fontIcon);
-            SetTextColor(hdc, _locked ? Rgb(96, 96, 106) : Rgb(200, 200, 208));
-            var lr = _lockRect;
-            DrawTextW(hdc, _locked ? "" : "", -1, ref lr, DT_SINGLELINE | DT_CENTER | DT_VCENTER | DT_NOPREFIX);
-            y += _headerH + S(6);
-
-            // Counters: total | match in progress
-            var x2 = x + _col1W + S(ColGap);
-            Text(hdc, _fontBig, Rgb(Themes.Current.ClassicTotal), v.Total, x - S(1), y, x + _col1W + S(4), y + _bigH);
-            Text(hdc, _fontBig, v.Current == null ? Rgb(80, 80, 92) : v.CurrentLive ? Rgb(110, 224, 150) : Rgb(226, 226, 232), v.Current ?? "—", x2 - S(1), y, right + S(4), y + _bigH);
-            var sep = new RECT { Left = x + _col1W + S(ColGap) / 2, Top = y + S(8), Right = x + _col1W + S(ColGap) / 2 + 1, Bottom = y + _bigH + _captionH };
-            FillRect(hdc, ref sep, _brushLine);
-            y += _bigH;
-            Text(hdc, _fontCaption, Rgb(130, 130, 142), CaptionTotal, x, y, x + _col1W + S(4), y + _captionH);
-            Text(hdc, _fontCaption, Rgb(130, 130, 142), v.CurrentCaption, x2, y, right + S(4), y + _captionH);
-            y += _captionH + S(12);
-
-            if (v.Rows.Count > 0)
-            {
-                var line = new RECT { Left = x, Top = y, Right = right, Bottom = y + 1 };
-                FillRect(hdc, ref line, _brushLine);
-                y += 1 + S(10);
-                foreach (var row in v.Rows)
-                {
-                    Text(hdc, _fontLabel, Rgb(130, 130, 142), row.Label, x, y, x + _labelW, y + _rowH);
-                    var vx = x + _labelW + S(12);
-                    Text(hdc, _fontSmall, row.Treasure ? Rgb(196, 160, 255) : Rgb(226, 226, 232), row.Value, vx, y, right + S(4), y + _rowH);
-                    if (row.Detail != null)
-                    {
-                        var dx = vx + TextWidth(hdc, _fontSmall, row.Value, out _) + S(6);
-                        Text(hdc, _fontCaption, Rgb(130, 130, 142), row.Detail, dx, y, right + S(4), y + _rowH - S(2), DT_BOTTOM);
-                    }
-                    y += _rowH + S(4);
-                }
-            }
+            PaintPanel(hwnd, hdc);
         }
     }
 
-
-    // ---- "hud" style: figures only, outlined like the game's own HUD, right-aligned under the minimap -------------
-    //
-    //  ● [chest] 3 934       total; the red dot while a match is in progress (gold while it is counted live)
-    //   Dernière • 14        last finished match, kept during the next one
-    //    Session • 83
-    //      [star] 36         treasures
-
-    private sealed record HudRow(string Label, string Value);
-
-    private static HudRow StateRow(OverlayView v) => new(L.T("Dernière", "Last", "Última", "Última"), v.Last ?? "—");
-
-    /// <summary>The figures of the match in progress are readable (its chests are already in the total).</summary>
-    private static bool LiveFigures(OverlayView v) => v.CurrentLive && v.Current is { } cur && cur != "…";
-
-    private static int Sc(double v) => (int)Math.Round(v * _scale);
-
-    private const string Sep = "  •  ";
-
-    private static void RelayoutStyled(IntPtr hwnd)
+    /// <summary>A rounded bar: dark track, the part done in the accent color (green once the goal is reached).</summary>
+    private static void Bar(IntPtr hdc, int left, int top, int width, int height, int percent, bool done, bool outlined, uint track)
     {
-        var v = _view;
-        var hdc = GetDC(hwnd);
-        int w, h;
-        try
+        var pen = CreatePen(0, outlined ? Math.Max(1, Sc(2)) : 0, outlined ? Ink : track);
+        var oldPen = SelectObject(hdc, pen);
+        var brush = CreateSolidBrush(track);
+        var old = SelectObject(hdc, brush);
+        RoundRect(hdc, left, top, left + width, top + height, height, height);
+        var fillW = (int)Math.Round(width * Math.Clamp(percent, 0, 100) / 100.0);
+        if (fillW > 0)
         {
-            var pad = Sc(8);
-            var lockW = Sc(22);
-            var bigW = TextWidth(hdc, _fontHudBig, v.Total, out _hudBigH);
-            var state = StateRow(v);
-            var sessionLabel = L.T("Session", "Session", "Sesión", "Sessão");
-            var rowsW = new[]
-            {
-                TextWidth(hdc, _fontHudSmall, state.Label + Sep + state.Value, out _hudSmallH),
-                TextWidth(hdc, _fontHudSmall, sessionLabel + Sep + v.Session, out _),
-                v.Squad != null ? TextWidth(hdc, _fontHudSmall, OverlayModel.SquadLabel + Sep + v.Squad, out _) : 0,
-                Sc(22) + TextWidth(hdc, _fontHudSmall, v.Treasures, out _),
-            }.Concat((v.Goals ?? []).Select(g => TextWidth(hdc, _fontHudSmall, g.Label + Sep + g.Text, out _))).Max();
-            // Room for the in-match dot is always kept: the overlay does not widen when a match starts.
-            w = lockW + pad + Math.Max(Sc(18) + Sc(26) + Sc(8) + bigW, rowsW) + pad + Sc(14);
-            h = pad + _hudBigH + ((v.Squad != null ? 4 : 3) + (v.Goals?.Count ?? 0)) * (_hudSmallH + Sc(2)) + pad;
-            w = Math.Max(_stableW, w);
-            _stableW = w;
-            _lockRect = new RECT { Left = Sc(2), Top = 0, Right = lockW, Bottom = h };
+            var fill = CreateSolidBrush(done ? Green : Rgb(Themes.Current.Accent));
+            SelectObject(hdc, fill);
+            RoundRect(hdc, left, top, left + Math.Max(height, fillW), top + height, height, height);
+            SelectObject(hdc, brush);
+            DeleteObject(fill);
+        }
+        SelectObject(hdc, old);
+        SelectObject(hdc, oldPen);
+        DeleteObject(brush);
+        DeleteObject(pen);
+    }
 
-            GetWindowRect(hwnd, out var cur);
-            int nx = cur.Left, ny = cur.Top;
-            var mi = new MONITORINFO { cbSize = (uint)Marshal.SizeOf<MONITORINFO>() };
-            if (!_offscreen && GetMonitorInfoW(MonitorFromWindow(hwnd, MONITOR_DEFAULTTONEAREST), ref mi))
-            {
-                var work = mi.rcWork;
-                if (cur.Right - cur.Left > 0 && (cur.Left + cur.Right) / 2 > (work.Left + work.Right) / 2)
-                {
-                    nx = cur.Right - w; // anchored on the right edge (under the minimap)
-                }
-                nx = Math.Max(work.Left, Math.Min(nx, work.Right - w));
-                ny = Math.Max(work.Top, Math.Min(ny, work.Bottom - h));
-            }
-            SetWindowPos(hwnd, HWND_TOPMOST, nx, ny, w, h, SWP_NOACTIVATE);
-            SetWindowRgn(hwnd, IntPtr.Zero, true); // plain rectangle: the corners are made invisible by the key color
-            if (nx != cur.Left || ny != cur.Top)
-            {
-                _onMoved?.Invoke(nx, ny);
-            }
-        }
-        finally
+    private static void PaintHud(IntPtr hwnd, IntPtr hdc)
+    {
+        GetClientRect(hwnd, out var rc);
+        var key = CreateSolidBrush(KeyColor);
+        FillRect(hdc, ref rc, key);
+        DeleteObject(key);
+        SetBkMode(hdc, TRANSPARENT);
+        var v = _view;
+        var pad = Sc(8);
+        var right = rc.Right - pad - Sc(12); // italic glyphs and their outline lean past the measured width
+        var white = Rgb(255, 255, 255);
+        var gold = Rgb(Themes.Current.Accent);
+        var labelColor = Rgb(Themes.Current.Label);
+
+        // Unlocked: a dark backdrop to grab it, and the padlock (locked, only the figures remain, mouse goes through).
+        if (!_locked)
         {
-            ReleaseDC(hwnd, hdc);
+            var pen = CreatePen(0, 1, Rgb(58, 66, 86));
+            var brush = CreateSolidBrush(Rgb(28, 34, 48));
+            var oldPen = SelectObject(hdc, pen);
+            var old = SelectObject(hdc, brush);
+            RoundRect(hdc, 0, 0, rc.Right, rc.Bottom, Sc(12), Sc(12));
+            SelectObject(hdc, old);
+            SelectObject(hdc, oldPen);
+            DeleteObject(brush);
+            DeleteObject(pen);
+            SelectObject(hdc, _fontIcon);
+            SetTextColor(hdc, Rgb(200, 200, 208));
+            var lr = _lockRect;
+            DrawTextW(hdc, "", -1, ref lr, DT_SINGLELINE | DT_CENTER | DT_VCENTER | DT_NOPREFIX);
         }
-        InvalidateRect(hwnd, IntPtr.Zero, true);
-        UpdateWindow(hwnd);
+
+        var left = _lockRect.Right;
+        var y = pad;
+
+        // Total, with the chest, and the red dot while a match is in progress.
+        var bigW = TextWidth(hdc, _fontHudBig, v.Total, out _);
+        Outlined(hdc, _fontHudBig, LiveFigures(v) ? gold : white, v.Total, left, y, right, y + _hudBigH, DT_RIGHT);
+        var iw = Sc(26);
+        var ih = Sc(22);
+        var ix = right - bigW - Sc(8) - iw;
+        Chest(hdc, ix, y + (_hudBigH - ih) / 2, iw, ih, gold, Rgb(Themes.Current.AccentDeep), Ink, Ink);
+        if (v.CurrentLive)
+        {
+            var d = Sc(11);
+            Disc(hdc, ix - Sc(7) - d, y + (_hudBigH - d) / 2, d, Rgb(255, 59, 48), Ink, Math.Max(1, Sc(1.5)));
+        }
+        y += _hudBigH + Sc(2);
+
+        // "Last 6  Session 31  ★ 1", right-aligned, drawn from the right.
+        var x = right;
+        var facts = Facts(v);
+        for (var i = facts.Count - 1; i >= 0; i--)
+        {
+            var f = facts[i];
+            var vw = TextWidth(hdc, _fontHudSmall, f.Value, out _);
+            Outlined(hdc, _fontHudSmall, f.Treasure ? Rgb(214, 190, 255) : white, f.Value, left, y, x, y + _hudSmallH, DT_RIGHT, thin: true);
+            x -= vw;
+            if (f.Treasure)
+            {
+                Star(hdc, x - Sc(9), y + _hudSmallH / 2, Sc(7), Rgb(196, 155, 255), Ink);
+                x -= Sc(18);
+            }
+            else
+            {
+                x -= Sc(6);
+                Outlined(hdc, _fontHudSmall, labelColor, f.Label, left, y, x, y + _hudSmallH, DT_RIGHT, thin: true);
+                x -= TextWidth(hdc, _fontHudSmall, f.Label, out _);
+            }
+            x -= Sc(12);
+        }
+        y += _hudSmallH + Sc(6);
+
+        foreach (var g in v.Goals ?? [])
+        {
+            if (_style == "icons")
+            {
+                // [icon] (bar with its number inside)
+                var barW = Sc(IconBarW);
+                var barH = Sc(20);
+                var barLeft = right - barW;
+                var top = y + (_goalRowH - barH) / 2;
+                Bar(hdc, barLeft, top, barW, barH, g.Percent, g.Done, outlined: true, Rgb(24, 28, 38));
+                Outlined(hdc, _fontHudTiny, white, g.Numbers, barLeft, top, barLeft + barW, top + barH, DT_CENTER | DT_VCENTER, thin: true);
+                var d = Sc(22);
+                var cx = barLeft - Sc(7) - d;
+                Disc(hdc, cx, y + (_goalRowH - d) / 2, d, Ink, Ink, 1);
+                GoalIcon(hdc, cx + d / 2, y + _goalRowH / 2, Sc(6), g.Label == Goals.DailyLabel, labelColor);
+            }
+            else
+            {
+                // Label | bar | number, in three aligned columns.
+                var numLeft = right - _goalNumW;
+                var barW = Sc(HudBarW);
+                var barH = Sc(10);
+                var barLeft = numLeft - Sc(8) - barW;
+                Bar(hdc, barLeft, y + (_goalRowH - barH) / 2, barW, barH, g.Percent, g.Done, outlined: true, Rgb(24, 28, 38));
+                Outlined(hdc, _fontHudSmall, g.Done ? Green : white, g.Numbers, numLeft, y, right + Sc(12), y + _goalRowH, DT_LEFT, thin: true);
+                Outlined(hdc, _fontHudSmall, labelColor, g.Short, left, y, barLeft - Sc(8), y + _goalRowH, DT_RIGHT, thin: true);
+            }
+            y += _goalRowH + Sc(5);
+        }
+    }
+
+    /// <summary>The goal's icon: a target (day) or a calendar (week), drawn with lines.</summary>
+    private static void GoalIcon(IntPtr hdc, int cx, int cy, int r, bool day, uint color)
+    {
+        var pen = CreatePen(0, Math.Max(1, Sc(1.6)), color);
+        var oldPen = SelectObject(hdc, pen);
+        var oldBrush = SelectObject(hdc, GetStockObject(NULL_BRUSH));
+        if (day)
+        {
+            Ellipse(hdc, cx - r, cy - r, cx + r + 1, cy + r + 1);
+            var r2 = Math.Max(1, r / 2);
+            Ellipse(hdc, cx - r2, cy - r2, cx + r2 + 1, cy + r2 + 1);
+        }
+        else
+        {
+            Rectangle(hdc, cx - r, cy - r + Sc(1), cx + r + 1, cy + r + 1);
+            MoveToEx(hdc, cx - r, cy - r / 3, IntPtr.Zero);
+            LineTo(hdc, cx + r, cy - r / 3);
+        }
+        SelectObject(hdc, oldBrush);
+        SelectObject(hdc, oldPen);
+        DeleteObject(pen);
+    }
+
+    private static void PaintPanel(IntPtr hwnd, IntPtr hdc)
+    {
+        GetClientRect(hwnd, out var rc);
+        FillRect(hdc, ref rc, _brushBg);
+        SetBkMode(hdc, TRANSPARENT);
+        var v = _view;
+        var border = CreateRoundRectRgn(0, 0, rc.Right + 1, rc.Bottom + 1, Sc(12), Sc(12));
+        FrameRgn(hdc, border, _brushBorder, 1, 1);
+        DeleteObject(border);
+
+        var x = Sc(14);
+        var right = rc.Right - Sc(14);
+        var muted = Rgb(185, 196, 214);
+        var white = Rgb(255, 255, 255);
+        var y = Sc(12);
+
+        // Lock button (Segoe MDL2 Assets: E785 = open padlock, E72E = closed padlock).
+        SelectObject(hdc, _fontIcon);
+        SetTextColor(hdc, _locked ? Rgb(96, 104, 120) : Rgb(210, 216, 228));
+        var lr = _lockRect;
+        DrawTextW(hdc, _locked ? "" : "", -1, ref lr, DT_SINGLELINE | DT_CENTER | DT_VCENTER | DT_NOPREFIX);
+
+        // [chest] 290            chests
+        //                        in total
+        var iw = Sc(26);
+        var ih = Sc(22);
+        Chest(hdc, x, y + (_panelTop - ih) / 2, iw, ih, Rgb(Themes.Current.Accent), Rgb(Themes.Current.AccentDeep), Ink, Ink);
+        var tx = x + iw + Sc(8);
+        Text(hdc, _fontPanelBig, LiveFigures(v) ? Rgb(Themes.Current.Accent) : white, v.Total, tx, y, right, y + _panelTop);
+        if (v.CurrentLive)
+        {
+            var d = Sc(9);
+            var dx = tx + TextWidth(hdc, _fontPanelBig, v.Total, out _) + Sc(7);
+            Disc(hdc, dx, y + (_panelTop - d) / 2, d, Rgb(255, 59, 48), Rgb(14, 20, 34), 1);
+        }
+        var capRight = _lockRect.Left - Sc(6);
+        Text(hdc, _fontCaption, muted, CaptionTotalLine1, x, y + _panelTop / 2 - Sc(13), capRight, y + _panelTop / 2, DT_RIGHT);
+        Text(hdc, _fontCaption, muted, CaptionTotalLine2, x, y + _panelTop / 2, capRight, y + _panelTop / 2 + Sc(13), DT_RIGHT);
+        y += _panelTop + Sc(8);
+
+        // Last 6   Session 31   Treasures 1, spread over the width.
+        var facts = Facts(v);
+        var widths = facts.Select(f => TextWidth(hdc, _fontCaption, f.Label, out _) + Sc(4) + TextWidth(hdc, _fontPanelNum, f.Value, out _)).ToList();
+        var gap = facts.Count > 1 ? (right - x - widths.Sum()) / (facts.Count - 1) : 0;
+        var fx = x;
+        for (var i = 0; i < facts.Count; i++)
+        {
+            var f = facts[i];
+            var lw = TextWidth(hdc, _fontCaption, f.Label, out _);
+            Text(hdc, _fontCaption, muted, f.Label, fx, y, fx + lw + Sc(2), y + _panelFactsH, DT_VCENTER);
+            Text(hdc, _fontPanelNum, f.Treasure ? Rgb(214, 190, 255) : white, f.Value, fx + lw + Sc(4), y, fx + widths[i] + Sc(4), y + _panelFactsH, DT_VCENTER);
+            fx += widths[i] + gap;
+        }
+        y += _panelFactsH;
+
+        // Goal: "Daily goal ........ 44 / 30" and a thin bar under it.
+        foreach (var g in v.Goals ?? [])
+        {
+            y += Sc(9);
+            Text(hdc, _fontLabel, white, g.Label, x, y, right, y + _panelNumH, DT_VCENTER);
+            Text(hdc, _fontPanelNum, g.Done ? Green : white, g.Numbers, x, y, right, y + _panelNumH, DT_RIGHT | DT_VCENTER);
+            y += _panelNumH + Sc(4);
+            var track = new RECT { Left = x, Top = y, Right = right, Bottom = y + Sc(7) };
+            var trackBrush = CreateSolidBrush(Rgb(52, 60, 78));
+            FillRect(hdc, ref track, trackBrush);
+            DeleteObject(trackBrush);
+            var fill = new RECT { Left = x, Top = y, Right = x + (int)Math.Round((right - x) * g.Percent / 100.0), Bottom = y + Sc(7) };
+            var fillBrush = CreateSolidBrush(g.Done ? Green : Rgb(Themes.Current.Accent));
+            FillRect(hdc, ref fill, fillBrush);
+            DeleteObject(fillBrush);
+            y += Sc(7);
+        }
     }
 
     /// <summary>Text outlined in near black, like the game's own HUD figures (readable on any background).</summary>
@@ -744,93 +918,6 @@ public static class NativeOverlay
         SelectObject(hdc, oldPen);
         DeleteObject(brush);
         DeleteObject(pen);
-    }
-
-    /// <summary>"Label  •  value" right-aligned: pale label, white value.</summary>
-    private static int LabelValue(IntPtr hdc, string label, string value, int left, int right, int top, int height, uint valueColor)
-    {
-        if (value.Length == 0)
-        {
-            Outlined(hdc, _fontHudSmall, Rgb(Themes.Current.Label), label, left, top, right, top + height, DT_RIGHT, thin: true);
-            return right - TextWidth(hdc, _fontHudSmall, label, out _);
-        }
-        var valueW = TextWidth(hdc, _fontHudSmall, value, out _);
-        Outlined(hdc, _fontHudSmall, valueColor, value, left, top, right, top + height, DT_RIGHT, thin: true);
-        var labelRight = right - valueW;
-        Outlined(hdc, _fontHudSmall, Rgb(Themes.Current.Label), label + Sep, left, top, labelRight, top + height, DT_RIGHT, thin: true);
-        return labelRight - TextWidth(hdc, _fontHudSmall, label + Sep, out _);
-    }
-
-    private static void PaintStyled(IntPtr hwnd, IntPtr hdc)
-    {
-        GetClientRect(hwnd, out var rc);
-        var key = CreateSolidBrush(KeyColor);
-        FillRect(hdc, ref rc, key);
-        DeleteObject(key);
-        SetBkMode(hdc, TRANSPARENT);
-        var v = _view;
-        var pad = Sc(8);
-        var right = rc.Right - pad - Sc(12); // italic glyphs and their outline lean past the measured width
-        var white = Rgb(255, 255, 255);
-        var gold = Rgb(Themes.Current.Accent);
-        var ink = Rgb(11, 15, 24);
-
-        // Unlocked: a dark backdrop to grab it, and the padlock (locked, only the figures remain, mouse goes through).
-        if (!_locked)
-        {
-            var pen = CreatePen(0, 1, Rgb(58, 66, 86));
-            var brush = CreateSolidBrush(Rgb(28, 34, 48));
-            var oldPen = SelectObject(hdc, pen);
-            var old = SelectObject(hdc, brush);
-            RoundRect(hdc, 0, 0, rc.Right, rc.Bottom, Sc(12), Sc(12));
-            SelectObject(hdc, old);
-            SelectObject(hdc, oldPen);
-            DeleteObject(brush);
-            DeleteObject(pen);
-            SelectObject(hdc, _fontIcon);
-            SetTextColor(hdc, Rgb(200, 200, 208));
-            var lr = _lockRect;
-            DrawTextW(hdc, "", -1, ref lr, DT_SINGLELINE | DT_CENTER | DT_VCENTER | DT_NOPREFIX);
-        }
-
-        var left = _lockRect.Right;
-        var y = pad;
-        var state = StateRow(v);
-        var live = LiveFigures(v);
-
-        // Total, with the chest, and the red dot while a match is in progress.
-        var bigW = TextWidth(hdc, _fontHudBig, v.Total, out _);
-        Outlined(hdc, _fontHudBig, live ? gold : white, v.Total, left, y, right, y + _hudBigH, DT_RIGHT);
-        var iw = Sc(26);
-        var ih = Sc(22);
-        var ix = right - bigW - Sc(8) - iw;
-        Chest(hdc, ix, y + (_hudBigH - ih) / 2, iw, ih, gold, Rgb(Themes.Current.AccentDeep), ink, ink);
-        if (v.CurrentLive)
-        {
-            var d = Sc(11);
-            Disc(hdc, ix - Sc(7) - d, y + (_hudBigH - d) / 2, d, Rgb(255, 59, 48), ink, Math.Max(1, Sc(1.5)));
-        }
-        y += _hudBigH + Sc(2);
-
-        // Last finished match (also during the next one), session, treasures.
-        var rowH = _hudSmallH;
-        LabelValue(hdc, state.Label, state.Value, left, right, y, rowH, white);
-        y += rowH + Sc(2);
-        LabelValue(hdc, L.T("Session", "Session", "Sesión", "Sessão"), v.Session, left, right, y, rowH, white);
-        y += rowH + Sc(2);
-        if (v.Squad != null)
-        {
-            LabelValue(hdc, OverlayModel.SquadLabel, v.Squad, left, right, y, rowH, white);
-            y += rowH + Sc(2);
-        }
-        foreach (var g in v.Goals ?? [])
-        {
-            LabelValue(hdc, g.Label, g.Text, left, right, y, rowH, g.Done ? gold : white);
-            y += rowH + Sc(2);
-        }
-        var tw = TextWidth(hdc, _fontHudSmall, v.Treasures, out _);
-        Outlined(hdc, _fontHudSmall, Rgb(214, 190, 255), v.Treasures, left, y, right, y + rowH, DT_RIGHT, thin: true);
-        Star(hdc, right - tw - Sc(12), y + rowH / 2, Sc(8), Rgb(196, 155, 255), ink);
     }
 
     private static uint Rgb(byte r, byte g, byte b) => (uint)(r | (g << 8) | (b << 16));
@@ -912,6 +999,10 @@ public static class NativeOverlay
     [DllImport("user32.dll")] private static extern int SetWindowRgn(IntPtr hwnd, IntPtr rgn, bool redraw);
     [DllImport("user32.dll")] private static extern bool GetWindowRect(IntPtr hwnd, out RECT rect);
     [DllImport("user32.dll")] private static extern bool GetClientRect(IntPtr hwnd, out RECT rect);
+    [DllImport("gdi32.dll")] private static extern IntPtr GetStockObject(int i);
+    [DllImport("gdi32.dll")] private static extern bool MoveToEx(IntPtr hdc, int x, int y, IntPtr point);
+    [DllImport("gdi32.dll")] private static extern bool LineTo(IntPtr hdc, int x, int y);
+    private const int NULL_BRUSH = 5;
     [DllImport("user32.dll")] private static extern bool InvalidateRect(IntPtr hwnd, IntPtr rect, bool erase);
     [DllImport("user32.dll")] private static extern IntPtr BeginPaint(IntPtr hwnd, out PAINTSTRUCT ps);
     [DllImport("user32.dll")] private static extern bool EndPaint(IntPtr hwnd, ref PAINTSTRUCT ps);

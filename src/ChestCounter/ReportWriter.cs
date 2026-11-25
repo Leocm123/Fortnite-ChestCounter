@@ -587,7 +587,7 @@ public static class ReportWriter
             var treasure = string.Join("<br>", m.TreasureFinds.Select(f => $"<span class=\"{(f.FromGoldenChest ? "gold" : "star")}\">{(f.FromGoldenChest ? "★★" : "★")} {H(f.DisplayName)}</span>"))
                 + string.Concat(m.TeamTreasureFinds.Select((f, i) => $"<span class=\"team\">{(i == 0 && m.TreasureFinds.Count == 0 ? "" : "<br>")}{TeamIcon} ★ {H(f.DisplayName)}</span>"));
             var win = m.Placement == 1;
-            sb.Append($"<tr class=\"r\"><td class=\"nw num items\">{L.DateTimeShort(When(m))}</td><td>{H(Pretty.Playlist(m.Playlist))}</td><td class=\"nw num\"{(win ? " style=\"color:#b9821c;font-weight:700\"" : "")}>{H(Pretty.Placement(m))}</td><td class=\"n num big\">{m.ChestsOpened}{(m.VehicleChestsMissing ? $" <span class=\"warn\" title=\"{H(VehicleWarning)}\">{Icons.Svg("warning", "ic ici")}</span>" : "")}</td>{(teamChests > 0 ? $"<td class=\"n num sq\" title=\"{H(string.Join(", ", m.TeamChests.Where(x => x.Chests > 0).Select(x => $"{x.Name} {x.Chests}")))}\">{(m.TeamChests.Count > 0 ? "+" + m.TeamChestsOpened : "")}</td>" : "")}<td class=\"items\">{treasure}</td></tr>");
+            sb.Append($"<tr class=\"r\" data-sid=\"{H(m.SessionId)}\"><td class=\"nw num items\">{L.DateTimeShort(When(m))}</td><td>{H(Pretty.Playlist(m.Playlist))}</td><td class=\"nw num\"{(win ? " style=\"color:#b9821c;font-weight:700\"" : "")}>{H(Pretty.Placement(m))}</td><td class=\"n num big\">{m.ChestsOpened}{(m.VehicleChestsMissing ? $" <span class=\"warn\" title=\"{H(VehicleWarning)}\">{Icons.Svg("warning", "ic ici")}</span>" : "")}</td>{(teamChests > 0 ? $"<td class=\"n num sq\" title=\"{H(string.Join(", ", m.TeamChests.Where(x => x.Chests > 0).Select(x => $"{x.Name} {x.Chests}")))}\">{(m.TeamChests.Count > 0 ? "+" + m.TeamChestsOpened : "")}</td>" : "")}<td class=\"items\">{treasure}</td></tr>");
         }
         sb.Append($"</table>{Pager("t-matches")}</div>");
         var blind = matches.Count(m => m.VehicleChestsMissing);
@@ -625,7 +625,7 @@ public static class ReportWriter
             // Opened in the counter's window (?t=...): choices are saved by the counter itself (config, data.json).
             var tok=new URLSearchParams(location.search).get('t');
             // In the counter's window, the pencil of "chests in total" opens the window's edit box.
-            if(tok&&window.self!==window.top){document.documentElement.classList.add('incounter');var eb=document.getElementById('editchests');if(eb)eb.onclick=function(){try{window.parent.postMessage({cc:'editChests'},location.origin)}catch(e){}}}
+            if(tok&&window.self!==window.top){document.documentElement.classList.add('incounter');var eb=document.getElementById('editchests');if(eb)eb.onclick=function(){try{window.parent.postMessage({cc:'editChests'},location.origin)}catch(e){}};document.addEventListener('click',function(e){var tr=e.target.closest&&e.target.closest('tr[data-sid]');if(tr)try{window.parent.postMessage({cc:'showMatch',id:tr.getAttribute('data-sid')},location.origin)}catch(x){}})}
             function post(action,value){if(!tok)return;try{fetch('/api/action',{method:'POST',headers:{'X-Token':tok,'Content-Type':'application/json'},body:JSON.stringify({action:action,value:value})})}catch(e){}}
             // Switches: the counter's setting, or (report opened as a file) what this browser remembers.
             function toggle(id,cls,action){
@@ -1228,7 +1228,7 @@ public static class ReportWriter
         return $"""<div class="profiles muted">{L.T("Autres profils sur ce PC : ", "Other profiles on this PC: ", "Otros perfiles en este PC: ", "Outros perfis neste PC: ")}{string.Join(", ", others)} · {L.T("« Changer de profil » dans le compteur", "\"Switch profile\" in the counter", "«Cambiar de perfil» en el contador", "\"Trocar perfil\" no contador")}</div>""";
     }
 
-    /// <summary>Style of the OBS page: the one chosen for the overlay ("hud" or "classic").</summary>
+    /// <summary>Style of the OBS page: the one chosen for the overlay ("hud", "icons" or "classic").</summary>
     public static volatile string OverlayStyle = "hud";
 
     /// <summary>What the overlay shows right now (also written by <see cref="WriteAll"/>, so that the OBS page never goes back).</summary>
@@ -1252,79 +1252,98 @@ public static class ReportWriter
         }
     }
 
-    public static string Overlay(OverlayView v) => OverlayStyle == "classic" ? OverlayClassic(v) : OverlayHud(v);
+    public static string Overlay(OverlayView v) => OverlayStyle switch { "classic" => OverlayPanel(v), "icons" => OverlayHud(v, icons: true), _ => OverlayHud(v, icons: false) };
+
+    private const string ChestSvg = """<svg viewBox="0 0 30 26" aria-hidden="true"><rect x="2" y="10" width="26" height="14" rx="2" fill="{0}" stroke="#0b0f18" stroke-width="2.5"/><path d="M2 12 Q15 -2 28 12" fill="{1}" stroke="#0b0f18" stroke-width="2.5"/><rect x="12.5" y="12" width="5" height="6" rx="1" fill="#0b0f18"/></svg>""";
+
+    private static string Hex((byte R, byte G, byte B) c) => $"#{c.R:x2}{c.G:x2}{c.B:x2}";
+
+    /// <summary>"Last 6  Session 31  ★ 1": the facts under the total.</summary>
+    private static List<(string Label, string Value, bool Treasure)> OverlayFacts(OverlayView v)
+    {
+        var facts = new List<(string, string, bool)> { (L.T("Dernière", "Last", "Última", "Última"), v.Last ?? "—", false), (L.T("Session", "Session", "Sesión", "Sessão"), v.Session, false) };
+        if (v.Squad != null)
+        {
+            facts.Add((OverlayModel.SquadLabel, v.Squad, false));
+        }
+        facts.Add((L.T("Trésors", "Treasures", "Tesoros", "Tesouros"), v.Treasures, true));
+        return facts;
+    }
 
     /// <summary>
-    /// The HUD overlay as a web page, for OBS ("Browser" source, local file): transparent, figures outlined like the
-    /// game's, same rows as the overlay on screen. Refreshes itself every 5 seconds.
+    /// The HUD looks as a web page, for OBS ("Browser" source, local file): transparent, outlined figures like the
+    /// game's. Aligned block (goals as label | bar | number) or bars with icons. Refreshes itself every 5 seconds.
     /// </summary>
-    private static string OverlayHud(OverlayView v)
+    private static string OverlayHud(OverlayView v, bool icons)
     {
-        // The last finished match stays during the next one; the red dot next to the total says a match is in progress.
-        var state = Row(L.T("Dernière", "Last", "Última", "Última"), v.Last ?? "—", "");
-        var squad = v.Squad != null ? Row(OverlayModel.SquadLabel, v.Squad, "") : "";
-        var goals = string.Concat((v.Goals ?? []).Select(g => Row(g.Label, g.Text, g.Done ? "gold" : "")));
-        static string Row(string label, string value, string cls) =>
-            $"<div class=\"r {cls}\"><span>{H(label)}</span>{(value.Length > 0 ? $"<span class=\"sep\">•</span><b>{H(value)}</b>" : "")}</div>";
+        var accent = Hex(Themes.Current.Accent);
+        var label = Hex(Themes.Current.Label);
+        var live = v.CurrentLive && v.Current is { } c && c != "…";
+        var chips = string.Join("", OverlayFacts(v).Select(f => f.Treasure ? $"<span class=\"t\">★ {H(f.Value)}</span>" : $"<span><i>{H(f.Label)}</i> {H(f.Value)}</span>"));
+        var goals = string.Concat((v.Goals ?? []).Select(g => icons
+            ? $"<div class=\"gi\"><span class=\"ib\">{(g.Label == Goals.DailyLabel ? "<svg viewBox=\"0 0 24 24\"><circle cx=\"12\" cy=\"12\" r=\"9\"/><circle cx=\"12\" cy=\"12\" r=\"4.5\"/></svg>" : "<svg viewBox=\"0 0 24 24\"><rect x=\"3\" y=\"5\" width=\"18\" height=\"16\" rx=\"2\"/><path d=\"M3 10h18M8 3v4M16 3v4\"/></svg>")}</span><span class=\"tr big\"><b class=\"{(g.Done ? "done" : "")}\" style=\"width:{g.Percent}%\"></b><em>{H(g.Numbers)}</em></span></div>"
+            : $"<span class=\"k\">{H(g.Short)}</span><span class=\"tr\"><b class=\"{(g.Done ? "done" : "")}\" style=\"width:{g.Percent}%\"></b></span><span class=\"n{(g.Done ? " ok" : "")}\">{H(g.Numbers)}</span>"));
         return $$"""
             <!doctype html><html lang="{{L.Code}}"><head><meta charset="utf-8"><meta http-equiv="refresh" content="5">
             <title>{{L.T("Overlay coffres", "Chest overlay", "Overlay de cofres", "Overlay de baús")}}</title>
             <style>
             html,body{margin:0;background:transparent}
-            body{padding:10px 14px;display:inline-block;color:#fff;font-family:Bahnschrift,"Segoe UI",sans-serif;font-style:italic;font-weight:600;text-align:right;
-                 -webkit-text-stroke:4px #0b0f18;paint-order:stroke fill;letter-spacing:.01em}
-            .total{display:flex;align-items:center;justify-content:flex-end;gap:10px;font-size:46px;font-weight:700;font-stretch:condensed;line-height:1.05}
-            .total.live{color:#ffd23f}
+            body{padding:10px 14px;display:inline-block;color:#fff;font-family:Bahnschrift,"Segoe UI",sans-serif;font-style:italic;font-weight:700;text-align:right}
+            .o{-webkit-text-stroke:4px #0b0f18;paint-order:stroke fill;letter-spacing:.01em}
+            .total{display:flex;align-items:center;justify-content:flex-end;gap:10px;font-size:46px;line-height:1.05;font-stretch:condensed}
+            .total.live{color:{{accent}}}
             .total svg{width:30px;height:26px;flex:none}
-            .r{display:flex;align-items:center;justify-content:flex-end;gap:8px;font-size:21px;font-stretch:semi-condensed;line-height:1.3}
-            .r.gold b{color:#ffd23f}
-            .sep{opacity:.9}
             .dot{width:13px;height:13px;border-radius:50%;background:#ff3b30;box-shadow:0 0 0 2px #0b0f18;flex:none}
-            .t{color:#d6beff}.t .star{color:#c49bff}
-            </style></head><body>
-            <div class="total{{(v.CurrentLive && v.Current is { } c && c != "…" ? " live" : "")}}">{{(v.CurrentLive ? "<i class=\"dot\"></i>" : "")}}<svg viewBox="0 0 30 26" aria-hidden="true"><rect x="2" y="10" width="26" height="14" rx="2" fill="#ffd23f" stroke="#0b0f18" stroke-width="2.5"/><path d="M2 12 Q15 -2 28 12" fill="#e0a526" stroke="#0b0f18" stroke-width="2.5"/><rect x="12.5" y="12" width="5" height="6" rx="1" fill="#0b0f18"/></svg>{{H(v.Total)}}</div>
-            {{state}}
-            {{Row(L.T("Session", "Session", "Sesión", "Sessão"), v.Session, "")}}
-            {{squad}}
-            {{goals}}
-            <div class="r t"><span class="star">★</span><b>{{H(v.Treasures)}}</b></div>
+            .chips{display:flex;justify-content:flex-end;gap:14px;font-size:21px;font-stretch:semi-condensed;line-height:1.3}
+            .chips i{font-style:inherit;color:{{label}}}.chips .t{color:#d6beff}
+            .goals{display:grid;grid-template-columns:auto 130px auto;gap:6px 9px;align-items:center;justify-content:end;margin-top:8px;font-size:19px}
+            .goals .k{text-align:right;color:{{label}}}.goals .n{text-align:left}.goals .n.ok{color:#3fdc8a}
+            .tr{position:relative;display:block;height:11px;border-radius:6px;background:rgba(11,15,24,.75);box-shadow:0 0 0 2px #0b0f18;overflow:hidden}
+            .tr b{position:absolute;inset:0 auto 0 0;background:{{accent}}}.tr b.done{background:#3fdc8a}
+            .gis{display:flex;flex-direction:column;gap:7px;margin-top:8px;align-items:flex-end}
+            .gi{display:flex;align-items:center;gap:8px}
+            .ib{width:26px;height:26px;border-radius:50%;display:grid;place-items:center;background:#0b0f18}
+            .ib svg{width:16px;height:16px;fill:none;stroke:{{label}};stroke-width:2.4}
+            .tr.big{width:170px;height:24px;border-radius:12px}
+            .tr em{position:relative;display:block;text-align:center;font-size:15px;line-height:24px;-webkit-text-stroke:3px #0b0f18;paint-order:stroke fill}
+            </style></head><body class="o">
+            <div class="total{{(live ? " live" : "")}}">{{(v.CurrentLive ? "<i class=\"dot\"></i>" : "")}}{{string.Format(ChestSvg, accent, Hex(Themes.Current.AccentDeep))}}{{H(v.Total)}}</div>
+            <div class="chips">{{chips}}</div>
+            {{((v.Goals?.Count ?? 0) == 0 ? "" : icons ? $"<div class=\"gis\">{goals}</div>" : $"<div class=\"goals\">{goals}</div>")}}
             </body></html>
             """;
     }
 
-    /// <summary>The classic overlay (dark card) as a web page, for OBS.</summary>
-    private static string OverlayClassic(OverlayView v)
+    /// <summary>The quest panel as a web page, for OBS: a translucent dark plate, clean white text, thin bars.</summary>
+    private static string OverlayPanel(OverlayView v)
     {
-        var rows = new StringBuilder();
-        foreach (var r in v.Rows)
-        {
-            rows.Append($"<div class=\"row{(r.Treasure ? " t" : "")}\"><span>{H(r.Label)}</span><b>{H(r.Value)}{(r.Detail != null ? $" <small>{H(r.Detail)}</small>" : "")}</b></div>");
-        }
+        var accent = Hex(Themes.Current.Accent);
+        var live = v.CurrentLive && v.Current is { } c && c != "…";
+        var facts = string.Concat(OverlayFacts(v).Select(f => $"<span>{H(f.Label)}<b{(f.Treasure ? " class=\"t\"" : "")}>{H(f.Value)}</b></span>"));
+        var goals = string.Concat((v.Goals ?? []).Select(g =>
+            $"<div class=\"g\"><div class=\"gh\"><span>{H(g.Label)}</span><b{(g.Done ? " class=\"ok\"" : "")}>{H(g.Numbers)}</b></div><div class=\"tr\"><b class=\"{(g.Done ? "done" : "")}\" style=\"width:{g.Percent}%\"></b></div></div>"));
         return $$"""
             <!doctype html><html lang="{{L.Code}}"><head><meta charset="utf-8"><meta http-equiv="refresh" content="5">
             <title>{{L.T("Overlay coffres", "Chest overlay", "Overlay de cofres", "Overlay de baús")}}</title>
             <style>
-            html,body{margin:0;background:transparent;color:#e2e2e8;font:500 16px/1.3 "Segoe UI",system-ui,sans-serif}
-            .box{display:inline-block;min-width:260px;padding:14px 18px 12px;border-radius:16px;background:rgba(18,18,22,.86);border:1px solid #3a3a42;text-shadow:0 1px 3px rgba(0,0,0,.6)}
-            .head{display:flex;justify-content:space-between;gap:16px;font:700 12px "Segoe UI",sans-serif;letter-spacing:.08em;color:#9696a2}
-            .live{color:#60d680}
-            .counters{display:flex;align-items:stretch;gap:18px;margin:4px 0 10px}
-            .counters>div{display:flex;flex-direction:column}
-            .sep{width:1px;background:#2c2c34;margin:8px 0 2px}
-            .big{font-size:40px;font-weight:800;line-height:1.1;font-variant-numeric:tabular-nums}
-            .total{color:#f2b84b}.cur{color:#6ee096}.none{color:#50505c}
-            .cap{font-size:11px;font-weight:600;color:#82828e}
-            .rows{border-top:1px solid #2c2c34;padding-top:8px;display:grid;grid-template-columns:auto 1fr;gap:4px 12px}
-            .row{display:contents}.row span{font-size:13px;font-weight:600;color:#82828e}.row b{font-weight:500}
-            .row.t b{color:#c4a0ff}.row small{font-size:11px;font-weight:600;color:#82828e}
-            </style></head><body><div class="box">
-            <div class="head"><span>{{L.T("COFFRES", "CHESTS", "COFRES", "BAÚS")}}</span>{{(v.Badge != null ? $"<span class=\"live\">{H(v.Badge)}</span>" : "")}}</div>
-            <div class="counters">
-              <div><span class="big total">{{H(v.Total)}}</span><span class="cap">total</span></div>
-              <div class="sep"></div>
-              <div><span class="big {{(v.Current == null ? "none" : v.CurrentLive ? "cur" : "")}}">{{H(v.Current ?? "—")}}</span><span class="cap">{{H(v.CurrentCaption)}}</span></div>
-            </div>
-            <div class="rows">{{rows}}</div>
+            html,body{margin:0;background:transparent}
+            body{padding:8px;display:inline-block;font-family:"Segoe UI",system-ui,sans-serif;color:#fff}
+            .p{width:280px;padding:12px 14px 14px;border-radius:10px;background:rgba(14,20,34,.78);border:1px solid rgba(68,86,120,.6);box-shadow:0 2px 12px rgba(0,0,0,.3)}
+            .total{display:flex;align-items:center;gap:9px;font:700 34px Bahnschrift,"Segoe UI",sans-serif;line-height:1}
+            .total.live{color:{{accent}}}
+            .total svg{width:28px;height:24px;flex:none}
+            .dot{width:10px;height:10px;border-radius:50%;background:#ff3b30;flex:none}
+            .total small{margin-left:auto;text-align:right;font:600 12.5px "Segoe UI",sans-serif;color:#b9c4d6;line-height:1.2}
+            .facts{display:flex;justify-content:space-between;margin:10px 0 2px;font-size:13px;color:#b9c4d6}
+            .facts b{margin-left:5px;color:#fff;font:700 16px Bahnschrift,"Segoe UI",sans-serif}.facts b.t{color:#d6beff}
+            .g{margin-top:9px}.gh{display:flex;justify-content:space-between;font-size:13.5px;font-weight:600}
+            .gh b{font:700 15px Bahnschrift,"Segoe UI",sans-serif}.gh b.ok{color:#3fdc8a}
+            .tr{position:relative;height:7px;border-radius:2px;background:rgba(255,255,255,.18);margin-top:4px;overflow:hidden}
+            .tr b{position:absolute;inset:0 auto 0 0;background:{{accent}}}.tr b.done{background:#3fdc8a}
+            </style></head><body><div class="p">
+            <div class="total{{(live ? " live" : "")}}">{{string.Format(ChestSvg, accent, Hex(Themes.Current.AccentDeep))}}{{H(v.Total)}}{{(v.CurrentLive ? "<i class=\"dot\"></i>" : "")}}<small>{{L.T("coffres<br>au total", "chests<br>in total", "cofres<br>en total", "baús<br>no total")}}</small></div>
+            <div class="facts">{{facts}}</div>
+            {{goals}}
             </div></body></html>
             """;
     }

@@ -39,8 +39,9 @@ public static class MapView
             .OrderByDescending(x => x.Count).Take(top).ToList();
 
     /// <summary>
-    /// Everything the window's map draws, in a compact form: each chest as [u, v, kind, flags] (u and v in thousandths
-    /// of the picture; flags: 1 = this week, 2 = last match, 4 = opened in the storm).
+    /// Everything the window's map draws, in a compact form: each chest as [u, v, kind, flags, match, time] (u and v in
+    /// thousandths of the picture; flags: 1 = this week, 2 = last match, 4 = opened in the storm; match: index in
+    /// "matches", -1 for an older one; time: seconds into the replay).
     /// </summary>
     public static object Data(TrackerData view)
     {
@@ -51,6 +52,9 @@ public static class MapView
         var weekStart = Goals.WeekStart(Goals.Today);
         var last = matches.OrderByDescending(Goals.When).FirstOrDefault();
         var kinds = points.Select(p => ChestKinds.Canonical(p.Chest.Kind)).Distinct().ToList();
+        // The latest matches with placed chests, to show one of them as a route (newest first).
+        var recentMatches = matches.Where(m => m.Chests.Any(c => c.X != null)).OrderByDescending(Goals.When).Take(60).ToList();
+        var matchIndex = recentMatches.Select((m, i) => (m.SessionId, i)).ToDictionary(x => x.SessionId, x => x.i);
         var image = MapData.HasImage && MapData.Folder != null
             ? $"/images/{MapData.ImageName}?v={File.GetLastWriteTimeUtc(Path.Combine(MapData.Folder, MapData.ImageName)).Ticks}"
             : null;
@@ -63,6 +67,16 @@ public static class MapView
             {
                 (int)Math.Round(p.U * 1000), (int)Math.Round(p.V * 1000), kinds.IndexOf(ChestKinds.Canonical(p.Chest.Kind)),
                 (Goals.When(p.Match).Date >= weekStart ? 1 : 0) | (p.Match.SessionId == last?.SessionId ? 2 : 0) | (p.Chest.InStorm == true ? 4 : 0),
+                matchIndex.GetValueOrDefault(p.Match.SessionId, -1), (int)Math.Round(p.Chest.TimeSeconds),
+            }).ToList(),
+            matches = recentMatches.Select(m => new
+            {
+                id = m.SessionId,
+                label = $"{L.DateTimeShort(Goals.When(m))} · {Pretty.Playlist(m.Playlist)} · {Pretty.Placement(m)} · {L.Count(m.ChestsOpened, "coffre", "chest", "cofre", "baú")}",
+                chests = m.ChestsOpened,
+                storm = m.Chests.Count(c => c.InStorm == true),
+                place = Pretty.Placement(m),
+                elims = m.Eliminations,
             }).ToList(),
             pois = pois.Select(p => { var (u, v) = MapData.Project(p.X, p.Y); return new { name = p.Name, u = Math.Round(u * 1000, 1), v = Math.Round(v * 1000, 1) }; }).ToList(),
             places = Places(points, pois).Select(p => new { name = p.Name, count = L.N(p.Count), matches = L.Count(p.Matches, "partie", "parties", "match", "matches", "partida", "partidas", "partida", "partidas"), n = p.Count }).ToList(),

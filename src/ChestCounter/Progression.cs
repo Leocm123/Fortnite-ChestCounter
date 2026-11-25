@@ -14,6 +14,10 @@ public static class Goals
         public bool Done => Value >= Target;
         public string Text => $"{L.N(Value)}/{L.N(Target)}{(Done ? " ✓" : "")}";
         public int Percent => Target <= 0 ? 0 : Math.Min(100, (int)Math.Round(100.0 * Value / Target));
+        /// <summary>"Day" / "Week": the label of the overlay's goal bars.</summary>
+        public string Short => Label == DailyLabel ? L.T("Jour", "Day", "Día", "Dia") : L.T("Semaine", "Week", "Semana", "Semana");
+        /// <summary>"44/30", without the check mark (the overlay's bars show a goal reached in green).</summary>
+        public string Numbers => $"{L.N(Value)}/{L.N(Target)}";
     }
 
     public static DateTime Today => L.Shown(DateTime.UtcNow).Date;

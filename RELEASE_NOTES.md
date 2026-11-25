@@ -2,6 +2,19 @@
 
 > **Ative os replays no Fortnite primeiro**: *Configurações → Jogo → Replays → Gravar Replays: Ativado*. A ferramenta só lê esses arquivos de replay: nenhuma modificação no jogo, nenhum acesso à memória do jogo.
 
+**Novidades da 1.12.0**
+- **Hoje** na aba Início: baús de hoje, partidas e sessão
+- **Seus recordes**: melhor partida, dia, semana, sessão e mais, com o selo "novo!" quando um recorde cai (também no Discord)
+- **Ranking do esquadrão** mostra 5 colegas e um botão "Mostrar mais", até 15
+- **Onde você pousa**: o local do primeiro baú de cada partida, com média de baús, colocação e top 10
+- **Rota da partida no mapa**: escolha uma partida (ou clique nela no relatório) e veja a ordem dos baús abertos
+- **Quando você joga melhor**: baús por partida por dia da semana e horário
+- **Evolução semanal**: as últimas 8 semanas lado a lado
+- **Resumo da sessão** quando o Fortnite fecha: na aba Início, no Discord e em notificação
+- **Retrospectiva**: uma imagem para compartilhar com seus números, para salvar ou copiar
+- **Notificações do Windows** para recordes e o fim da sessão (pode desligar em Configurações)
+- **Overlay com 3 estilos** para escolher: Bloco alinhado, Barras com ícones e Painel de missões, com as metas em barras. A página do OBS segue o estilo escolhido
+
 **Novidades da 1.11.1**
 - **Nomes certos das armas e itens** em "O que seus baús dão": o Fortnite usa codinomes nos IDs internos (o Flapjack Rifle é "Chrono_Pan_Rifle"), e agora o contador tem a tabela da temporada, conferida na wiki do Fortnite. Um item que ainda não está na tabela aparece como "não identificado", nunca com um nome inventado
 - Nova raridade **Exótico** e categorias **Utilitários** e **Corpo a corpo**
@@ -47,6 +60,19 @@ O Windows pode mostrar *"O Windows protegeu o computador"* (exe sem assinatura):
 ---
 
 **English** · Download **`ChestCounter.exe`** below and run it. Already using it? The counter offers the update on its home tab. Your history and settings are kept.
+
+**What's new in 1.12.0**
+- **Today** on the home tab: today's chests, matches and session
+- **Your records**: best match, day, week, session and more, with a "new!" badge when one falls (also on Discord)
+- **Squad ranking** shows 5 teammates and a "Show more" button, up to 15
+- **Where you land**: the place of your first chest each match, with average chests, placement and top 10
+- **Match route on the map**: pick a match (or click it in the report) to see the order of your chests
+- **When you play best**: chests per match by weekday and time of day
+- **Weekly evolution**: the last 8 weeks side by side
+- **Session summary** when Fortnite closes: on the home tab, on Discord and as a notification
+- **Recap**: a shareable image with your numbers, to save or copy
+- **Windows notifications** for records and the end of the session (can be turned off in Settings)
+- **Overlay in 3 styles** to choose from: Aligned block, Bars with icons and Quest panel, with goals as bars. The OBS page follows the chosen style
 
 **What's new in 1.11.1**
 - **Real names of weapons and items** in "What your chests give": Fortnite's internal ids use code names (the Flapjack Rifle is "Chrono_Pan_Rifle"), and the counter now has the season's table, checked against the Fortnite wiki. An item missing from the table shows as "unidentified", never under a made-up name

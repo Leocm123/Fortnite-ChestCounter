@@ -23,13 +23,14 @@ public static class DiscordNotify
 
     /// <summary>A just-counted match. Returns at once: the post is sent in the background (failures are ignored).</summary>
     public static void MatchCounted(Config config, MatchRecord m, IReadOnlyList<MatchRecord> allMatches, int total,
-        IReadOnlyList<Achievement> unlocked, IReadOnlyList<Goals.Progress> goalsReached)
+        IReadOnlyList<Achievement> unlocked, IReadOnlyList<Goals.Progress> goalsReached, IReadOnlyList<Insights.Record>? records = null)
     {
         if (!IsValid(config.DiscordWebhook))
         {
             return;
         }
-        var notable = m.TreasureFinds.Count > 0 || unlocked.Count > 0 || goalsReached.Count > 0;
+        records ??= [];
+        var notable = m.TreasureFinds.Count > 0 || unlocked.Count > 0 || goalsReached.Count > 0 || records.Count > 0;
         if (config.DiscordMode == "treasure" && !notable)
         {
             return;
@@ -42,6 +43,10 @@ public static class DiscordNotify
         foreach (var f in m.TreasureFinds)
         {
             lines.Add($"{L.T("Trésor", "Treasure", "Tesoro", "Tesouro")}{L.T(" : ", ": ", ": ", ": ")}**{f.DisplayName}**");
+        }
+        foreach (var r in records)
+        {
+            lines.Add($"{L.T("Nouveau record", "New record", "Nuevo récord", "Novo recorde")}{L.T(" : ", ": ", ": ", ": ")}**{r.Name}** — {r.ValueText}");
         }
         foreach (var a in unlocked)
         {
@@ -81,6 +86,52 @@ public static class DiscordNotify
         {
             try { using var _ = await Http.PostAsJsonAsync(config.DiscordWebhook!.Trim(), payload); }
             catch { /* offline: the next match will try again */ }
+        });
+    }
+
+    /// <summary>The summary of a play session, when Fortnite closes (every mode: it is one message per session).</summary>
+    public static void SessionOver(Config config, Insights.Session s, int total)
+    {
+        if (!IsValid(config.DiscordWebhook))
+        {
+            return;
+        }
+        var lines = new List<string>
+        {
+            $"{L.Count(s.Matches, "partie", "parties", "match", "matches", "partida", "partidas", "partida", "partidas")} · {L.T("meilleure partie", "best match", "mejor partida", "melhor partida")}{L.T(" : ", ": ", ": ", ": ")}**{L.Count(s.BestMatch, "coffre", "chest", "cofre", "baú")}**",
+        };
+        if (s.AvgPlacement > 0)
+        {
+            lines.Add($"{L.T("Classement moyen", "Average placement", "Puesto medio", "Colocação média")}{L.T(" : ", ": ", ": ", ": ")}{L.Ordinal((int)Math.Round(s.AvgPlacement))}");
+        }
+        if (s.Treasures > 0)
+        {
+            lines.Add(L.Count(s.Treasures, "trésor", "treasure", "tesoro", "tesouro"));
+        }
+        if (s.Storm > 0)
+        {
+            lines.Add($"{L.Count(s.Storm, "coffre", "chest", "cofre", "baú")} {L.T("dans la tempête", "in the storm", "en la tormenta", "na tempestade")}");
+        }
+        lines.AddRange(s.Records.Select(r => $"{L.T("Nouveau record", "New record", "Nuevo récord", "Novo recorde")}{L.T(" : ", ": ", ": ", ": ")}{r}"));
+        var payload = new
+        {
+            username = L.T("Compteur de coffres", "Chest Counter", "Contador de cofres", "Contador de Baús"),
+            embeds = new[]
+            {
+                new
+                {
+                    title = $"{L.T("Session terminée", "Session over", "Sesión terminada", "Sessão encerrada")} · {L.Count(s.Chests, "coffre", "chest", "cofre", "baú")}",
+                    description = string.Join("\n", lines),
+                    color = Color,
+                    fields = new object[] { new { name = L.T("Coffres au total", "Chests in total", "Cofres en total", "Baús no total"), value = L.N(total), inline = true } },
+                    timestamp = s.To.ToString("o"),
+                },
+            },
+        };
+        _ = Task.Run(async () =>
+        {
+            try { using var _ = await Http.PostAsJsonAsync(config.DiscordWebhook!.Trim(), payload); }
+            catch { /* offline */ }
         });
     }
 

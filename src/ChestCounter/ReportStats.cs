@@ -22,6 +22,24 @@ public static class ReportStats
         :root[data-accent="noite"] .pirate{font-family:"Segoe UI",system-ui,sans-serif;font-weight:700;font-size:.85em}
         :root[data-accent="arena"] .pirate{font-family:Bahnschrift,"Segoe UI",sans-serif;font-weight:700;font-style:italic;text-transform:uppercase;font-size:.85em}
         #mapa{scroll-margin-top:16px}
+        .recs{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:10px}
+        .rec{display:flex;gap:12px;align-items:flex-start;background:var(--card);color:var(--cink);border:1px solid var(--line);border-radius:8px;padding:12px 14px}
+        .rec .ai{flex:none;width:38px;height:38px;border-radius:50%;display:grid;place-items:center;background:color-mix(in srgb,var(--gold) 18%,transparent);color:var(--gold)}.rec .ai .ic{width:20px;height:20px}
+        .rec .rk{font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--cmuted);display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+        .rec .rv{font-size:26px;font-weight:700;line-height:1.15}.rec .rd{font-size:12.5px;color:var(--cmuted)}
+        .rec.new{border-color:var(--team);box-shadow:inset 0 0 0 1px var(--team)}
+        .rnew{display:inline-block;padding:1px 7px;border-radius:999px;background:var(--team);color:#fff;font-size:10.5px;letter-spacing:.04em}
+        .wks{display:grid;grid-template-columns:repeat(8,1fr);gap:10px;align-items:end;height:200px}
+        .wk{display:flex;flex-direction:column;align-items:center;justify-content:flex-end;height:100%;gap:4px;font-size:12px;color:var(--cmuted)}
+        .wk i{width:100%;max-width:56px;border-radius:5px 5px 2px 2px;background:color-mix(in srgb,var(--gold) 55%,transparent)}.wk.now i{background:var(--gold)}
+        .wk b{color:var(--cink);font-size:14px}.wk small{font-size:11.5px}
+        .heat{display:grid;grid-template-columns:56px repeat(6,1fr);gap:4px;font-size:12px}
+        .heat .hh{text-align:center;color:var(--cmuted);padding-bottom:2px}.heat .hd{display:flex;align-items:center;color:var(--cmuted);text-transform:capitalize}
+        .heat .hc{border-radius:6px;padding:6px 4px;text-align:center;background:color-mix(in srgb,var(--gold) calc(var(--k) * 85% + 10%),transparent);color:var(--cink);line-height:1.15}
+        .heat .hc b{display:block;font-size:15px}.heat .hc small{font-size:10.5px;opacity:.75}
+        .heat .hc.empty{background:color-mix(in srgb,var(--cink) 5%,transparent)}
+        .moresq{margin:10px auto 4px;display:block;padding:7px 16px;border-radius:8px;border:1px solid var(--line);background:transparent;color:var(--cink);font:600 13px "Segoe UI",system-ui,sans-serif;cursor:pointer}
+        html.incounter tr[data-sid]{cursor:pointer}html.incounter tr[data-sid]:hover td{background:color-mix(in srgb,var(--gold) 12%,transparent)}
         html.incounter #mapa{display:none} /* the window has its own Map tab */
         html.incounter main>header{display:none} /* the window shows its own title */
         html.incounter main{padding-top:4px}
@@ -93,10 +111,14 @@ public static class ReportStats
         }
         var sb = new StringBuilder();
         sb.Append(YourStats(matches));
+        sb.Append(RecordsSection(matches));
         sb.Append(MapSection(matches));
         sb.Append(AchievementsSection(matches, manual));
+        sb.Append(WeeklySection(matches));
         sb.Append("<div class=\"two\">").Append(ByMode(matches)).Append(ByPlacement(matches)).Append("</div>");
+        sb.Append(WhenSection(matches));
         sb.Append(Rhythm(matches));
+        sb.Append(LandingSection(matches));
         sb.Append(ChestsAndResult(matches));
         sb.Append(SquadRanking(matches));
         sb.Append(LootSection(matches));
@@ -213,6 +235,99 @@ public static class ReportStats
             + $"<div class=\"mapgrid\"><div><div class=\"card mapcard\" id=\"mapbox\" data-f=\"all\"><div class=\"mapf\">{filters}</div>{svg}<div class=\"maplegend\">{legend}</div></div>"
             + (MapData.HasImage ? $"<div class=\"items\" style=\"margin-top:6px\">{L.T("Carte : fortnite-api.com", "Map: fortnite-api.com", "Mapa: fortnite-api.com", "Mapa: fortnite-api.com")}</div>" : "")
             + $"</div>{placesHtml}</div>{keepFilter}</section>";
+    }
+
+    // ---- Records -----------------------------------------------------------------------------------------------
+
+    private static string RecordsSection(IReadOnlyList<MatchRecord> matches)
+    {
+        var records = Insights.Records(matches);
+        if (records.Count == 0)
+        {
+            return "";
+        }
+        var cards = string.Concat(records.Select(r =>
+            $"<div class=\"rec{(r.IsNew ? " new" : "")}\"><span class=\"ai\">{Icons.Svg(r.Icon)}</span><div style=\"flex:1;min-width:0\"><div class=\"rk\">{H(r.Name)}{(r.IsNew ? $"<span class=\"rnew\">{L.T("nouveau !", "new!", "¡nuevo!", "novo!")}</span>" : "")}</div><div class=\"rv num\">{H(r.ValueText)}</div><div class=\"rd\">{H(r.Detail)}</div></div></div>"));
+        return $"<section>{Title(L.T("Tes records", "Your records", "Tus récords", "Seus recordes"))}<div class=\"recs\">{cards}</div></section>";
+    }
+
+    // ---- Weekly trend ------------------------------------------------------------------------------------------
+
+    private static string WeeklySection(IReadOnlyList<MatchRecord> matches)
+    {
+        var weeks = Insights.Weeks(matches);
+        if (weeks.All(w => w.Matches == 0))
+        {
+            return "";
+        }
+        var max = Math.Max(1, weeks.Max(w => w.Chests));
+        var bars = string.Concat(weeks.Select((w, i) =>
+        {
+            var avg = w.Matches > 0 ? F1((double)w.Chests / w.Matches) : "—";
+            var tip = $"{L.T("Semaine du", "Week of", "Semana del", "Semana de")} {w.Start.ToString("dd/MM", L.Culture)}: {L.Count(w.Chests, "coffre", "chest", "cofre", "baú")} · {L.Count(w.Matches, "partie", "parties", "match", "matches", "partida", "partidas", "partida", "partidas")} · {avg} {L.T("par partie", "per match", "por partida", "por partida")}";
+            return $"<div class=\"wk{(i == weeks.Count - 1 ? " now" : "")}\" title=\"{H(tip)}\"><b class=\"num\">{(w.Chests > 0 ? L.N(w.Chests) : "")}</b><i style=\"height:{Math.Max(2, (int)Math.Round(100.0 * w.Chests / max))}%\"></i><span>{w.Start.ToString("dd/MM", L.Culture)}</span><small class=\"num\">{avg}</small></div>";
+        }));
+        var current = weeks[^1];
+        var previous = weeks[^2];
+        return $"<section>{Title(L.T("Évolution semaine par semaine", "Week by week", "Semana a semana", "Evolução semanal"), L.T("coffres par semaine · moyenne par partie en dessous", "chests per week · average per match below", "cofres por semana · media por partida debajo", "baús por semana · média por partida embaixo"))}"
+            + $"<div class=\"card chart\"><div class=\"wks\">{bars}</div><div class=\"plegend\" style=\"margin-top:10px\"><span>{L.T("Cette semaine", "This week", "Esta semana", "Esta semana")}: <b>{L.N(current.Chests)}</b> {Trend(current.Chests, previous.Chests)}</span><span>{L.T("Trésors sur 8 semaines", "Treasures over 8 weeks", "Tesoros en 8 semanas", "Tesouros em 8 semanas")}: <b>{L.N(weeks.Sum(w => w.Treasures))}</b></span></div></div></section>";
+    }
+
+    // ---- When the player does best -----------------------------------------------------------------------------
+
+    private static string WhenSection(IReadOnlyList<MatchRecord> matches)
+    {
+        if (matches.Count < 10)
+        {
+            return "";
+        }
+        var slots = Insights.Slots(matches);
+        var max = slots.Max(s => s.AvgChests);
+        var min = slots.Min(s => s.AvgChests);
+        var days = Enumerable.Range(0, 7).Select(i => new DateTime(2024, 1, 1).AddDays(i).ToString("ddd", L.Culture)).ToList(); // 1 Jan 2024 is a Monday
+        var head = "<div></div>" + string.Concat(Enumerable.Range(0, 6).Select(b => $"<div class=\"hh\">{b * 4}h–{b * 4 + 4}h</div>"));
+        var cells = new StringBuilder(head);
+        for (var d = 0; d < 7; d++)
+        {
+            cells.Append($"<div class=\"hd\">{H(days[d])}</div>");
+            for (var b = 0; b < 6; b++)
+            {
+                var s = slots.FirstOrDefault(x => x.Day == d && x.Block == b);
+                if (s == null)
+                {
+                    cells.Append("<div class=\"hc empty\"></div>");
+                    continue;
+                }
+                var k = max > min ? (s.AvgChests - min) / (max - min) : 1;
+                var tip = $"{days[d]} {b * 4}h–{b * 4 + 4}h: {F1(s.AvgChests)} {L.T("coffres par partie", "chests per match", "cofres por partida", "baús por partida")} · {L.Count(s.Matches, "partie", "parties", "match", "matches", "partida", "partidas", "partida", "partidas")}";
+                cells.Append($"<div class=\"hc\" style=\"--k:{k.ToString("0.00", System.Globalization.CultureInfo.InvariantCulture)}\" title=\"{H(tip)}\"><b class=\"num\">{F1(s.AvgChests)}</b><small>{s.Matches}</small></div>");
+            }
+        }
+        var top = slots.Where(s => s.Matches >= 2).OrderByDescending(s => s.AvgChests).FirstOrDefault();
+        var note = top == null ? "" : L.T($"Tu fais le mieux le {days[top.Day]} entre {top.Block * 4}h et {top.Block * 4 + 4}h : {F1(top.AvgChests)} coffres par partie.",
+            $"You do best on {days[top.Day]} between {top.Block * 4}h and {top.Block * 4 + 4}h: {F1(top.AvgChests)} chests per match.",
+            $"Rindes mejor el {days[top.Day]} entre las {top.Block * 4}h y las {top.Block * 4 + 4}h: {F1(top.AvgChests)} cofres por partida.",
+            $"Você rende mais na {days[top.Day]} entre {top.Block * 4}h e {top.Block * 4 + 4}h: {F1(top.AvgChests)} baús por partida.");
+        return $"<section>{Title(L.T("Quand tu joues le mieux", "When you do best", "Cuándo rindes más", "Quando você joga melhor"), L.T("moyenne de coffres par partie · nombre de parties en petit", "average chests per match · matches in small", "media de cofres por partida · partidas en pequeño", "média de baús por partida · partidas em miúdo"))}"
+            + $"<div class=\"card chart\"><div class=\"heat\">{cells}</div>{(note.Length > 0 ? $"<p class=\"items\" style=\"margin:10px 0 0\">{H(note)}</p>" : "")}</div></section>";
+    }
+
+    // ---- Landing spots -----------------------------------------------------------------------------------------
+
+    private static string LandingSection(IReadOnlyList<MatchRecord> matches)
+    {
+        var landings = Insights.Landings(matches);
+        if (landings.Count == 0)
+        {
+            return "";
+        }
+        var top = Math.Max(0.1, landings.Max(l => l.AvgChests));
+        var rows = string.Concat(landings.Select(l =>
+            $"<tr><td><b>{H(l.Place)}</b></td><td class=\"sub num\">{L.N(l.Matches)}</td><td style=\"width:130px\">{Bar((int)Math.Round(100 * l.AvgChests / top))}</td><td class=\"n num\">{F1(l.AvgChests)}</td>"
+            + $"<td class=\"n num\">{(l.AvgPlacement > 0 ? L.Ordinal((int)Math.Round(l.AvgPlacement)) : "—")}</td><td class=\"n num\">{(int)Math.Round(100 * l.Top10)}%</td></tr>"));
+        return $"<section>{Title(L.T("Où tu atterris", "Where you land", "Dónde aterrizas", "Onde você pousa"), L.T("le lieu de ton premier coffre de chaque partie", "the place of your first chest of each match", "el lugar de tu primer cofre de cada partida", "o local do seu primeiro baú de cada partida"))}"
+            + $"<div class=\"card\"><table><tr><th>{L.T("Lieu", "Place", "Lugar", "Local")}</th><th class=\"r\">{L.T("Parties", "Matches", "Partidas", "Partidas")}</th><th></th><th class=\"r\">{L.T("Coffres", "Chests", "Cofres", "Baús")}</th>"
+            + $"<th class=\"r\">{L.T("Classement moyen", "Avg. placement", "Puesto medio", "Colocação média")}</th><th class=\"r\">Top 10</th></tr>{rows}</table></div></section>";
     }
 
     // ---- Achievements ------------------------------------------------------------------------------------------
@@ -394,7 +509,7 @@ public static class ReportStats
         var you = matches.Select(m => m.PlayerName).FirstOrDefault(n => !string.IsNullOrEmpty(n)) ?? L.T("toi", "you", "tú", "você");
         // The player, over the same matches (the ones played with somebody).
         mates.Add((you, withTeam.Count, withTeam.Sum(m => m.ChestsOpened), true));
-        var rows = mates.OrderByDescending(x => (double)x.Chests / x.Matches).ThenByDescending(x => x.Matches).Take(12).ToList();
+        var rows = mates.OrderByDescending(x => (double)x.Chests / x.Matches).ThenByDescending(x => x.Matches).Take(15).ToList();
         var top = Math.Max(0.1, rows.Max(x => (double)x.Chests / x.Matches));
 
         var sb = new StringBuilder($"<section>{Title(L.T("Classement de l'équipe", "Squad ranking", "Clasificación del equipo", "Ranking do esquadrão"),
@@ -407,11 +522,17 @@ public static class ReportStats
             var r = rows[i];
             var avg = (double)r.Chests / r.Matches;
             var medal = i < 3 ? $"<span class=\"rank r{i + 1}\">{Icons.Medal(i + 1)}</span>" : $"<span class=\"rank\">{L.N(i + 1)}</span>";
-            sb.Append($"<tr><td class=\"num\">{medal}</td><td>{(r.You ? $"<b>{H(r.Name)}</b> ({L.T("toi", "you", "tú", "você")})" : H(r.Name))}</td>"
+            sb.Append($"<tr{(i >= 5 ? " class=\"more\" hidden" : "")}><td class=\"num\">{medal}</td><td>{(r.You ? $"<b>{H(r.Name)}</b> ({L.T("toi", "you", "tú", "você")})" : H(r.Name))}</td>"
                 + $"<td style=\"width:150px\">{Bar((int)Math.Round(100 * avg / top), r.You ? "var(--team)" : null)}</td>"
                 + $"<td class=\"n num big\">{F1(avg)}</td><td class=\"sub num\">{L.N(r.Chests)}</td><td class=\"sub num\">{L.N(r.Matches)}</td></tr>");
         }
-        return sb.Append("</table></div></section>").ToString();
+        sb.Append("</table>");
+        if (rows.Count > 5)
+        {
+            // 5 shown, 5 more at each click, up to 15.
+            sb.Append($"<button type=\"button\" class=\"moresq\" onclick=\"var r=this.parentNode.querySelectorAll('tr.more[hidden]');for(var i=0;i<5&&i<r.length;i++)r[i].hidden=false;if(r.length<=5)this.remove()\">{L.T("Afficher plus", "Show more", "Mostrar más", "Mostrar mais")}</button>");
+        }
+        return sb.Append("</div></section>").ToString();
     }
 
     // ---- Loot --------------------------------------------------------------------------------------------------

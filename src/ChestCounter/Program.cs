@@ -269,6 +269,10 @@ if (!showWhatsNew && config.LastVersion != AppInfo.VersionText)
 }
 DateTime? autoCloseAt = null;
 DateTime? fortniteClosedSince = null;
+// Session summary (CheckGameSession): when Fortnite was seen running, since when it is closed, the last summary.
+DateTime? gameSince = null, gameGoneSince = null;
+Insights.Session? sessionSummary = null;
+var nextGameCheck = DateTime.MinValue;
 FileSystemWatcher? watcher = null;
 var watcherFired = false;
 var nextScan = DateTime.UtcNow.AddSeconds(2);
@@ -495,6 +499,7 @@ while (!quit)
     {
         CheckAutoClose();
     }
+    CheckGameSession();
 
     // A new treasure week (Sunday): the chances of the weekly treasures start again from that week's chests, even for
     // a counter left open with no match played.
@@ -880,15 +885,76 @@ void AfterNewMatches(HashSet<string> known)
     {
         Console.WriteLine($"   {L.T("Objectif atteint", "Goal reached", "Meta cumplida", "Meta batida")}: {g.Label} ({g.Text})");
     }
+    var records = Insights.Broken(before, view.Matches);
+    foreach (var r in records)
+    {
+        Console.WriteLine($"   {L.T("Nouveau record", "New record", "Nuevo récord", "Novo recorde")}: {r.Name} — {r.ValueText}");
+    }
     Console.ResetColor();
 
-    // Discord: only matches played in the last 3 hours (not replays left from earlier days), 3 at most. The
-    // achievements and goals go with the last one.
+    // Discord and Windows notifications: only matches played in the last 3 hours (not replays left from earlier
+    // days), 3 at most. The achievements, goals and records go with the last one.
     var recent = fresh.Where(m => DateTime.UtcNow - (m.MatchStartUtc ?? m.AnalyzedAtUtc) < TimeSpan.FromHours(3)).TakeLast(3).ToList();
     for (var i = 0; i < recent.Count; i++)
     {
         var lastOne = i == recent.Count - 1;
-        DiscordNotify.MatchCounted(config, recent[i], view.Matches, view.TotalChests, lastOne ? unlocked : [], lastOne ? reached : []);
+        DiscordNotify.MatchCounted(config, recent[i], view.Matches, view.TotalChests, lastOne ? unlocked : [], lastOne ? reached : [], lastOne ? records : []);
+    }
+    if (recent.Count > 0 && config.WindowsNotifications && guiWindowed && OperatingSystem.IsWindows())
+    {
+        var lines = new List<string>();
+        lines.AddRange(records.Select(r => $"{L.T("Nouveau record", "New record", "Nuevo récord", "Novo recorde")}: {r.Name} — {r.ValueText}"));
+        lines.AddRange(recent.SelectMany(m => m.TreasureFinds).Select(f => $"{L.T("Trésor", "Treasure", "Tesoro", "Tesouro")}: {f.DisplayName}"));
+        lines.AddRange(reached.Select(g => $"{L.T("Objectif atteint", "Goal reached", "Meta cumplida", "Meta batida")}: {g.Label} ({g.Text.Replace(" ✓", "")})"));
+        lines.AddRange(unlocked.Select(a => $"{L.T("Succès", "Achievement", "Logro", "Conquista")}: {a.Name}"));
+        if (lines.Count > 0)
+        {
+            GuiWindow.Notify(appName, string.Join("\n", lines.Take(5)));
+        }
+    }
+}
+
+// ---- Session summary: when Fortnite closes, what the session brought ------------------------------------------
+void CheckGameSession()
+{
+    if (DateTime.UtcNow < nextGameCheck || !OperatingSystem.IsWindows())
+    {
+        return;
+    }
+    nextGameCheck = DateTime.UtcNow.AddSeconds(15);
+    if (FortniteWatch.IsFortniteRunning())
+    {
+        gameSince ??= DateTime.UtcNow;
+        gameGoneSince = null;
+        return;
+    }
+    if (gameSince is not DateTime since)
+    {
+        return;
+    }
+    // Closed for 30 s and the last replay counted: the session is over.
+    gameGoneSince ??= DateTime.UtcNow;
+    if (DateTime.UtcNow - gameGoneSince < TimeSpan.FromSeconds(30) || tracker.HasPending || tracker.IsFinishing)
+    {
+        return;
+    }
+    gameSince = null;
+    gameGoneSince = null;
+    var view = Profiles.View(data, config);
+    if (Insights.SessionOf(view.Matches, since, DateTime.UtcNow) is not { } summary)
+    {
+        return;
+    }
+    sessionSummary = summary;
+    var text = $"{L.Count(summary.Matches, "partie", "parties", "match", "matches", "partida", "partidas", "partida", "partidas")} · {L.Count(summary.Chests, "coffre", "chest", "cofre", "baú")} · "
+        + $"{L.T("meilleure", "best", "mejor", "melhor")}: {L.N(summary.BestMatch)}" + (summary.Treasures > 0 ? $" · {L.Count(summary.Treasures, "trésor", "treasure", "tesoro", "tesouro")}" : "");
+    Console.ForegroundColor = ConsoleColor.Cyan;
+    Console.WriteLine($"{L.Stamp} {L.T("Session terminée", "Session over", "Sesión terminada", "Sessão encerrada")}: {text}");
+    Console.ResetColor();
+    DiscordNotify.SessionOver(config, summary, view.TotalChests);
+    if (config.WindowsNotifications && guiWindowed)
+    {
+        GuiWindow.Notify(L.T("Session terminée", "Session over", "Sesión terminada", "Sessão encerrada"), text + (summary.Records.Count > 0 ? "\n" + string.Join("\n", summary.Records.Take(3)) : ""));
     }
 }
 
@@ -991,6 +1057,14 @@ object BuildGuiState()
         last = last == null ? null : new { chests = L.N(last.ChestsOpened), when = L.DateTimeShort(L.Shown(last.MatchStartUtc ?? last.AnalyzedAtUtc)), mode = Pretty.Playlist(last.Playlist), place = Pretty.Placement(last) },
         locale = L.Culture.Name,
         todayChests = L.N(Goals.ChestsToday(matches)),
+        todayMatches = L.N(matches.Count(m => Goals.When(m).Date == Goals.Today)),
+        // The session that just ended (Fortnite closed), until dismissed.
+        sessionSummary = sessionSummary is not { } ss ? null : new
+        {
+            matches = L.N(ss.Matches), chests = L.N(ss.Chests), best = L.N(ss.BestMatch), treasures = L.N(ss.Treasures), storm = L.N(ss.Storm),
+            placement = ss.AvgPlacement > 0 ? L.Ordinal((int)Math.Round(ss.AvgPlacement)) : "—",
+            minutes = (int)Math.Round((ss.To - ss.From).TotalMinutes), records = ss.Records,
+        },
         // The last 14 days (chests per day, today last) for the small chart of the total.
         spark = Enumerable.Range(0, 14).Select(i => Goals.Today.AddDays(i - 13)).Select(d => matches.Where(m => Goals.When(m).Date == d).Sum(m => m.ChestsOpened)).ToList(),
         sparkFrom = Goals.Today.AddDays(-13).ToString("dd/MM", L.Culture),
@@ -1031,6 +1105,7 @@ object BuildGuiState()
             languages = L.Codes.Select(c => new[] { c, L.NativeName(c) }).ToList(),
             theme = Themes.Current.Id,
             themes = Themes.All.Select(t => new[] { t.Id, t.Name }).ToList(),
+            windowsNotifications = config.WindowsNotifications,
             performanceMode = config.PerformanceMode,
             performanceRecommended = Performance.Recommended,
             dailyGoal = config.DailyGoal,
@@ -1250,6 +1325,9 @@ object? RunGuiAction(string name, System.Text.Json.JsonElement value)
         case "copyObsPath": CopyToClipboard(Path.GetFullPath(store.OverlayPath)); settingsChanged = false; break;
         case "openDataFolder": Open(store.Folder); settingsChanged = false; break;
         case "mapData": result = MapView.Data(Profiles.View(data, config)); settingsChanged = false; break;
+        case "recap": result = Insights.Recap(Profiles.View(data, config)); settingsChanged = false; break;
+        case "dismissSession": sessionSummary = null; settingsChanged = false; break;
+        case "windowsNotifications": config.WindowsNotifications = Bool(); break;
         case "openReportFile": if (File.Exists(store.ReportPath)) Open(store.ReportPath); settingsChanged = false; break;
         case "openErrorLog": if (File.Exists(store.ErrorLogPath)) Open(store.ErrorLogPath); settingsChanged = false; break;
         case "openIssues": Open(AppInfo.IssuesUrl); settingsChanged = false; break;

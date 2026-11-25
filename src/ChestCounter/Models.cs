@@ -172,6 +172,9 @@ public sealed class Config
     public double? MapMinY { get; set; }
     public double? MapSpan { get; set; }
 
+    /// <summary>Windows notifications for a record, a treasure, a goal reached or an achievement (and the session summary).</summary>
+    public bool WindowsNotifications { get; set; } = true;
+
     /// <summary>Lighter counter for low-end PCs (see <see cref="Performance"/>).</summary>
     public bool PerformanceMode { get; set; }
 
