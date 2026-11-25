@@ -2,6 +2,10 @@
 
 > **Ative os replays no Fortnite primeiro**: *Configurações → Jogo → Replays → Gravar Replays: Ativado*. A ferramenta só lê esses arquivos de replay: nenhuma modificação no jogo, nenhum acesso à memória do jogo.
 
+**Novidades da 1.13.0**
+- **Ranking do esquadrão com ordenação**: escolha entre Média, Baús, Partidas juntos e Tesouros. A escolha fica salva
+- **Novo estilo de overlay Clean empilhado**: o total e, embaixo, a última partida, a sessão e os tesouros, um por linha, sem fundo. A página do OBS também segue esse estilo
+
 **Novidades da 1.12.1**
 - **Novo estilo de overlay Clean**: uma linha só, sem fundo, com o total, a última partida, a sessão e os tesouros. Encaixa no jogo sem ocupar espaço, e a página do OBS também segue esse estilo
 
@@ -63,6 +67,10 @@ O Windows pode mostrar *"O Windows protegeu o computador"* (exe sem assinatura):
 ---
 
 **English** · Download **`ChestCounter.exe`** below and run it. Already using it? The counter offers the update on its home tab. Your history and settings are kept.
+
+**What's new in 1.13.0**
+- **Sortable squad ranking**: pick Average, Chests, Matches together or Treasures. Your choice is remembered
+- **New Clean stacked overlay style**: the total with the last match, session and treasures under it, one per line, no background. The OBS page follows it too
 
 **What's new in 1.12.1**
 - **New Clean overlay style**: a single line with no background, showing the total, last match, session and treasures. It fits into the game without taking up room, and the OBS page follows it too

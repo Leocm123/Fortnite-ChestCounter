@@ -62,6 +62,7 @@ public static class GuiPage
         ["hud"] = L.T("Bloc aligné (objectifs en barres)", "Aligned block (goal bars)", "Bloque alineado (metas en barras)", "Bloco alinhado (metas em barras)"),
         ["icons"] = L.T("Barres avec icônes", "Bars with icons", "Barras con iconos", "Barras com ícones"),
         ["clean"] = L.T("Épuré (une ligne, sans fond)", "Clean (one line, no background)", "Limpio (una línea, sin fondo)", "Clean (uma linha, sem fundo)"),
+        ["stack"] = L.T("Épuré empilé (sans fond)", "Clean stacked (no background)", "Limpio apilado (sin fondo)", "Clean empilhado (sem fundo)"),
         ["classic"] = L.T("Panneau de quêtes", "Quest panel", "Panel de misiones", "Painel de missões"),
         ["size"] = L.T("Taille", "Size", "Tamaño", "Tamanho"),
         ["opacity"] = L.T("Opacité", "Opacity", "Opacidad", "Opacidade"),
@@ -794,7 +795,7 @@ public static class GuiPage
         function overlay(T){
           const o=S.overlay;
           const look=scard('overlay',esc(T.inGame),esc(T.overlayCardHelp),row(esc(T.showInGame),'',sw('ov',o.show,'showOverlay'))
-            +row(esc(T.style),'',sel('overlayStyle',o.style,[['hud',T.hud],['icons',T.icons],['clean',T.clean],['classic',T.classic]]))
+            +row(esc(T.style),'',sel('overlayStyle',o.style,[['hud',T.hud],['icons',T.icons],['clean',T.clean],['stack',T.stack],['classic',T.classic]]))
             +(o.show?row(esc(T.size),'',sel('overlaySize',o.size,o.sizes.map(x=>[x,x+' %'])))+row(esc(T.opacity),'',sel('overlayOpacity',o.opacity,o.opacities.map(x=>[x,x+' %']))):'')
             +row(esc(T.squadToggle)+`<span class="badge" title="${esc(T.inaccurateWhy)}">${esc(T.inaccurate)}</span>`,esc(T.squadHelp),sw('sq',o.squad,'showSquadTotal'))
             +(o.running?`<div class="actions" style="margin-top:12px"><button class="b" onclick="api('toggleOverlayVisible')">${IC.eye}${esc(o.visible?T.hideOverlay:T.showOverlay)}</button><button class="b" onclick="api('toggleOverlayLock')">${IC.lock}${esc(o.locked?T.unlock:T.lock)}</button></div>`:''));

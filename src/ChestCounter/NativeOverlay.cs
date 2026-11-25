@@ -52,8 +52,8 @@ public static class NativeOverlay
     /// anti-aliased edge of the black outline around the text blends into it without any colored fringe.</summary>
     private static readonly uint KeyColor = 0x00010001;
 
-    /// <summary>"hud" (aligned block), "icons" (bars with icons), "clean" (one line, no goals), "classic" (quest panel).</summary>
-    public static string[] Styles => new[] { "hud", "icons", "clean", "classic" };
+    /// <summary>"hud" (aligned block), "icons" (bars with icons), "clean" (one line, no goals), "stack" (clean, stacked), "classic" (quest panel).</summary>
+    public static string[] Styles => new[] { "hud", "icons", "clean", "stack", "classic" };
 
     /// <summary>Changes the look of the overlay at once.</summary>
     public static void SetStyle(string style)
@@ -442,6 +442,7 @@ public static class NativeOverlay
     //  "hud"     Aligned block: outlined figures like the game's HUD, the goals as bars of the same width in a column.
     //  "icons"   Bars with icons: the same figures, the goals as an icon and a bar with its number inside.
     //  "clean"   Clean: one line of outlined figures (total, last, session, treasures), nothing else.
+    //  "stack"   Clean stacked: the same facts, one per line under the total.
     //  "classic" Quest panel: a translucent dark plate, like the game's quest tracker, clean white text, thin bars.
 
     /// <summary>The small facts under the total: last match, session, squad (when shown), treasures.</summary>
@@ -537,12 +538,27 @@ public static class NativeOverlay
         return (w, pad + Math.Max(_cleanBigH, _hudSmallH) + pad);
     }
 
+    private static (int W, int H) MeasureStack(IntPtr hdc)
+    {
+        var v = _view;
+        var pad = Sc(6);
+        var bigW = TextWidth(hdc, _fontCleanBig, v.Total, out _cleanBigH);
+        var facts = CleanFacts(v);
+        var factW = facts.Max(f => FactsWidth(hdc, [f], out _hudSmallH));
+        var w = Sc(22) + pad + Math.Max(Sc(16) + Sc(22) + Sc(7) + bigW, factW) + pad + Sc(12);
+        return (w, pad + _cleanBigH + Sc(1) + facts.Count * _hudSmallH + pad);
+    }
+
     private static (int W, int H) MeasureHud(IntPtr hdc)
     {
         var v = _view;
         if (_style == "clean")
         {
             return MeasureClean(hdc);
+        }
+        if (_style == "stack")
+        {
+            return MeasureStack(hdc);
         }
         var pad = Sc(8);
         var bigW = TextWidth(hdc, _fontHudBig, v.Total, out _hudBigH);
@@ -698,6 +714,11 @@ public static class NativeOverlay
             PaintClean(hdc, rc, left);
             return;
         }
+        if (_style == "stack")
+        {
+            PaintStack(hdc, rc, left);
+            return;
+        }
         var y = pad;
 
         // Total, with the chest, and the red dot while a match is in progress.
@@ -774,6 +795,33 @@ public static class NativeOverlay
             x -= Sc(12);
         }
         return x + Sc(12);
+    }
+
+    /// <summary>The clean look, stacked: the total, then one fact per line, all right-aligned.</summary>
+    private static void PaintStack(IntPtr hdc, RECT rc, int left)
+    {
+        var v = _view;
+        var pad = Sc(6);
+        var right = rc.Right - pad - Sc(12);
+        var gold = Rgb(Themes.Current.Accent);
+        var y = pad;
+        var bigW = TextWidth(hdc, _fontCleanBig, v.Total, out _);
+        Outlined(hdc, _fontCleanBig, LiveFigures(v) ? gold : Rgb(255, 255, 255), v.Total, left, y, right, y + _cleanBigH, DT_RIGHT);
+        var iw = Sc(22);
+        var ih = Sc(18);
+        var ix = right - bigW - Sc(7) - iw;
+        Chest(hdc, ix, y + (_cleanBigH - ih) / 2, iw, ih, gold, Rgb(Themes.Current.AccentDeep), Ink, Ink);
+        if (v.CurrentLive)
+        {
+            var d = Sc(9);
+            Disc(hdc, ix - Sc(6) - d, y + (_cleanBigH - d) / 2, d, Rgb(255, 59, 48), Ink, Math.Max(1, Sc(1.5)));
+        }
+        y += _cleanBigH + Sc(1);
+        foreach (var f in CleanFacts(v))
+        {
+            DrawFacts(hdc, [f], left, right, y);
+            y += _hudSmallH;
+        }
     }
 
     /// <summary>The clean look: "[chest] 285   Last 8  Session 0  ★ 1" on one line, bottoms aligned.</summary>

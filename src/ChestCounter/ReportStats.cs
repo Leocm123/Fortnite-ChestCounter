@@ -1,3 +1,4 @@
+using System.Globalization;
 using System.Net;
 using System.Text;
 
@@ -38,7 +39,11 @@ public static class ReportStats
         .heat .hc{border-radius:6px;padding:6px 4px;text-align:center;background:color-mix(in srgb,var(--gold) calc(var(--k) * 85% + 10%),transparent);color:var(--cink);line-height:1.15}
         .heat .hc b{display:block;font-size:15px}.heat .hc small{font-size:10.5px;opacity:.75}
         .heat .hc.empty{background:color-mix(in srgb,var(--cink) 5%,transparent)}
-        .moresq{margin:10px auto 4px;display:block;padding:7px 16px;border-radius:8px;border:1px solid var(--line);background:transparent;color:var(--cink);font:600 13px "Segoe UI",system-ui,sans-serif;cursor:pointer}
+        .sqsort{display:flex;align-items:center;justify-content:flex-end;gap:10px;margin-bottom:8px;font-size:13px;color:var(--cmuted);flex-wrap:wrap}
+        .seg{display:inline-flex;gap:2px;padding:3px;border-radius:9px;background:color-mix(in srgb,var(--cink) 7%,transparent)}
+        .seg button{border:0;background:transparent;color:var(--cink);font:600 12.5px "Segoe UI",system-ui,sans-serif;padding:5px 11px;border-radius:7px;cursor:pointer;opacity:.75}
+        .seg button.on{background:var(--gold);color:#fff;opacity:1}
+        .moresq[hidden]{display:none}.moresq{margin:10px auto 4px;display:block;padding:7px 16px;border-radius:8px;border:1px solid var(--line);background:transparent;color:var(--cink);font:600 13px "Segoe UI",system-ui,sans-serif;cursor:pointer}
         html.incounter tr[data-sid]{cursor:pointer}html.incounter tr[data-sid]:hover td{background:color-mix(in srgb,var(--gold) 12%,transparent)}
         html.incounter #mapa{display:none} /* the window has its own Map tab */
         html.incounter main>header{display:none} /* the window shows its own title */
@@ -503,35 +508,58 @@ public static class ReportStats
             .Select(g =>
             {
                 var latest = g.OrderByDescending(x => Goals.When(x.m)).First().t.Name;
-                return (Name: latest, Matches: g.Select(x => x.m.SessionId).Distinct().Count(), Chests: g.Sum(x => x.t.Chests), You: false);
+                var treasures = g.Sum(x => x.m.TeamTreasureFinds.Count(f => f.Teammate == x.t.Name));
+                return (Name: latest, Matches: g.Select(x => x.m.SessionId).Distinct().Count(), Chests: g.Sum(x => x.t.Chests), Treasures: treasures, You: false);
             })
             .ToList();
         var you = matches.Select(m => m.PlayerName).FirstOrDefault(n => !string.IsNullOrEmpty(n)) ?? L.T("toi", "you", "tú", "você");
         // The player, over the same matches (the ones played with somebody).
-        mates.Add((you, withTeam.Count, withTeam.Sum(m => m.ChestsOpened), true));
-        var rows = mates.OrderByDescending(x => (double)x.Chests / x.Matches).ThenByDescending(x => x.Matches).Take(15).ToList();
+        mates.Add((you, withTeam.Count, withTeam.Sum(m => m.ChestsOpened), withTeam.Sum(m => m.TreasureFinds.Count), true));
+        // Everyone is written (the most frequent teammates first, at most 60); the page sorts them by the chosen
+        // column and shows 5, then 5 more at each click, up to 15.
+        var rows = mates.OrderByDescending(x => x.Matches).ThenByDescending(x => x.Chests).Take(60)
+            .OrderByDescending(x => (double)x.Chests / x.Matches).ThenByDescending(x => x.Matches).ToList();
         var top = Math.Max(0.1, rows.Max(x => (double)x.Chests / x.Matches));
 
-        var sb = new StringBuilder($"<section>{Title(L.T("Classement de l'équipe", "Squad ranking", "Clasificación del equipo", "Ranking do esquadrão"),
-            L.T("coffres par partie jouée ensemble · imprécis au-delà de 150 m de toi", "chests per match played together · inaccurate beyond 150 m from you",
-                "cofres por partida jugada juntos · impreciso a más de 150 m de ti", "baús por partida jogada junto · impreciso a mais de 150 m de você"))}"
-            + $"<div class=\"card\"><table><tr><th>#</th><th>{L.T("Joueur", "Player", "Jugador", "Jogador")}</th><th></th><th class=\"r\">{L.T("Moyenne", "Average", "Media", "Média")}</th>"
-            + $"<th class=\"r\">{L.T("Coffres", "Chests", "Cofres", "Baús")}</th><th class=\"r\">{L.T("Parties ensemble", "Matches together", "Partidas juntos", "Partidas juntos")}</th></tr>");
+        var sorts = new[]
+        {
+            ("avg", L.T("Moyenne", "Average", "Media", "Média")),
+            ("c", L.T("Coffres", "Chests", "Cofres", "Baús")),
+            ("m", L.T("Parties ensemble", "Matches together", "Partidas juntos", "Partidas juntos")),
+            ("t", L.T("Trésors", "Treasures", "Tesoros", "Tesouros")),
+        };
+        var seg = string.Concat(sorts.Select((s, i) => $"<button type=\"button\" data-k=\"{s.Item1}\"{(i == 0 ? " class=\"on\"" : "")}>{H(s.Item2)}</button>"));
+        var sb = new StringBuilder($"<section id=\"squad\">{Title(L.T("Classement de l'équipe", "Squad ranking", "Clasificación del equipo", "Ranking do esquadrão"),
+            L.T("parties jouées ensemble · imprécis au-delà de 150 m de toi", "matches played together · inaccurate beyond 150 m from you",
+                "partidas jugadas juntos · impreciso a más de 150 m de ti", "partidas jogadas junto · impreciso a mais de 150 m de você"))}"
+            + $"<div class=\"card\"><div class=\"sqsort\"><span>{L.T("Trier par", "Sort by", "Ordenar por", "Ordenar por")}</span><div class=\"seg\">{seg}</div></div>"
+            + $"<table><tr><th>#</th><th>{L.T("Joueur", "Player", "Jugador", "Jogador")}</th><th></th>"
+            + string.Concat(sorts.Select(s => $"<th class=\"r\" data-col=\"{s.Item1}\">{H(s.Item2)}</th>")) + "</tr>");
         for (var i = 0; i < rows.Count; i++)
         {
             var r = rows[i];
             var avg = (double)r.Chests / r.Matches;
             var medal = i < 3 ? $"<span class=\"rank r{i + 1}\">{Icons.Medal(i + 1)}</span>" : $"<span class=\"rank\">{L.N(i + 1)}</span>";
-            sb.Append($"<tr{(i >= 5 ? " class=\"more\" hidden" : "")}><td class=\"num\">{medal}</td><td>{(r.You ? $"<b>{H(r.Name)}</b> ({L.T("toi", "you", "tú", "você")})" : H(r.Name))}</td>"
+            sb.Append($"<tr data-avg=\"{avg.ToString("0.###", CultureInfo.InvariantCulture)}\" data-c=\"{r.Chests}\" data-m=\"{r.Matches}\" data-t=\"{r.Treasures}\"{(i >= 5 ? " hidden" : "")}>"
+                + $"<td class=\"num\">{medal}</td><td>{(r.You ? $"<b>{H(r.Name)}</b> ({L.T("toi", "you", "tú", "você")})" : H(r.Name))}</td>"
                 + $"<td style=\"width:150px\">{Bar((int)Math.Round(100 * avg / top), r.You ? "var(--team)" : null)}</td>"
-                + $"<td class=\"n num big\">{F1(avg)}</td><td class=\"sub num\">{L.N(r.Chests)}</td><td class=\"sub num\">{L.N(r.Matches)}</td></tr>");
+                + $"<td class=\"n num big\" data-col=\"avg\">{F1(avg)}</td><td class=\"sub num\" data-col=\"c\">{L.N(r.Chests)}</td><td class=\"sub num\" data-col=\"m\">{L.N(r.Matches)}</td><td class=\"sub num\" data-col=\"t\">{L.N(r.Treasures)}</td></tr>");
         }
         sb.Append("</table>");
-        if (rows.Count > 5)
-        {
-            // 5 shown, 5 more at each click, up to 15.
-            sb.Append($"<button type=\"button\" class=\"moresq\" onclick=\"var r=this.parentNode.querySelectorAll('tr.more[hidden]');for(var i=0;i<5&&i<r.length;i++)r[i].hidden=false;if(r.length<=5)this.remove()\">{L.T("Afficher plus", "Show more", "Mostrar más", "Mostrar mais")}</button>");
-        }
+        sb.Append($"<button type=\"button\" class=\"moresq\"{(rows.Count > 5 ? "" : " hidden")}>{L.T("Afficher plus", "Show more", "Mostrar más", "Mostrar mais")}</button>");
+        var medals = System.Text.Json.JsonSerializer.Serialize(new[] { Icons.Medal(1), Icons.Medal(2), Icons.Medal(3) });
+        sb.Append("<script>(function(){var s=document.getElementById('squad'),medals=" + medals + ",shown=5,key='avg',more=s.querySelector('.moresq');"
+            + "function all(){return [].slice.call(s.querySelectorAll('tr[data-m]'))}"
+            + "function draw(){var rows=all();rows.sort(function(a,b){return (+b.dataset[key]-+a.dataset[key])||(+b.dataset.m-+a.dataset.m)||(+b.dataset.c-+a.dataset.c)});"
+            + "var top=Math.max(1e-9,+rows[0].dataset[key]),max=Math.min(15,rows.length);"
+            + "rows.forEach(function(r,i){r.parentNode.appendChild(r);r.hidden=i>=Math.min(shown,max);var k=r.cells[0].firstChild;k.className='rank'+(i<3?' r'+(i+1):'');k.innerHTML=i<3?medals[i]:(i+1).toLocaleString();"
+            + "r.querySelector('.meter i').style.width=Math.max(2,Math.round(100*+r.dataset[key]/top))+'%';"
+            + "[].forEach.call(r.querySelectorAll('td[data-col]'),function(c){var on=c.dataset.col==key;c.classList.toggle('big',on);c.classList.toggle('n',on);c.classList.toggle('sub',!on)})});"
+            + "[].forEach.call(s.querySelectorAll('.seg button'),function(b){b.classList.toggle('on',b.dataset.k==key)});"
+            + "more.hidden=shown>=max}"
+            + "[].forEach.call(s.querySelectorAll('.seg button'),function(b){b.onclick=function(){key=b.dataset.k;try{localStorage.setItem('cc-sqsort',key)}catch(e){}draw()}});"
+            + "more.onclick=function(){shown+=5;draw()};"
+            + "try{var k=localStorage.getItem('cc-sqsort');if(k&&s.querySelector('.seg button[data-k=\"'+k+'\"]'))key=k}catch(e){}draw()})()</script>");
         return sb.Append("</div></section>").ToString();
     }
 

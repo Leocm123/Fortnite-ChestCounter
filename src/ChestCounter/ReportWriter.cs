@@ -1228,7 +1228,7 @@ public static class ReportWriter
         return $"""<div class="profiles muted">{L.T("Autres profils sur ce PC : ", "Other profiles on this PC: ", "Otros perfiles en este PC: ", "Outros perfis neste PC: ")}{string.Join(", ", others)} · {L.T("« Changer de profil » dans le compteur", "\"Switch profile\" in the counter", "«Cambiar de perfil» en el contador", "\"Trocar perfil\" no contador")}</div>""";
     }
 
-    /// <summary>Style of the OBS page: the one chosen for the overlay ("hud", "icons", "clean" or "classic").</summary>
+    /// <summary>Style of the OBS page: the one chosen for the overlay ("hud", "icons", "clean", "stack" or "classic").</summary>
     public static volatile string OverlayStyle = "hud";
 
     /// <summary>What the overlay shows right now (also written by <see cref="WriteAll"/>, so that the OBS page never goes back).</summary>
@@ -1252,10 +1252,10 @@ public static class ReportWriter
         }
     }
 
-    public static string Overlay(OverlayView v) => OverlayStyle switch { "classic" => OverlayPanel(v), "icons" => OverlayHud(v, icons: true), "clean" => OverlayClean(v), _ => OverlayHud(v, icons: false) };
+    public static string Overlay(OverlayView v) => OverlayStyle switch { "classic" => OverlayPanel(v), "icons" => OverlayHud(v, icons: true), "clean" => OverlayClean(v, stacked: false), "stack" => OverlayClean(v, stacked: true), _ => OverlayHud(v, icons: false) };
 
-    /// <summary>The clean look as a web page, for OBS: one line of outlined figures, no goals, no background.</summary>
-    private static string OverlayClean(OverlayView v)
+    /// <summary>The clean look as a web page, for OBS: outlined figures, no goals, no background; on one line or stacked.</summary>
+    private static string OverlayClean(OverlayView v, bool stacked)
     {
         var accent = Hex(Themes.Current.Accent);
         var label = Hex(Themes.Current.Label);
@@ -1275,7 +1275,8 @@ public static class ReportWriter
             .dot{width:10px;height:10px;border-radius:50%;background:#ff3b30;box-shadow:0 0 0 2px #0b0f18;flex:none}
             .f{display:flex;gap:12px;font-size:20px;font-stretch:semi-condensed}
             .f i{font-style:inherit;color:{{label}}}.f .t{color:#d6beff}
-            </style></head><body>
+            body.stack{flex-direction:column;align-items:flex-end;gap:0}body.stack .f{flex-direction:column;align-items:flex-end;gap:0;line-height:1.2}
+            </style></head><body{{(stacked ? " class=\"stack\"" : "")}}>
             <div class="total{{(live ? " live" : "")}}">{{(v.CurrentLive ? "<i class=\"dot\"></i>" : "")}}{{string.Format(ChestSvg, accent, Hex(Themes.Current.AccentDeep))}}{{H(v.Total)}}</div>
             <div class="f">{{facts}}</div>
             </body></html>
